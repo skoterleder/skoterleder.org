@@ -32,10 +32,10 @@
 		<script src="plugins/markercluser/leaflet.markercluster.js"></script>
 		
 		<script src="plugins/L.Control.Locate.js"></script>
-		<link rel="stylesheet" href="css/L.Control.Locate.css" />
+		<link rel="stylesheet" href="plugins/L.Control.Locate.css" />
 		<!--[if lt IE 9]>
 			<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.ie.css" />
-			<link rel="stylesheet" href="css/L.Control.Locate.ie.css"/>
+			<link rel="stylesheet" href="plugins/L.Control.Locate.ie.css"/>
 		<![endif]-->
 		
 		</head>
@@ -121,8 +121,6 @@
 					<li>Vänta på att skoterleder.org uppdateras, kan ta någon dag innan din nyinritade skoterled syns. (Oftast uppdateras kartan varje natt).</li>
 				</ol>
 				<p>Det är steg 3 som kan vara lite lurigt! Och steg 4 glöms ofta bort av ivriga användare!</p>
-				<!-- <p>Här finns en liten youtube film om att: <a href="http://www.youtube.com/watch?v=5jIMKc-2JY0">
-					 Skapa skoterleder i OpenStreetMap med JOSM</a>.</p>-->
 				<a href="create.html" class="biglink">
 					Läs mer om hur du uppdaterar kartan</a>
 			</div>
@@ -144,7 +142,6 @@
 
 			<p>Följ oss gärna på Facebook för att få uppdateringar och nyheter!</p>
 			<div class="fb-like" data-href="http://www.facebook.com/skoterleder" data-send="false" data-width="265" data-show-faces="true" data-font="tahoma"></div>
-
 
 			<p>
 				<i style="font-size:0.8em;">
@@ -202,36 +199,26 @@
 				
 				<p>Ett aktiverings mail skickas till din mail adress där du måste aktivera markören innan den sysn på kartan.</p>
 				<p>Även länk för att ändra och tabort markören finns i mailet.</p>
-				
-
 			</form>
 			</p>
 		</div>
 
 		<div id="showMarkerBox"></div>
 		<div id="listBox"></div>
-		
+
 		<div id="beta">
 			<p class="closebeta">x</p>
 			<div class="large">Beta test!</div>
 			<p>All markörer kommer att raderas när betatiden är slut!</p>
 			<p>Prova så mycket ni vill nu!</p>
 		</div>
-		<!--
-		<div id="navwrappr">
-			<div id="navigation" class="">
-				<div class="showInfo navigationItem leaflet-bar">Mer <div class="firstLetter">I</div>nformation</div><div class="addMarker navigationItem leaflet-bar">Ny <div class="firstLetter">M</div>arkör</div>
-			</div>
-		</div>
-		-->
-		
+
 		<div id="alert"><p class="alertText"></p><p class="alertOk">OK</p></div>
-		<div id="grayout"> </div>
-		
+		<div id="grayout"></div>
+
 		<script src="js/variables.js"></script>
         <script src="js/skoterleder.js"></script>
         <script src="js/db-date.js"></script>
 		<script src="js/analytics.js"></script>
-      
     </body>
 </html>

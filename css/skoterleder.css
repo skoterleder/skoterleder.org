@@ -1,70 +1,61 @@
-
-			body {
-				padding: 0;
-				margin: 0;
-				font-family: Georgia, Times New Roman, times-roman, georgia, serif;
-			}
-			html, body, #map {
-				padding: 0;
-				margin: 0; 
-                height: 100%;
-                
-			}
-            #map {
-				padding: 0;
-				margin: 0; 
-            }
-            #map img {
-                margin:0;
-            }
-            #mapPage  {
-                height: 100%;
-            }
-			h1 {
-				font-family: Helvetica,Arial,sans-serif;
-				font-size: 1.4em;
-			}
-			h2 {
-				font-family: Helvetica,Arial,sans-serif;
-				font-size: 1.3em;
-			}
-			h3 {
-				font-family: Helvetica,Arial,sans-serif;
-				font-size: 1.1em;
-			}
-			h4 {
-				font-family: Helvetica,Arial,sans-serif;
-				margin-bottom: 5px;	
-			}
-			img {
-				margin: 5px;
-			}
-			
-			p {
-				font-size: 1em;
-				text-decoration: none;
-				text-shadow: none ;
-				font-weight: normal;
-				font-family: Georgia, Times New Roman, times-roman, georgia, serif;
-				margin: 6px 0;
-			}
-
-			h1,h2,h3,h4 {
-				color: #2f3e46;
-				margin: 6px 0;
-			}
-			td {
-				/* background-color: #f7f7f7; */
-			}
-
-			i {
-				font-size: 1.2em;
-			}
-			li {
-				margin-bottom: 0.3em;
-			}
-
-
+body {
+	padding: 0;
+	margin: 0;
+	font-family: Georgia, Times New Roman, times-roman, georgia, serif;
+}
+html, body, #map {
+	padding: 0;
+	margin: 0; 
+	height: 100%;
+	
+}
+#map {
+	padding: 0;
+	margin: 0; 
+}
+#map img {
+	margin:0;
+}
+#mapPage  {
+	height: 100%;
+}
+h1 {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 1.4em;
+}
+h2 {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 1.3em;
+}
+h3 {
+	font-family: Helvetica,Arial,sans-serif;
+	font-size: 1.1em;
+}
+h4 {
+	font-family: Helvetica,Arial,sans-serif;
+	margin-bottom: 5px;	
+}
+img {
+	margin: 5px;
+}
+p {
+	font-size: 1em;
+	text-decoration: none;
+	text-shadow: none ;
+	font-weight: normal;
+	font-family: Georgia, Times New Roman, times-roman, georgia, serif;
+	margin: 6px 0;
+}
+h1,h2,h3,h4 {
+	color: #2f3e46;
+	margin: 6px 0;
+}
+i {
+	font-size: 1.2em;
+}
+li {
+	margin-bottom: 0.3em;
+}
 
 .hidden {
 	display:none;
@@ -87,47 +78,6 @@
 	background:none !important;
 	
 	}
-#navigation {
-
-	display:inline-block;
-	height: 35px;
-	line-height: 35px;
-	z-index: 1001;
-	bborder: solid #D0D0EE 1px;
-	padding: 0;
-}
-
-
-.firstLetter {
-	font-family:Satisfy;
-	font-size: 1.5em;
-	display: inline;
-}
-.navigationItem{
-	font-family: Verdana;
-	background-color: rgba(255, 255, 255, 0.95);
-	border: 1px solid #ccc;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	display: inline;
-	padding: 5px 20px;
-	cursor: pointer;
-	pointer-events: auto;
-}
-.navigationItem:hover{
-	color: #194194;
-}
-.navigationItem:first-child{
-	border-right: none;
-	border-bottom-right-radius: 0;
-	border-top-right-radius: 0;
-}
-.navigationItem:last-child{
-	border-left: none;
-	border-bottom-left-radius: 0;
-	border-top-left-radius: 0;
-}
-
 
 #alert {
     display:none;
@@ -203,22 +153,22 @@ background: transparent;
 }
 
 .collapsible {
-padding:10px;
-margin:0;
-border-top: 1px solid #ccc;
-border-left: 1px solid #ccc;
-border-right: 1px solid #ccc;
-cursor: pointer;
-background: #eee;
-font-weight: bold;
-color: #222;
-text-shadow: 0 1px 0 #fff;
-background-image: -webkit-gradient(linear,left top,left bottom,from( #fff ),to( #E6E6E6 ));
-background-image: -webkit-linear-gradient( #fff,#E6E6E6 );
-background-image: -moz-linear-gradient( #fff,#E6E6E6 );
-background-image: -ms-linear-gradient( #fff,#E6E6E6 );
-background-image: -o-linear-gradient( #fff,#E6E6E6 );
-background-image: linear-gradient( #fff,#E6E6E6 );
+	padding:10px;
+	margin:0;
+	border-top: 1px solid #ccc;
+	border-left: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	cursor: pointer;
+	background: #eee;
+	font-weight: bold;
+	color: #222;
+	text-shadow: 0 1px 0 #fff;
+	background-image: -webkit-gradient(linear,left top,left bottom,from( #fff ),to( #E6E6E6 ));
+	background-image: -webkit-linear-gradient( #fff,#E6E6E6 );
+	background-image: -moz-linear-gradient( #fff,#E6E6E6 );
+	background-image: -ms-linear-gradient( #fff,#E6E6E6 );
+	background-image: -o-linear-gradient( #fff,#E6E6E6 );
+	background-image: linear-gradient( #fff,#E6E6E6 );
 }
 .collapsible:hover {
 	background: #eee;
@@ -259,7 +209,6 @@ background-image: linear-gradient( #fff,#E6E6E6 );
 label {
 	display: block;
 }
-
 
 #beta {
     position:absolute;
@@ -407,13 +356,12 @@ textarea#description  , textarea#cdescription, textarea#flagDesc   {
 	filter: alpha(opacity=30);
 	opacity: 0.3;
 }
-
 .line {
 	height: 1px;
 	background-color:#E0E0E0;
 	margin:10px;
-
 }
+
 .iconImg {
 	vertical-align: middle;
 	margin:0;
@@ -505,57 +453,21 @@ th:last-child {
     border-radius: 0 8px 8px 0;
 }
 
-/*
-.moreinfo  {
-    background: #bbb;
-    background: rgba(0, 0, 0, 0.25);
-	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-	border-radius: 4px;
-	
-    }
-.moreinfo a{
-     font-family: Arial, Helvetica, sans-serif;
-     font-size: 1.5em;
-     font-weight: bold;
-     border: 1px solid #ccc;
-    padding: 3px 10px;
-    color: #262626;
-    text-decoration: none;
-    background-color: #eee;
-    background-color: rgba(255, 255, 255, 0.8);
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
-}
-
-.leaflet-touch .moreinfo a{
-    font-size: 1.6em;
-}
-*/
-
 
 .leaflet-container {
-overflow: hidden!important;
+	overflow: hidden!important;
 }            
+.leaflet-popup-content p {
+	font-family: sans-serif;
+	margin: 4px 0px;
+}
+.leaflet-popup-content h2 {
+	margin: 0 0 5px 0;
+}
+.leaflet-popup-content h3 {
+	margin: 0 0 5px 0;
+}           
 
-
-
-
-                        
-            .leaflet-popup-content p {
-                font-family: sans-serif;
-                margin: 4px 0px;
-            }
-            .leaflet-popup-content h2 {
-                margin: 0 0 5px 0;
-            }
-             .leaflet-popup-content h3 {
-                margin: 0 0 5px 0;
-            }           
-
-
-
-/* ok nedåt */
 .leaflet-bar a {
 	width: 40px;
 	height: 40px;
@@ -610,25 +522,10 @@ overflow: hidden!important;
 .leaflet-control-links {
 	font-size: 1.1em!important;
 } 
-
- 
  
 .fb-like {
     margin-left:10px;
 }
-
-/* Bort ?*/
-.shadow {
-	background-color: #f32;
-	-moz-box-shadow: 4px 4px 5px #000;
-	-webkit-box-shadow: 4px 4px 5px #000;
-	box-shadow: 4px 4px 5px #000;
-	/* For IE 8 */
-	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#000000')";
-	/* For IE 5.5 - 7 */
-	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=5, Direction=135, Color='#000000');
-}
-
 
 #grayout {
     position: fixed;
