@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="se">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+        <title>Skoterleder.org - Snöskoterkarta!</title>
+        <meta property="og:title" content="Skoterleder.org - Snöskoterkarta!" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="http://skoterleder.org" />
+        <meta property="og:image" content="http://skoterleder.org/images/skoterleder.png" />
+        <meta property="og:site_name" content="Skoterleder.org" />
+        <meta property="fb:app_id" content="251469678234528" />
+
+        <meta property="og:description" content="En öppen och fri karta där alla kan bidra med skoterleder.
+                                                 En karta som förts och främst är till för de som åker skoter!
+                                                 Finns inte lederna med där du kör?
+                                                 Hjälp då till så kommer snart alla leder in på kartan!"/>
+        <meta name="Description" content="Skoterkarta för skoteråkare av skoteråkare!
+            Skoterleder.org är en öppen och fri karta där alla kan bidra med skoterleder. 
+            Perfekt vid planering inför skoterresan eller ute på leden med kartan i mobilen. 
+            Sedan fungerar bra på mobila enheter!" />
+		
+		<link rel="stylesheet" href="plugins/leaflet.0.7.2/leaflet.css" />
+        <link rel="stylesheet" href="css/skoterleder.css" />
+        <script src="plugins/leaflet.0.7.2/leaflet.js"></script> 
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
+        <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+        <script src="plugins/google.js"></script>
+
+		<link rel="stylesheet" href="plugins/markercluser/MarkerCluster.css" />
+		<link rel="stylesheet" href="plugins/markercluser/MarkerCluster.Default.css" />
+		<script src="plugins/markercluser/leaflet.markercluster.js"></script>
+		
+		<script src="plugins/L.Control.Locate.js"></script>
+		<link rel="stylesheet" href="css/L.Control.Locate.css" />
+		<!--[if lt IE 9]>
+			<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.ie.css" />
+			<link rel="stylesheet" href="css/L.Control.Locate.ie.css"/>
+		<![endif]-->
+		
+		</head>
+    <body>
+
+        <div id="fb-root"></div>
+        <script>
+            // To get old permalinks to work
+            if (window.location.search.substr(0,5) == "?zoom" ) {
+                window.location = 'http://skoterleder.org/' + window.location.search.replace('?zoom', '#zoom');
+            }
+        </script>
+
+		
+        <div data-role="page" id="mapPage">
+            <div data-role="content" id="map"></div>
+        </div>
+        <div id="main-info" class="info scrollbox">
+			<div class="header">
+				<p class="infoClose infoCloseRight">X</p>
+				<h1>Skoterleder.org</h1>
+				<p>Kartan för skoteråkare, av skoteråkare!</p>
+			</div>
+
+			<h2 class="collapsible" collaps="omskoterleder">Om skoterleder.org</h2>
+			<div class="hidden collapsdata omskoterleder">
+				<p>Skoterleder.org är en öppen och fri karta där alla kan bidra med skoterleder.</p>
+				<p>En karta som förts och främst är till för de som åker skoter!  Kartan kan även användas på bl.a. Skoterklubbens, Kommunens eller varför inte Din hemsida för att visa skoterleder i ditt område.</p>
+				<p>Kartan hämtar  data ifrån <a href="http://www.openstreetmap.org/">OpenStreetMap</a> och vi behöver din hjälp med att göra den komplett!</p>
+			</div>
+			<h2 class="collapsible" collaps="ommarkorer">Om Markörer</h2>
+			<div class="hidden collapsdata ommarkorer">
+				<p>På kartan kan alla placera ut markörer. Använd ”Ny Markör” knappen och följ instruktionerna. </p>
+				<p>Det är viktigt att rätt e-postadress används så att du kan aktivera och t.ex. ändra på din markör.
+				Din e-postadress kommer inte att visas på sidan.</p>
+				<p>Du kommer också få e-post när någon kommenterar din markör. </p>
+				<h2 class="header">Regler:</h2>
+				<p>Regel nr 1: Don't be evil.</p>
+				<p>Använd knappen ”rapportera” för att rapportera olämpligt innehåll. (Kommer)</p>
+				<p>Använd kommentars fältet för att uppmana markörskaparen om att ändra eller  ta bort markören vid t.ex. ändrade förutsättningar. </p>
+			</div>
+
+			<h2 class="collapsible" collaps="forbattra">Förbättra kartan</h2>
+			<div class="hidden collapsdata forbattra">
+				<p>Tycker du att kartan är tom i ditt område? Fördjupa dig lite i OSM och rita in sjöar via satelitbilder, GPX tracka skoterleder och vägar, ta dig ut i naturen!</p>
+				<p>Det enda man inte får göra är att rita av kopieringsskyddat material!</p>
+				<p>Hjälp till att tracka leder och skapa GPX spår som laddas in i <a href="http://www.openstreetmap.org/">OpenStreetMap</a> och mappas till leder.</p>
+				<p><i>Tillsammans kan vi göra en bra karta!</i></p>
+				<p>Använd t.ex. en smartphone med lämplig app för att göra GPX spår.</p>
+			</div>
+			<h2 class="collapsible" collaps="mobilapp">Mobilappar</h2>
+			<div class="hidden collapsdata mobilapp">
+				<p>
+					Med en kart-app så sparas (cachas) kartan automatiskt i telefonen så
+					att du kommer åt kartan även om du inte har tillgång till internet.
+					Det förutsätter dock att du kollat på kartan först med tillgång till internet,
+					kolla på de områden som du ska besöka i olika zoom lägen.
+				</p>
+				<p>
+					Tänk på att rensa den cachade kartan då och då så att nya kartbilder visas eftersom
+					kartan ständigt förbättras.
+				</p>
+
+				<h3>Läs mer här:</h3>
+				
+				<a href="android.html"  class="biglink">Android appar</a>
+				<a href="ios.html" class="biglink">iOS appar</a>
+
+				<p>I alla apparna är det lätt att göra GPX spår över hur du åkt.</p>
+				
+			</div>
+			<h2 class="collapsible" collaps="uppdatemap">Uppdatera kartan</h2>
+			<div class="hidden collapsdata uppdatemap">
+				<p>
+					Alla kan rita in leder på kartan. Det krävs lite
+					datorvana, men det är inte supersvårt. Här ska jag
+					beskriva arbetssättet!
+				</p>
+				<ol>
+					<li>Skapa GPX spår över skoterleden.</li>
+					<li>Ladda upp GPX spåret till <a href="http://openstreetmap.org">OpenStreetMap.org</a></li>
+					<li>Rita av GPX spåret i OpenStreetMap och tagga sträckan med information om skoterleden.</li>
+					<li>Vänta på att skoterleder.org uppdateras, kan ta någon dag innan din nyinritade skoterled syns. (Oftast uppdateras kartan varje natt).</li>
+				</ol>
+				<p>Det är steg 3 som kan vara lite lurigt! Och steg 4 glöms ofta bort av ivriga användare!</p>
+				<!-- <p>Här finns en liten youtube film om att: <a href="http://www.youtube.com/watch?v=5jIMKc-2JY0">
+					 Skapa skoterleder i OpenStreetMap med JOSM</a>.</p>-->
+				<a href="create.html" class="biglink">
+					Läs mer om hur du uppdaterar kartan</a>
+			</div>
+
+			<h2 class="collapsible" collaps="kontaktinfo">Kontaktinformation</h2>
+			<div class="hidden collapsdata kontaktinfo">
+				<img src="http://skoterleder.org/images/henrik.jpg" alt="Bild på Henrik" style="float:right;ppadding-right:20px;ppadding-bottom:20px;" />
+
+				<p>Jag heter Henrik Rosvall och är skapare av denna sida.</p>
+				<p>Ni når mig lättas på mail: <a href="mailto:henrik@skoterleder.org">henrik@skoterleder.org</a></p>
+				<p>Eller via telefon 076-8084274.</p>
+				<p>Skoterleder.org finns också <a href="http://www.facebook.com/skoterleder">Facebook</a></p>
+				<div style="clear:both;"></div>
+			</div>
+			<h2 class="collapsible" collaps="tecken">Teckenförklaring</h2>
+			<div class="hidden collapsdata tecken">
+				<img src="http://skoterleder.org/images/leder.png" alt="Teckenförklaring">
+			</div>
+
+			<p>Följ oss gärna på Facebook för att få uppdateringar och nyheter!</p>
+			<div class="fb-like" data-href="http://www.facebook.com/skoterleder" data-send="false" data-width="265" data-show-faces="true" data-font="tahoma"></div>
+
+
+			<p>
+				<i style="font-size:0.8em;">
+					Kartan uppdaterad med OSM data från: <span id="db-date">Datum</span>
+				</i>
+			</p>
+			<p>
+				<spam style="font-size:0.7em;">
+					Tiden är i
+					<a href="http://sv.wikipedia.org/wiki/Koordinerad_universell_tid">Zulu</a>,
+					eller UTC som det också kan kallas och ligger 1 timme 
+					efter på vintern och 2 timmar efter svensk tid på sommaren.
+				</spam>
+			</p>
+		   
+			<p class="infoClose biglink">Åter till kartan</p>
+
+        </div>
+
+		<div id="newMarkerBox">
+			<h3>Skapa ny markör</h3>
+			<p>
+			<form action="#" id="addMarkerForm">
+				<label for="title">Rubrik</label>
+				<input id='title' type='text' name='title' value=''>
+				<label for="description">Beskrivning</label>
+				<textarea id='description' name="description" cols="30" rows="6"></textarea>
+
+				<label for="icon">Typ av markör</label>
+				<img src="images/icons/snowmobile-green.png" class="selectIconType iconSelected" type="1" title="Information om skoterled">
+				<img src="images/icons/information.png" class="selectIconType" type="2" title="Allmän information">
+				<img src="images/icons/treedown.png" class="selectIconType" type="3" title="Blockerad skoterled">
+				<img src="images/icons/caution.png" class="selectIconType" type="4" title="Varning, fara!">
+				<img src="images/icons/fixmap.png" class="selectIconType" type="5" title="Rapportera kartfel">
+				
+				<div >Vald markör: <div class="iconText">Information om skoterled</div></div>
+				<input id='type' type='hidden' name='type' value='1'>
+				
+				<h3>Om dig</h3>
+				<label for="name">Ditt namn</label>
+				<input id='name' type='text' name='name' value=''>
+
+				<label for="email">Ditt e-post adress (visas ej)</label>
+				<input id='email' type='text' name='email' value=''>
+
+				<input id='lat' type='hidden' name='lat' value=''>
+				<input id='lng' type='hidden' name='lng' value=''>
+				
+				<div>
+					<input type='submit' value='Spara' class='inputbutton'>
+					<input type="button" value="Stäng" onclick=";" class="close inputbutton"/>
+				</div>
+				
+				<div class="error"></div>
+				
+				<p>Ett aktiverings mail skickas till din mail adress där du måste aktivera markören innan den sysn på kartan.</p>
+				<p>Även länk för att ändra och tabort markören finns i mailet.</p>
+				
+
+			</form>
+			</p>
+		</div>
+
+		<div id="showMarkerBox"></div>
+		<div id="listBox"></div>
+		
+		<div id="beta">
+			<p class="closebeta">x</p>
+			<div class="large">Beta test!</div>
+			<p>All markörer kommer att raderas när betatiden är slut!</p>
+			<p>Prova så mycket ni vill nu!</p>
+		</div>
+		<!--
+		<div id="navwrappr">
+			<div id="navigation" class="">
+				<div class="showInfo navigationItem leaflet-bar">Mer <div class="firstLetter">I</div>nformation</div><div class="addMarker navigationItem leaflet-bar">Ny <div class="firstLetter">M</div>arkör</div>
+			</div>
+		</div>
+		-->
+		
+		<div id="alert"><p class="alertText"></p><p class="alertOk">OK</p></div>
+		<div id="grayout"> </div>
+		
+		<script src="js/variables.js"></script>
+        <script src="js/skoterleder.js"></script>
+        <script src="js/db-date.js"></script>
+		<script src="js/analytics.js"></script>
+      
+    </body>
+</html>

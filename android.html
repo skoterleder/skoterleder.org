@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+        <title>Android appar till skoterleder.org kartan</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+        <link rel="stylesheet" href="css/skoterleder.css" />
+    </head>
+    <body>
+        <div data-role="page" id="android" data-theme="a" style="max-width: 635px; margin:auto; position: relative;" class="ui-corner-all">
+            <div data-role="content" data-theme="c" class="ui-corner-all">
+                <div data-theme="b" data-role="header" class="ui-corner-all">
+                    <h1>Skoterleder.org</h1>
+                    <p style="text-align: center;">Kartan för skoteråkare, av skoteråkare!</p>
+                </div>
+
+                <h2 data-theme="a" data-role="header" class="ui-corner-all" style="text-align: center;" >
+                    Android appar för att visa skoterleder.org kartan!
+                </h2>
+                <p>
+                  Till Android rekomenderar jag <a href="https://play.google.com/store/apps/details?id=menion.android.locus&hl=sv">
+                  Locus</a> eller <a href="https://play.google.com/store/apps/details?id=com.orux.oruxmaps&hl=sv">
+                  OruxMaps</a>
+                </p>
+                <p>
+                  Med båda dessa appar är det lätt att göra gpx spår över leder.
+                  Locus är lite större och kanske lite mer komplicerad att jobba med.
+                </p>
+                <h4>Läs mer om apparna här:</h4>
+                <div data-role="collapsible-set">
+                <div data-role="collapsible" data-collapsed="true" >
+                    <h3>
+                        Locus
+                    </h3>
+                    <img src="http://skoterleder.org/images/locus.jpg" class="shadow" style="float:right; max-width:33%;" >
+                    <p>I Locus finns redan skoterleder.org kartan med från början.</p>
+                    <p>Men för att få ut mer av din mobile upplevelse rekomenderar jag att du lägger in denna fil till Locus, då får du mer kartor.</p>
+                    <ol>
+                      <li>
+                        Installera <a href="https://market.android.com/search?q=locus&amp;c=apps">
+                        Locus</a> på din mobil (och du måste ha starta appen en gång).
+                      </li>
+                      <li>Ladda ner denna zip fil: (ny fil 11/11-12) <a href="media/locus.zip">locus.zip</a>
+                      <a href="media/locus.zip"><img src="http://skoterleder.org/images/folder_zip.png" alt="Zipfile" style="vertical-align:middle;" /></a></li>
+                      <li>Flytta dess innehåll till minneskortet på telefonen.</li>
+                    </ol>
+                    <p>
+                      Zip filen inehåller 4 filer, dessa ska in i biblioteket <i>sdcard/Locus/mpsOnline/custom/</i>
+                    </p>
+                    <p>
+                      Det är viktigt att de hamnar i <i>"custom"</i> biblioteket.
+                    </p>
+                    <h4>Så här ska det se ut:</h4>
+                    <p><img src="http://skoterleder.org/images/locus-path.png" alt="Filer" style="max-width:98%;"></p>
+                    <p>Klart. Resultat:</p>
+                    <p>
+                    <object type="application/x-shockwave-flash" style="width:560px; height:315px;" data="http://www.youtube.com/v/S_3VqAsoJW4?version=3">
+                        <param name="movie" value="http://www.youtube.com/v/S_3VqAsoJW4?version=3" />
+                        <param name="allowFullScreen" value="true" />
+                        <param name="allowscriptaccess" value="always" />
+                    </object>
+                    </p>
+                </div>
+                <div data-role="collapsible" data-collapsed="true">
+                    <h3>
+                        OruxMaps
+                    </h3>
+                    <img src="http://skoterleder.org/images/oruxmaps.jpg" class="shadow" style="float:right; max-width:33%;" >
+                    <p>För att visa skoterleder.org kartan i OruxMaps måste du lägga in en fil på minneskortet på telefonen.</p>
+                    <ol>
+                      <li>
+                        Installera <a href="https://play.google.com/store/apps/details?id=com.orux.oruxmaps">OruxMaps</a>
+                        på din mobil (och du måste ha starta appen en gång).
+                      </li>
+                      <li>Ladda ner denna fil: <a href="http://skoterleder.org/media/onlinemapsources.xml">onlinemapsources.xml</a>
+                      <li>Flytta filen till telfonens minneskort under mappen <i>/sdcard/oruxmaps/mapfiles/</i></li>
+                    </ol>
+                    <p>Klart, nu ska skoterleder.org kartan finns med i OruxMaps.</p>
+                </div>
+                </div>
+
+
+
+                <a data-role="button" href="#" data-icon="arrow-l" data-iconpos="left"
+                    id="return_click" data-rel="back">
+                        Åter till kartan
+                </a>
+            </div>
+        </div>
+    </body>
+</html>

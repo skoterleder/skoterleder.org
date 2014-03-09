@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+        <title>Skapa skoterleder i OSM</title>
+
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+        <!--[if lte IE 8]>
+            <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+        <![endif]-->
+		<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/jquery.mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+        <link rel="stylesheet" href="css/skoterleder.css" />
+        <script src="http://maps.google.com/maps/api/js?v=3.2&sensor=false"></script>
+        <script src="plugins/google.js"></script>
+    </head>
+    <body>
+        <div data-role="page" id="create" data-theme="a" style="max-width: 635px; margin:auto; position: relative;" class="ui-corner-all">
+        <div data-role="content" data-theme="c" class="ui-corner-all">
+            <div data-theme="b" data-role="header" class="ui-corner-all">
+                <h1>Skoterleder.org</h1>
+                <p style="text-align: center;">Kartan för skoteråkare, av skoteråkare!</p>
+            </div>
+
+            <h2 data-theme="a" data-role="header" class="ui-corner-all" style="text-align: center;" >
+                Att skapa skoterleder!
+            </h2>
+            <p>
+            Tanken är att alla ska kunna rita in leder på kartan.
+            Det krävs lite datorvana, men det är inte supersvårt.
+            Här ska jag beskriva arbetssättet!
+            </p>
+            <h2>Översikt över arbetssättet:</h2>
+            <ol>
+                <li>Skapa GPX spår över skoterleden.</li>
+                <li>Ladda upp GPX spåret till <a href="http://openstreetmap.org">OpenStreetMap.org</a></li>
+                <li>Rita av GPX spåret i OpenStreetMap och tagga sträckan med information om skoterleden.</li>
+                <li>Vänta på att skoterleder.org uppdateras, kan ta någon dag innan din nyinritade skoterled syns. (Oftast snabbare).</li>
+            </ol>
+
+            <h2>Steg 1:</h2>
+            <img src="images/locus-x8.jpg" alt="Mobiltelefon med Locus" style="float:right; max-width:33%;" />
+            <p>För att rita in skoterleder på skoterlerder.org karan behöver du först och
+            främst ett GPX spår över leden. GPX spåret eller helst spåren (ju fler ju bättre),
+            gör man enkelt med t.ex. en Smartphone. En enkel android telefon har oftast
+            förvånansvärd bra GPS i sig.</p>
+            <p>Det finns flera appar till Android telefoner, här beskriver jag hur Locus fungera.</p>
+            <h3>Android appen Locus:</h3>
+            <a href="https://market.android.com/search?q=locus&amp;c=apps"><img src="images/locus_icon.png" alt="Locus icon" style="float:left" /></a>
+            <p>Locus är en lite mer avancerad app med möjlighet att visa olika kartor.
+            I denna app kan du också skapa GPX spår. GPX spåren, filerna måste sedan
+            laddas över till dator manuellt.</p>
+            <p>I Locus cachas kartan automatiskt, vilket är bra om du inte har tillgång
+            till internet ute i skogen/fjället så kommer kartan i alla fall att visas.
+            Så det kan vara bra att zooma och panorera runt på kartan så att kartan lagras.
+            Dock känner inte Locus av uppdateringar av kartan så att det kan vara bra att
+            rensa karta-cachen då och då. </p>
+
+            <p>Andra appar är OruxMaps, Andnav osv. Prova vad ni tycker är bäst!</p>
+
+            <h2>Steg 2:</h2>
+            <p>Att ladda upp GPX spåren till openstreetmap.org är enkelt. Skapa ett konto på
+            <a href="http://openstreetmap.org">OpenStreetMap</a>. Upptill på sidan finns den
+            en flik som heter GPS-spår, gå in där och välj sedan ”Ladda upp GPS-spår”.
+            I formuläret som kommer fram väljer du din GPX fil och skriver in en beskrivning,
+            t.ex. ”Skoter led till Storuvan”, eller vad det nu är. I taggar kan du t.ex.
+            skriva in ”snowmobile”. Under synlighet är det trevligt om ”Identifierbar” välj,
+            men det är upp till dig.</p>
+            <img src="images/osm-uppload.png" alt="OpenStreetMap" width="640" hight="258" style="max-width:100%;">
+            <p>
+            Då finns spåret på <a href="http://openstreetmap.org">OpenStreetMap</a>
+            då återstår bara att rita in leden/vägen/stigen i OpenStreetMap,
+             för GPX spåren syns inte automatiskt som leder osv.
+             </p>
+            <h2>Steg 3:</h2>
+            <p>Rita in skoterleden på OpenStreetMap karta.</p>
+            <p>
+            <a href="http://openstreetmap.org">OpenStreetMap</a> är alltså en öppen karta
+            där alla kan bidra med det han/hon tycker är intressant. Allt bygger på fritt material,
+            och inget kopieringsskyddat material får användas när kartan skapas.
+            Inte heller får kartor ritas av och t.ex. namn får inte heller läsas från annan karta.</p>
+            <p>
+            Men det är inget problem får oss eftersom vi använder oss av GPX filer som vi skapat själva!</p>
+
+            <p>
+            Det finns flera olika program att använda för att redigera kartan,
+            Potlatch 2 är inbyggt i OpenStreetMap och nås via redigera fliken.
+            Sedan finns det <a href="http://josm.openstreetmap.de/">JOSM</a>
+            som är ett externt program som klarar lite mer,
+            och framför allt är det bättre på att zooma flygfoton, bra när man
+            ska kartlägga sjöar m.m. </p>
+
+            <p>
+            Här kan du läs hur du ska tagga de olika lederna:
+            <a href="http://wiki.openstreetmap.org/wiki/Key:snowmobile">Key:snowmobile</a>
+            </p>
+            <h3>Liten film som visar hur du kan jobba med JOSM :</h3>
+            <p>
+                    <object type="application/x-shockwave-flash" style="width:560px; height:315px;" data="http://www.youtube.com/v/5jIMKc-2JY0?version=3">
+                        <param name="movie" value="http://www.youtube.com/v/5jIMKc-2JY0?version=3" />
+                        <param name="allowFullScreen" value="true" />
+                        <param name="allowscriptaccess" value="always" />
+                    </object>
+            </p>
+            <p>
+            Här finns hela klippet på youtube: <a href="http://www.youtube.com/watch?v=5jIMKc-2JY0">
+            Skapa skoterleder i OpenStreetMap med JOSM</a>.
+            </p>
+            <h3>Mer information om det kommer!</h3>
+            <span id=test></span>
+            <a data-role="button" href="index.html" data-icon="arrow-l" data-iconpos="left"
+                id="toMap" style="display:none" data-ajax="false" >
+                    Till kartan
+            </a>
+            <a data-role="button" href="#" data-icon="arrow-l" data-iconpos="left"
+                id="return_click" data-rel="back">
+                    Åter till kartan
+            </a>
+        </div>
+        </div>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $("#toMap").show();
+                $("#return_click").hide();
+            });
+        </script>
+    </body>
+</html>
