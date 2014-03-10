@@ -8,14 +8,14 @@ var timeout = new Date().getTime() + 1*60*1000; //add 1 minutes;
 $(document).ready(function() {
 	
 	$.ajaxSetup({ cache: false });
-    var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
+	var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
 	
-    var touchDev = false;
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
-        var touchDev = true;
-    }
+	var touchDev = false;
+	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+		var touchDev = true;
+	}
 
-    moveBetaInfobox();
+	moveBetaInfobox();
 	moveAlertbox();
 	
 	if (window.location.hash) {
@@ -35,25 +35,25 @@ $(document).ready(function() {
 		}
 	});
 
-    var addMarkerControllButton = L.Control.extend({
-        options: {
-                position: 'topright'
-        },
-        onAdd: function (map) {
-                // create the control container with a particular class name
-                var container = L.DomUtil.create('div', 'leaflet-bar');
+	var addMarkerControllButton = L.Control.extend({
+		options: {
+				position: 'topright'
+		},
+		onAdd: function (map) {
+				// create the control container with a particular class name
+				var container = L.DomUtil.create('div', 'leaflet-bar');
 				container.innerHTML += '<a href="#" class="addMarker text-bar-links">Ny Markör</a>';
-                
-                return container;
-        }
-    });
-    var addQueryButton = L.Control.extend({
-        options: {
-                position: 'topright'
-        },
-        onAdd: function (map) {
-                // create the control container with a particular class name
-                var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-layers markerQuery');
+				
+				return container;
+		}
+	});
+	var addQueryButton = L.Control.extend({
+		options: {
+				position: 'topright'
+		},
+		onAdd: function (map) {
+				// create the control container with a particular class name
+				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-layers markerQuery');
 				container.innerHTML += '<a href="#" class="text-bar-links queryLink">Urval</a> \
 					<div class="queryList"> \
 					<h2>Visa:</h2> \
@@ -74,104 +74,104 @@ $(document).ready(function() {
 					</div> \
 					</form> \
 				';
-                
-                return container;
-        }
-    });
+				
+				return container;
+		}
+	});
 
-    var openOsmLink = L.Control.extend({
-        options: {
-                position: 'bottomleft'
-        },
-        onAdd: function (map) {
-                // create the control container with a particular class name
-                var touch = "";
-                if (touchDev) var touch = "leaflet-touch ";
+	var openOsmLink = L.Control.extend({
+		options: {
+				position: 'bottomleft'
+		},
+		onAdd: function (map) {
+				// create the control container with a particular class name
+				var touch = "";
+				if (touchDev) var touch = "leaflet-touch ";
 
-                var container = L.DomUtil.create('a', touch +
-                    'leaflet-control-attribution leaflet-control-links');
-                container.href ='#';
-                container.innerHTML ='Öppna i OSM';
-                container.title = 'Öppna kartan i OpenStreetMap';
+				var container = L.DomUtil.create('a', touch +
+					'leaflet-control-attribution leaflet-control-links');
+				container.href ='#';
+				container.innerHTML ='Öppna i OSM';
+				container.title = 'Öppna kartan i OpenStreetMap';
 
-                container.onclick = function() {
-                    latlong = map.getCenter();
-                    zoom = map.getZoom();
-                    lat = latlong.lat;
-                    lng = latlong.lng;
-                    openLink = "http://www.openstreetmap.org/?lat=" 
-                        + lat+"&lon="+lng+"&zoom="+zoom;
-                    window.open(openLink,'_blank');
-                }
-                
-                return container;
-        }
-    });
-    var openOsmEditLink = L.Control.extend({
-        options: {
-                position: 'bottomleft'
-        },
-        onAdd: function (map) {
-                // create the control container with a particular class name
-                var touch = "";
-                if (touchDev) var touch = "leaflet-touch ";
-                
-                var container = L.DomUtil.create('a', touch +
-                    'leaflet-control-attribution leaflet-control-links');
-                container.href ='#';
-                container.innerHTML ='Editera i OSM';
-                container.title = 'Öppna kartan i OpenStreetMap Editor';
+				container.onclick = function() {
+					latlong = map.getCenter();
+					zoom = map.getZoom();
+					lat = latlong.lat;
+					lng = latlong.lng;
+					openLink = "http://www.openstreetmap.org/?lat=" 
+						+ lat+"&lon="+lng+"&zoom="+zoom;
+					window.open(openLink,'_blank');
+				}
+				
+				return container;
+		}
+	});
+	var openOsmEditLink = L.Control.extend({
+		options: {
+				position: 'bottomleft'
+		},
+		onAdd: function (map) {
+				// create the control container with a particular class name
+				var touch = "";
+				if (touchDev) var touch = "leaflet-touch ";
+				
+				var container = L.DomUtil.create('a', touch +
+					'leaflet-control-attribution leaflet-control-links');
+				container.href ='#';
+				container.innerHTML ='Editera i OSM';
+				container.title = 'Öppna kartan i OpenStreetMap Editor';
 
-                container.onclick = function() {
-                    latlong = map.getCenter();
-                    zoom = map.getZoom();
-                    if (zoom < 13) zoom=13; 
-                    lat = latlong.lat;
-                    lng = latlong.lng;
-                    openLink = "http://www.openstreetmap.org/edit?lat=" 
-                        + lat+"&lon="+lng+"&zoom="+zoom;
-                    window.open(openLink,'_blank');
-                }
-                
-                return container;
-        }
-    });
+				container.onclick = function() {
+					latlong = map.getCenter();
+					zoom = map.getZoom();
+					if (zoom < 13) zoom=13; 
+					lat = latlong.lat;
+					lng = latlong.lng;
+					openLink = "http://www.openstreetmap.org/edit?lat=" 
+						+ lat+"&lon="+lng+"&zoom="+zoom;
+					window.open(openLink,'_blank');
+				}
+				
+				return container;
+		}
+	});
 
-    var skoterleder = new L.tileLayer('http://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
-        maxZoom: 14,
-        attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-    });
-    var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-    });
-    var overl = new L.tileLayer('http://overl.skoterleder.org/tiles/{z}/{x}/{y}.png', {
-        maxZoom: 16,
-        attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-    });
-    var info = new L.tileLayer('http://overl.skoterleder.org/info/{z}/{x}/{y}.png', {
-        maxZoom: 16,
-        attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
-    });
+	var skoterleder = new L.tileLayer('http://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
+		maxZoom: 14,
+		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+	});
+	var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 18,
+		attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+	});
+	var overl = new L.tileLayer('http://overl.skoterleder.org/tiles/{z}/{x}/{y}.png', {
+		maxZoom: 16,
+		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+	});
+	var info = new L.tileLayer('http://overl.skoterleder.org/info/{z}/{x}/{y}.png', {
+		maxZoom: 16,
+		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+	});
 
-    var ggl = new L.Google("ROADMAP");
-    var ggh = new L.Google("HYBRID");
-    var ggt = new L.Google("TERRAIN");
+	var ggl = new L.Google("ROADMAP");
+	var ggh = new L.Google("HYBRID");
+	var ggt = new L.Google("TERRAIN");
 
-    map.addLayer(skoterleder);
-    var layersControl = new L.Control.Layers( {
+	map.addLayer(skoterleder);
+	var layersControl = new L.Control.Layers( {
 				'Skoterleder.org':skoterleder, 
-                'Open Street Map':osm, 
-                'Google Road':ggl, 'Google Satelit':ggh, 'Google Terräng':ggt},
-                {'Visa skoterleder':overl, 'Visa information':info }
+				'Open Street Map':osm, 
+				'Google Road':ggl, 'Google Satelit':ggh, 'Google Terräng':ggt},
+				{'Visa skoterleder':overl, 'Visa information':info }
 			);
 
 	map.addControl(new moreInfoButton()); 
 	map.addControl(new addMarkerControllButton()); 
 	map.addControl(new addQueryButton());
 	map.addControl(layersControl);
-    map.addControl(new openOsmLink()); 
-    map.addControl(new openOsmEditLink());
+	map.addControl(new openOsmLink()); 
+	map.addControl(new openOsmEditLink());
 
 
 	// Icons from http://mapicons.nicolasmollet.com/
@@ -184,37 +184,37 @@ $(document).ready(function() {
 	
 	iconType[0] = L.icon({
 		iconUrl: 'images/icons/question.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[1] = L.icon({
 		iconUrl: 'images/icons/snowmobile-green.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[2] = L.icon({
 		iconUrl: 'images/icons/information.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[3] = L.icon({
 		iconUrl: 'images/icons/treedown.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[4] = L.icon({
 		iconUrl: 'images/icons/caution.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[5] = L.icon({
 		iconUrl: 'images/icons/fixmap.png',
-		iconSize:     [32, 37], // size of the icon
+		iconSize:	 [32, 37], // size of the icon
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
@@ -225,10 +225,10 @@ $(document).ready(function() {
 		loadmarkers();
 	}, 1000);
 
-    // Fix map size after return to map page
-    $( document ).delegate("#mapPage", "pageshow", function() {
-        map.invalidateSize(false);
-    });
+	// Fix map size after return to map page
+	$( document ).delegate("#mapPage", "pageshow", function() {
+		map.invalidateSize(false);
+	});
 	
 	// add location control to global name space for testing only
 	// on a production site, omit the "lc = "!
@@ -1195,7 +1195,7 @@ function loadDisqus(identifier, title) {
 };
 
 function disqus_config() {
-    this.callbacks.onNewComment = [function(comment) {
+	this.callbacks.onNewComment = [function(comment) {
 		console.log(comment);
 		updateCommentsCount(comment.text.replace(/\n/g,"<br>") );
 	}];
@@ -1303,26 +1303,26 @@ function decodeEntities(input) {
 
 // from http://stackoverflow.com/a/1460174/1974332
 function createCookie(name, value, days) {
-    var expires;
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toGMTString();
-    } else {
-        expires = "";
-    }
-    document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
+	var expires;
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+		expires = "; expires=" + date.toGMTString();
+	} else {
+		expires = "";
+	}
+	document.cookie = escape(name) + "=" + escape(value) + expires + "; path=/";
 }
 function readCookie(name) {
-    var nameEQ = escape(name) + "=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
-    }
-    return null;
+	var nameEQ = escape(name) + "=";
+	var ca = document.cookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+		if (c.indexOf(nameEQ) === 0) return unescape(c.substring(nameEQ.length, c.length));
+	}
+	return null;
 }
 function eraseCookie(name) {
-    createCookie(name, "", -1);
+	createCookie(name, "", -1);
 }
