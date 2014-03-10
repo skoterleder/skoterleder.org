@@ -8,6 +8,7 @@ var timeout = new Date().getTime() + 1*60*1000; //add 1 minutes;
 $(document).ready(function() {
 	
 	$.ajaxSetup({ cache: false });
+	swedishTimeago();
 	var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
 	
 	var touchDev = false;
@@ -327,10 +328,19 @@ $(document).ready(function() {
 			var title = data.title;
 			var description = data.description;
 			var name = data.name;
-			var createtime = data.createtime;
+			var showtime = data.createtime;
+			var updatetime = data.updatetime;
 			var latlng = data.latlng;
 			var comments = data.comments;
-
+			var maxPopupWidth = 280;
+			if ($(window).width() < 480) maxPopupWidth = 200;
+			var hedline = "Skapad"
+			if (updatetime) {	// if marker is change
+				hedline = "Ändrad"
+				showtime = updatetime;
+			}
+			var created = jQuery.timeago(showtime);			
+			
 			var container = $('<div />');
 			
 			container.on('click', '.okLink', function() {
@@ -353,17 +363,19 @@ $(document).ready(function() {
 			});	
 
 			if (!linkin) map.removeLayer(popup); 	// Removing "laddar" popup
-			
+
 			var inactivText =""
 			if (data.status != "1") inactivText ="<p class='alerttext'>Denna markör är inte aktiv och syns inte på kartan</p>";
 			
 			container.html( inactivText + " \
 				<h2>"+title+"</h2><p>"+description.replace(/\r?\n/g, '<br>')+"</p> \
 				<div class='pupupdivider'></div> \
-				<p class='textlink'>Skapad av: "+name +" <br>\
-				<img src='images/icons/comment.png' title='Kommentarer' class='iconImg'> " + comments +" \
+				<p class='textlink'>" + hedline + " av: "+ name + " <br>\
+				" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
+				 title='Kommentarer' class='iconImg'> " + comments +" \
 				<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
 				<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
+				</p> \
 				<div class=''> \
 				<p id='popupLinks' class='floatRight'><a href='#' class='okLink linkButton'> \
 				Mer information</a> <a href='#' class='cancelLink linkButton'>Stäng</a></p> \
@@ -372,7 +384,7 @@ $(document).ready(function() {
 
 					//	<a href='#marker/"+id+"/change' rel='external'>Radera/Ändra</a>	</p>\
 
-			popup = L.popup( {offset: new L.Point(0, -27)})
+			popup = L.popup( {offset: new L.Point(0, -27),maxWidth: maxPopupWidth,})
 			.setLatLng(latlng)
 			.setContent(container[0])
 			.openOn(map);		
@@ -1299,6 +1311,26 @@ function decodeEntities(input) {
   var y = document.createElement('textarea');
   y.innerHTML = input;
   return y.value;
+}
+
+function swedishTimeago() {
+	jQuery.timeago.settings.strings = {
+	  prefixAgo: "för",
+	  prefixFromNow: "om",
+	  suffixAgo: "sedan",
+	  suffixFromNow: "",
+	  seconds: "mindre än en minut",
+	  minute: "ungefär en minut",
+	  minutes: "%d minuter",
+	  hour: "ungefär en timme",
+	  hours: "ungefär %d timmar",
+	  day: "en dag",
+	  days: "%d dagar",
+	  month: "ungefär en månad",
+	  months: "%d månader",
+	  year: "ungefär ett år",
+	  years: "%d år"
+	};
 }
 
 // from http://stackoverflow.com/a/1460174/1974332
