@@ -47,7 +47,7 @@ if (!$ehash) {
 }
 if ($ehash) {
 	/* Prepare statement */
-	$sql='SELECT id,title,hash,lat,lng,type,status,createtime,commenttime,updatetime,count,comments FROM marker WHERE  ehash=? ORDER BY id DESC';
+	$sql='SELECT id,title,hash,lat,lng,type,status,createtime,commenttime,updatetime,count,comments FROM marker WHERE status < 2 AND ehash=? ORDER BY id DESC';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
