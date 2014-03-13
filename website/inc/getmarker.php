@@ -5,7 +5,7 @@ include_once 'functions.php';
 $id = $_GET["id"];
 
 /* Prepare statement */
-$sql='SELECT status, title, description,name, createtime, commenttime, updatetime, email, lat, lng, comments, hash, type FROM marker WHERE id = ?';
+$sql='SELECT status, title, description,name, createtime, commenttime, updatetime, email, lat, lng, comments, hash, type, count FROM marker WHERE id = ?';
 $stmt = $db->prepare($sql);
 if($stmt === false) {
   trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -16,7 +16,7 @@ $stmt->bind_param('i',$id);
 
 $stmt->execute();
 
-$stmt->bind_result($status, $title, $description,$name,$createtime,$commenttime,$updatetime,$email,$lat,$lng,$comments, $hash, $type);
+$stmt->bind_result($status, $title, $description,$name,$createtime,$commenttime,$updatetime,$email,$lat,$lng,$comments, $hash, $type, $count);
 while ($stmt->fetch()) {
   // echo "title:$title Desc: $description <br>";
   	$jsonData = array(
@@ -34,6 +34,7 @@ while ($stmt->fetch()) {
 		'hash' => substr($hash,0,8),
 		'comments' => $comments,
 		'type' => $type,
+		'count' => $count,
 	);
 }
 $stmt->close();

@@ -397,6 +397,9 @@ $(document).ready(function() {
 			<p class='textlink'>" + hedline + " av: "+ name + " <br>\
 			" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
 			 title='Kommentarer' class='iconImg'> " + comments +" \
+			 &nbsp;&nbsp; \
+			 <img src='images/icons/open.png' title='Visad "+data.count+" ggr' class='iconImg'> \
+			" + data.count + " \
 			<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
 			<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
 			</p> \
