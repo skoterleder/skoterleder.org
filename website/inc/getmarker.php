@@ -36,8 +36,19 @@ while ($stmt->fetch()) {
 		'type' => $type,
 	);
 }
-
 $stmt->close();
+
+// update count of visited marker
+$sql='UPDATE marker SET count = count + 1 WHERE id=?';
+$stmt = $db->prepare($sql);
+if($stmt === false) {
+  echo "error";
+  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+}
+$stmt->bind_param('i',$id);
+$stmt->execute();
+$stmt->close();
+
 $db->close();
 
 $json = "";
@@ -50,5 +61,4 @@ if (!isset($jsonData)) {
 $json = json_encode($jsonData);
 
 print_r($json);
-
 ?>
