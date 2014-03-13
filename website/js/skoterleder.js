@@ -1,4 +1,5 @@
 var markers;
+var dataCache = [];
 var icon = [];
 var iconType = [];
 var baseLayer;
@@ -315,94 +316,109 @@ $(document).ready(function() {
 				.setLatLng(a.latlng)
 				.setContent("Laddar &nbsp;&nbsp;<img src='images/ajax-loader.gif'  width='16' height='16'>")
 				.openOn(map);	
-
 		}
+
 		location.replace("#marker/"+id); 
 
-		$.getJSON('inc/getmarker.php?id='+id, function(data) {
-
-			// console.log(data);
-			if (data.title === "error") {
-				return false
-			}
-			var title = data.title;
-			var description = data.description;
-			var name = data.name;
-			var showtime = data.createtime;
-			var updatetime = data.updatetime;
-			var latlng = data.latlng;
-			var comments = data.comments;
-			var maxPopupWidth = 280;
-			if ($(window).width() < 480) maxPopupWidth = 200;
-			var hedline = "Skapad"
-			if (updatetime) {	// if marker is change
-				hedline = "Ändrad"
-				showtime = updatetime;
-			}
-			var created = jQuery.timeago(showtime);			
-			
-			var container = $('<div />');
-			
-			container.on('click', '.okLink', function() {
-				loadMarkerPanel(id);
-				return false;
-				});
-			container.on('click', '.cancelLink', function() {
-				map.removeLayer(popup);
-				updateMapHash();
-				return false;
-			});
-			container.on('click', '.linkThis', function() {
-				location.replace("#marker/"+id); 
-				return false;
-			});		
-			container.on('click', '.linkZoom', function() {
-				map.setView(latlng,11)
-				location.replace("#marker/"+id); 
-				return false;
-			});	
-
-			if (!linkin) map.removeLayer(popup); 	// Removing "laddar" popup
-
-			var inactivText =""
-			if (data.status != "1") inactivText ="<p class='alerttext'>Denna markör är inte aktiv och syns inte på kartan</p>";
-			
-			container.html( inactivText + " \
-				<h2>"+title+"</h2><p>"+description.replace(/\r?\n/g, '<br>')+"</p> \
-				<div class='pupupdivider'></div> \
-				<p class='textlink'>" + hedline + " av: "+ name + " <br>\
-				" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
-				 title='Kommentarer' class='iconImg'> " + comments +" \
-				<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
-				<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
-				</p> \
-				<div class=''> \
-				<p id='popupLinks' class='floatRight'><a href='#' class='okLink linkButton'> \
-				Mer information</a> <a href='#' class='cancelLink linkButton'>Stäng</a></p> \
-				</div><div class='clearboth'></div> \
-				");
-
-					//	<a href='#marker/"+id+"/change' rel='external'>Radera/Ändra</a>	</p>\
-
-			popup = L.popup( {offset: new L.Point(0, -27),maxWidth: maxPopupWidth,})
-			.setLatLng(latlng)
-			.setContent(container[0])
-			.openOn(map);		
+		var loadtime = 0;
+		if (typeof dataCache[id] != 'undefined') loadtime = dataCache[id].loadtime;
 		
-			if (linkin) map.setView(latlng,11);
-			
+		if (loadtime > (new Date().getTime() - 60*1000)) {
+			// Using cached data for 1 minute.
+			dispalyMarker(id,dataCache[id],linkin,show);
+			console.log("Used Cased data");
+		} else {
+			$.getJSON('inc/getmarker.php?id='+id, function(data) {
+				data.loadtime = new Date().getTime(); 
+				dataCache[id] = data;
+
+				dispalyMarker(id,data,linkin,show);
+			})
+			.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
+					alert(jqXHR.responseText);
+					alert(textStatus);
+			});	
+		}
+	
+		ga('send', 'pageview',window.location.hash);
+	
+	}
+
+	function dispalyMarker(id,data,linkin,show) {
+		if (data.title === "error") {
+			return false
+		}
+
+		var title = data.title;
+		var description = data.description;
+		var name = data.name;
+		var showtime = data.createtime;
+		var updatetime = data.updatetime;
+		var latlng = data.latlng;
+		var comments = data.comments;
+		var maxPopupWidth = 280;
+		if ($(window).width() < 480) maxPopupWidth = 200;
+		var hedline = "Skapad"
+		if (updatetime) {	// if marker is change
+			hedline = "Ändrad"
+			showtime = updatetime;
+		}
+		var created = jQuery.timeago(showtime);			
+		
+		var container = $('<div />');
+		
+		container.on('click', '.okLink', function() {
+			loadMarkerPanel(id);
+			return false;
+			});
+		container.on('click', '.cancelLink', function() {
+			map.removeLayer(popup);
+			updateMapHash();
+			return false;
+		});
+		container.on('click', '.linkThis', function() {
 			location.replace("#marker/"+id); 
-			
-			if (show === "show") loadMarkerPanel(id);
-			
-		})
-		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
-				alert(jqXHR.responseText);
-				alert(textStatus);
+			return false;
+		});		
+		container.on('click', '.linkZoom', function() {
+			map.setView(latlng,11)
+			location.replace("#marker/"+id); 
+			return false;
 		});	
-	
-	ga('send', 'pageview',window.location.hash);
-	
+
+		if (!linkin) map.removeLayer(popup); 	// Removing "laddar" popup
+
+		var inactivText =""
+		if (data.status != "1") inactivText ="<p class='alerttext'>Denna markör är inte aktiv och syns inte på kartan</p>";
+		
+		container.html( inactivText + " \
+			<h2>"+title+"</h2><p>"+description.replace(/\r?\n/g, '<br>')+"</p> \
+			<div class='pupupdivider'></div> \
+			<p class='textlink'>" + hedline + " av: "+ name + " <br>\
+			" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
+			 title='Kommentarer' class='iconImg'> " + comments +" \
+			<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
+			<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
+			</p> \
+			<div class=''> \
+			<p id='popupLinks' class='floatRight'><a href='#' class='okLink linkButton'> \
+			Mer information</a> <a href='#' class='cancelLink linkButton'>Stäng</a></p> \
+			</div><div class='clearboth'></div> \
+			");
+
+				//	<a href='#marker/"+id+"/change' rel='external'>Radera/Ändra</a>	</p>\
+
+		popup = L.popup( {offset: new L.Point(0, -27),maxWidth: maxPopupWidth,})
+		.setLatLng(latlng)
+		.setContent(container[0])
+		.openOn(map);		
+
+		if (linkin) map.setView(latlng,11);
+		
+		location.replace("#marker/"+id); 
+		
+		if (show === "show") loadMarkerPanel(id);
+
 	}
 
 	function loadMarkerPanel(id){
@@ -412,172 +428,175 @@ $(document).ready(function() {
 		
 		$("<p>").text("Laddar...").appendTo("#showMarkerBox");
 		
-		$.getJSON('inc/getmarker.php?id='+id, function(data) {
-		
-			var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
-			var changeHTMLtext = "";
-			var commentsHTMLtext = "";
-			if (data.updatetime) changeHTMLtext = "<p class='narrow'>Ändrad: " + data.updatetime + "</p>";
-			if (data.commenttime) commentsHTMLtext = "<p class='narrow'>Senaste kommentar: " + data.commenttime + "</p>";  // Not in use!
-			
-			document.title = "Skoterleder.org - " + data.title;
-			
-			$("#showMarkerBox").empty();
-
-			var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
-			
-			div.on('click', '.closeMarkerBox', function() {
-				hidebox('#showMarkerBox');
-				updateMapHash();
-				return false;
-			});
-
-			div.on('click', '.adminMail', function() {
-				$("#displayInfo").empty();
-				$("#displayInfo").append(" \
-				<p>För att ändra denna markör krävs en ändra länk.</p> \
-				<p>Länken skickas bara till skaparen av markören, fylli din mailadress nedan.</p> \
-				<form action='#' id='adminMail'><input id='nemail' type='text' name='email' value='Din e-post adress'>\
-				<p><input type='submit' value='Skicka' class='inputbutton'> \
-				<input type='button' value='Avbryt' class='close inputbutton'></p>\
-				<input type='hidden' name='id' value='" + id + "'></form> \
-				<p>Som icke skapare av markören kan du föreslå ändringar via kommentars fältet.</p> \
-				");
-				
-				if (readCookie("email")) $("#nemail").val(readCookie("email"));
-				$("#displayInfo").slideDown();
-
-				$("#adminMail").submit(function(form) {
-					$("#displayInfo").append("<h4>Skickar...</h4>");
-					
-					$.ajax({
-						type: "GET",
-						url: "inc/markermail.php",
-						data: $("#adminMail").serialize(), // serializes the form's elements.
-						success: function(data)
-						{
-							$("#displayInfo").append("<h3>E-post skickat till dig</h3>");
-							
-							setTimeout(function() {	
-								$("#displayInfo").slideUp( "slow", function() {
-									$("#displayInfo").empty();
-								});
-							}, 1500);
-							return false;
-						},
-						error: function(data){
-							$("#displayInfo").append("<b>Kopplingsfel eller liknande, försök igen senare!</b>");
-							// $(".error").html("Kopplingsfel eller liknande, försök igen senare!");
-							return false;
-						}
-					});
-
-					return false; 
-				});
-
-				return false;
-			});
-			div.on('click', '.adminFlag', function() {
-				$("#displayInfo").empty();
-				$("#displayInfo").append(" \
-				<h3>Flagga denna markör som olämplig</h3> \
-				<p>Använd denna funktion bara när inehållet är kränkande eller på annat sätt olämpligt.</p> \
-				<form action='#' id='flagMarker'> \
-				<p><textarea id='flagDesc' name='description' rows='5'>Kort motivering</textarea></p> \
-				<p><input type='submit' value='Skicka' class='inputbutton'> \
-				<input type='button' value='Avbryt' class='close inputbutton'></p> \
-				<input type='hidden' name='hash' value='" + data.hash + "'> \
-				<input type='hidden' name='id' value='" + id + "'></form> \
-				");
-				
-				if (readCookie("email")) $("#nemail").val(readCookie("email"));
-				$("#displayInfo").slideDown();
-
-				$("#flagMarker").submit(function(form) {
-					$("#displayInfo").append("<h4>Skickar...</h4>");
-					
-					$.ajax({
-						type: "GET",
-						url: "inc/flag.php",
-						data: $("#flagMarker").serialize(), // serializes the form's elements.
-						success: function(data)
-						{
-							$("#displayInfo").append("<h3>Skaparen av markören och administratör meddelad</h3>");
-							
-							setTimeout(function() {	
-								$("#displayInfo").slideUp( "slow", function() {
-									$("#displayInfo").empty();
-								});
-							}, 2500);
-							return false;
-						},
-						error: function(data){
-							$("#displayInfo").append("<b>Kopplingsfel eller liknande, försök igen senare!</b>");
-							// $(".error").html("Kopplingsfel eller liknande, försök igen senare!");
-							return false;
-						}
-					});
-
-					return false; 
-				});
-
-				return false;
-			});
-
-
-			div.on('click', '.close', function() {
-				$("#displayInfo").slideUp( "slow", function() {
-					$("#displayInfo").empty();
-				});
-				return false;
-			});
-			div.on('click', '#nemail', function() {
-				if ($("#nemail").val() === "Din e-post adress") $("#nemail").val("");
-			});
-			div.on('click', '#flagDesc', function() {
-				if ($("#flagDesc").val() === "Kort motivering") $("#flagDesc").val("");
-			});
-			
-
-			
-			if (data.status != "1") {
-				$("<p>").addClass("alerttext").html("Denna markör är inte aktiv och syns inte på kartan").appendTo(div);
-			}
-			$("<h3>").html(data.title).appendTo(div);
-			$("<p>").html(data.description.replace(/\r?\n/g, '<br>')).appendTo(div);
-
-			$(div).append(" \
-			<table><tr><td>\
-			<div class='submitterAvatar'>" + avatarlink + " </div> \
-			</td><td class='textlink'>\
-			<p class='narrow'>Skapad av: " + data.name + " </p> \
-			<p class='narrow'>Skapad: " + data.createtime + " </p> " + changeHTMLtext + " \
-			</td></tr></table> \
-			<p class='narrow'><a href='#' class='adminMail textlink'>Ändra denna markör</a> \
-			<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
-			<div id='displayInfo'></div> \
-			<p class='narrow'><a href='#marker/"+id+"/show' class='textlink'>Länk hit</a></p>" 
-			); 
-
-			$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
-			$("<div>").attr("id","disqus_thread").appendTo(div);
-			$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
-			
-			$( "#showMarkerBox" ).data( "markerid", id);
-			$( "#showMarkerBox" ).data( "hash", data.hash);
-			
-			loadDisqus(id,data.title);
-		})
-		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
-				alert(jqXHR.responseText);
-				alert(textStatus);
-		});		
-		
+		if (dataCache[id].loadtime > (new Date().getTime() - 60*1000)) {
+			// Using cached data for 1 minute.
+			dispalyMarkerPanel(id,dataCache[id]);
+			console.log("Used Cased data");
+		} else {
+			$.getJSON('inc/getmarker.php?id='+id, function(data) {
+				data.loadtime = new Date().getTime();
+				dataCache[id] = data;
+				dispalyMarkerPanel(id,data);
+			})
+			.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
+					alert(jqXHR.responseText);
+					alert(textStatus);
+			});		
+		}
 		
 		showbox('#showMarkerBox');
 		
 	}
 
+	function dispalyMarkerPanel(id,data) {
+		var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
+		var changeHTMLtext = "";
+		var commentsHTMLtext = "";
+		if (data.updatetime) changeHTMLtext = "<p class='narrow'>Ändrad: " + data.updatetime + "</p>";
+		if (data.commenttime) commentsHTMLtext = "<p class='narrow'>Senaste kommentar: " + data.commenttime + "</p>";  // Not in use!
+		
+		document.title = "Skoterleder.org - " + data.title;
+		
+		$("#showMarkerBox").empty();
+
+		var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
+		
+		div.on('click', '.closeMarkerBox', function() {
+			hidebox('#showMarkerBox');
+			updateMapHash();
+			return false;
+		});
+
+		div.on('click', '.adminMail', function() {
+			$("#displayInfo").empty();
+			$("#displayInfo").append(" \
+			<p>För att ändra denna markör krävs en ändra länk.</p> \
+			<p>Länken skickas bara till skaparen av markören, fylli din mailadress nedan.</p> \
+			<form action='#' id='adminMail'><input id='nemail' type='text' name='email' value='Din e-post adress'>\
+			<p><input type='submit' value='Skicka' class='inputbutton'> \
+			<input type='button' value='Avbryt' class='close inputbutton'></p>\
+			<input type='hidden' name='id' value='" + id + "'></form> \
+			<p>Som icke skapare av markören kan du föreslå ändringar via kommentars fältet.</p> \
+			");
+
+			if (readCookie("email")) $("#nemail").val(readCookie("email"));
+			$("#displayInfo").slideDown();
+
+			$("#adminMail").submit(function(form) {
+				$("#displayInfo").append("<h4>Skickar...</h4>");
+
+				$.ajax({
+					type: "GET",
+					url: "inc/markermail.php",
+					data: $("#adminMail").serialize(), // serializes the form's elements.
+					success: function(data)
+					{
+						$("#displayInfo").append("<h3>E-post skickat till dig</h3>");
+						
+						setTimeout(function() {	
+							$("#displayInfo").slideUp( "slow", function() {
+								$("#displayInfo").empty();
+							});
+						}, 1500);
+						return false;
+					},
+					error: function(data){
+						$("#displayInfo").append("<b>Kopplingsfel eller liknande, försök igen senare!</b>");
+						// $(".error").html("Kopplingsfel eller liknande, försök igen senare!");
+						return false;
+					}
+				});
+				return false; 
+			});
+			return false;
+		});
+		div.on('click', '.adminFlag', function() {
+			$("#displayInfo").empty();
+			$("#displayInfo").append(" \
+			<h3>Flagga denna markör som olämplig</h3> \
+			<p>Använd denna funktion bara när inehållet är kränkande eller på annat sätt olämpligt.</p> \
+			<form action='#' id='flagMarker'> \
+			<p><textarea id='flagDesc' name='description' rows='5'>Kort motivering</textarea></p> \
+			<p><input type='submit' value='Skicka' class='inputbutton'> \
+			<input type='button' value='Avbryt' class='close inputbutton'></p> \
+			<input type='hidden' name='hash' value='" + data.hash + "'> \
+			<input type='hidden' name='id' value='" + id + "'></form> \
+			");
+			
+			if (readCookie("email")) $("#nemail").val(readCookie("email"));
+			$("#displayInfo").slideDown();
+
+			$("#flagMarker").submit(function(form) {
+				$("#displayInfo").append("<h4>Skickar...</h4>");
+
+				$.ajax({
+					type: "GET",
+					url: "inc/flag.php",
+					data: $("#flagMarker").serialize(), // serializes the form's elements.
+					success: function(data)
+					{
+						$("#displayInfo").append("<h3>Skaparen av markören och administratör meddelad</h3>");
+						setTimeout(function() {	
+							$("#displayInfo").slideUp( "slow", function() {
+								$("#displayInfo").empty();
+							});
+						}, 2500);
+						return false;
+					},
+					error: function(data){
+						$("#displayInfo").append("<b>Kopplingsfel eller liknande, försök igen senare!</b>");
+						// $(".error").html("Kopplingsfel eller liknande, försök igen senare!");
+						return false;
+					}
+				});
+				return false;
+			});
+			return false;
+		});
+
+		div.on('click', '.close', function() {
+			$("#displayInfo").slideUp( "slow", function() {
+				$("#displayInfo").empty();
+			});
+			return false;
+		});
+		div.on('click', '#nemail', function() {
+			if ($("#nemail").val() === "Din e-post adress") $("#nemail").val("");
+		});
+		div.on('click', '#flagDesc', function() {
+			if ($("#flagDesc").val() === "Kort motivering") $("#flagDesc").val("");
+		});
+		
+		
+		if (data.status != "1") {
+			$("<p>").addClass("alerttext").html("Denna markör är inte aktiv och syns inte på kartan").appendTo(div);
+		}
+		$("<h3>").html(data.title).appendTo(div);
+		$("<p>").html(data.description.replace(/\r?\n/g, '<br>')).appendTo(div);
+
+		$(div).append(" \
+		<table><tr><td>\
+		<div class='submitterAvatar'>" + avatarlink + " </div> \
+		</td><td class='textlink'>\
+		<p class='narrow'>Skapad av: " + data.name + " </p> \
+		<p class='narrow'>Skapad: " + data.createtime + " </p> " + changeHTMLtext + " \
+		</td></tr></table> \
+		<p class='narrow'><a href='#' class='adminMail textlink'>Ändra denna markör</a> \
+		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
+		<div id='displayInfo'></div> \
+		<p class='narrow'><a href='#marker/"+id+"/show' class='textlink'>Länk hit</a></p>" 
+		); 
+
+		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
+		$("<div>").attr("id","disqus_thread").appendTo(div);
+		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
+		
+		$( "#showMarkerBox" ).data( "markerid", id);
+		$( "#showMarkerBox" ).data( "hash", data.hash);
+		
+		loadDisqus(id,data.title);
+	}
+	
 	function changeMarker(id, hash) { 
 	
 		saveButtonText = "Spara";
@@ -1284,7 +1303,6 @@ function moveAlertbox () {
 		left: (($(window).width() - $('#alert').outerWidth()) /2 )
 	});
 }
-
 
 function convertOldHash(){
 	// #zoom=6&lat=60.91&lon=18.8&layer=Skoterleder.org  //Fix old permalinks 
