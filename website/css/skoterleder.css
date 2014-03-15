@@ -21,7 +21,7 @@ html, body, #map {
 }
 h1 {
 	font-family: Helvetica,Arial,sans-serif;
-	font-size: 1.4em;
+	font-size: 1.8em;
 }
 h2 {
 	font-family: Helvetica,Arial,sans-serif;
@@ -309,6 +309,13 @@ label {
 	text-decoration: none;
 	color: gray!important;
 }
+.gray  {
+	margin: -5px 0 2px 0px;
+	font-size: 0.85em;
+	font-family: arial;
+	color: gray;
+}
+
 a.textlink:hover {
 	color:black!important;
 }
