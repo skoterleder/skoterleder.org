@@ -17,7 +17,6 @@ $(document).ready(function() {
 		var touchDev = true;
 	}
 
-	moveBetaInfobox();
 	moveAlertbox();
 	
 	if (window.location.hash) {
@@ -1090,7 +1089,6 @@ $(document).ready(function() {
 	}
 	
 	$(window).resize(function(){
-		moveBetaInfobox();
 		moveInfo();
 		moveAlertbox();
 	});
@@ -1113,10 +1111,6 @@ $(document).ready(function() {
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
 	});	
-	
-	$("#beta").click(function() {
-		$('#beta').hide(500);
-	});		
 
 	$(".alertOk").click(function() {
 		$('#alert').hide(100);
@@ -1299,13 +1293,6 @@ function moveInfo() {
 		left: left,
 		width: divWidth,
 		height: divheight,
-	});
-}
-
-function moveBetaInfobox () {
-	$('#beta').css({
-		position:'absolute',
-		left: (($(window).width() - $('#beta').outerWidth()) /2 )
 	});
 }
 

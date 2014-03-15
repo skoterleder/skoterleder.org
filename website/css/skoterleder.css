@@ -210,35 +210,6 @@ label {
 	display: block;
 }
 
-#beta {
-	position:absolute;
-	top:100%;
-	width:210px;
-	margin:-150px 0 0 0;
-	z-index: 1000;
-	background-color: rgba(255, 252, 189, 0.82);
-	-moz-border-radius: 5px;
-	border-radius: 5px;
-	cursor: pointer;
-	padding: 0 11px;
-	font-size: 0.8em;
-}
-.large {
-	font-size: 1.7em;
-	text-align:center;
-	font-family: arial;
-	font-weight: bold;
-}
-.closebeta {
-	cursor: pointer;
-	float: right;
-	font: 23px/10px Tahoma, Verdana, sans-serif;
-	color: #424242;
-	text-decoration: none;
-	font-weight: bold;
-	background: transparent;
-}
-
 #listBox {
 	width: 333px;
 	height: 100%;
