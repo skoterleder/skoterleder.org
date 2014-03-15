@@ -1,2 +1,2 @@
-var serverUrl = "http://beta.skoterleder.org/";
-var disqus_shortname = 'betaskoterleder';
+var serverUrl = "http://skoterleder.org/";
+var disqus_shortname = 'skoterleder';
