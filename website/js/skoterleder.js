@@ -293,9 +293,7 @@ $(document).ready(function() {
 		if (baseLayer) var layer = "/" + baseLayer
 		
 		location.replace("#map/" + zoom + "/" + lat + "/" + lng + layer); 
-		document.title = "Skoterleder.org - Snöskoterkarta!"
-		
-		//console.log(baseLayer);
+
 		if(new Date().getTime() > timeout) {
 			timeout = new Date().getTime() + 1*60*1000; //add 15 minutes;
 			console.log("New time");
@@ -339,9 +337,6 @@ $(document).ready(function() {
 					alert(textStatus);
 			});	
 		}
-	
-		ga('send', 'pageview',window.location.hash);
-	
 	}
 
 	function dispalyMarker(id,data,linkin,show) {
@@ -365,6 +360,9 @@ $(document).ready(function() {
 		}
 		var created = jQuery.timeago(showtime);			
 		
+		document.title = "Skoterleder.org - " + title;
+		ga('send', 'pageview',window.location.hash);
+		
 		var container = $('<div />');
 		
 		container.on('click', '.okLink', function() {
@@ -373,6 +371,7 @@ $(document).ready(function() {
 			});
 		container.on('click', '.cancelLink', function() {
 			map.removeLayer(popup);
+			document.title = "Skoterleder.org - Snöskoterkarta!"
 			updateMapHash();
 			return false;
 		});
@@ -459,13 +458,15 @@ $(document).ready(function() {
 		if (data.commenttime) commentsHTMLtext = "<p class='narrow'>Senaste kommentar: " + data.commenttime + "</p>";  // Not in use!
 		
 		document.title = "Skoterleder.org - " + data.title;
-		
+		ga('send', 'pageview',window.location.hash);
+
 		$("#showMarkerBox").empty();
 
 		var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
 		
 		div.on('click', '.closeMarkerBox', function() {
 			hidebox('#showMarkerBox');
+			document.title = "Skoterleder.org - Snöskoterkarta!"
 			updateMapHash();
 			return false;
 		});
@@ -1109,6 +1110,7 @@ $(document).ready(function() {
 
 	$('.close').click(function() {
 		hidebox('#newMarkerBox');
+		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
 	});	
 	
@@ -1130,6 +1132,7 @@ $(document).ready(function() {
 		var toclose = $("#grayout").attr("close");
 		$('.'+toclose).hide();
 		$('#grayout').hide();
+		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
 	});	
 
@@ -1144,12 +1147,15 @@ $(document).ready(function() {
 
 	$('#showNewMarkes').click(function() {
 		loadmarkers("new");
+		ga('send', 'pageview','#New-markers');
 	});
 	$('#removeAllMarkers').click(function() {
 		map.removeLayer(markers);
+		ga('send', 'pageview','#Remove-markers');
 	});
 	$('#showAllMarkers').click(function() {
 		loadmarkers();
+		ga('send', 'pageview','#All-markers');
 	});
 	 
 	$(".queryLink").click( function() {
@@ -1254,6 +1260,8 @@ function showAlert(text) {
 }
 
 function showInfo() {
+
+	document.title = "Skoterleder.org - Mer Information"
 	ga('send', 'pageview', '#info');
 	
 	moveInfo();
@@ -1264,6 +1272,7 @@ function showInfo() {
 function hideInfo() {
 	$('.info').slideUp(400);
 	$('#grayout').hide(10);
+	document.title = "Skoterleder.org - Snöskoterkarta!"
 	updateMapHash();
 }
 function moveInfo() {
