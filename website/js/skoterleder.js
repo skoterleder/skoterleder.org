@@ -74,6 +74,7 @@ $(document).ready(function() {
 					</label> \
 					</div> \
 					</form> \
+					</div> \
 				';
 				
 				return container;
@@ -323,7 +324,7 @@ $(document).ready(function() {
 		if (loadtime > (new Date().getTime() - 60*1000)) {
 			// Using cached data for 1 minute.
 			dispalyMarker(id,dataCache[id],linkin,show);
-			console.log("Used Cased data");
+			console.log("Used cached data");
 		} else {
 			$.getJSON('inc/getmarker.php?id='+id, function(data) {
 				data.loadtime = new Date().getTime(); 
@@ -394,10 +395,12 @@ $(document).ready(function() {
 			<div class='pupupdivider'></div> \
 			<p class='textlink'>" + hedline + " av: "+ name + " <br>\
 			" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
-			 title='Kommentarer' class='iconImg'> " + comments +" \
+			 title='Kommentarer' class='iconImg' width='14' height='12'> " + comments + " \
 			 &nbsp;&nbsp; \
-			 <img src='images/icons/open.png' title='Visad "+data.count+" ggr' class='iconImg'> \
+			 <img src='images/icons/open.png' title='Visad " + data.count + " ggr' \
+			 width='16' height='12' class='iconImg'> \
 			" + data.count + " \
+			</p> \
 			<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
 			<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
 			</p> \
@@ -423,16 +426,17 @@ $(document).ready(function() {
 	}
 
 	function loadMarkerPanel(id){
-		location.replace("#marker/"+ id + "/show"); 
-		
 		$("#showMarkerBox").empty();
 		
 		$("<p>").text("Laddar...").appendTo("#showMarkerBox");
 		
-		if (dataCache[id].loadtime > (new Date().getTime() - 60*1000)) {
+		var loadtime = 0;
+		if (typeof dataCache[id] != 'undefined') loadtime = dataCache[id].loadtime;
+		
+		if (loadtime > (new Date().getTime() - 60*1000)) {
 			// Using cached data for 1 minute.
 			dispalyMarkerPanel(id,dataCache[id]);
-			console.log("Used Cased data");
+			console.log("Used cached data");
 		} else {
 			$.getJSON('inc/getmarker.php?id='+id, function(data) {
 				data.loadtime = new Date().getTime();
@@ -453,9 +457,11 @@ $(document).ready(function() {
 		var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
 		var changeHTMLtext = "";
 		var commentsHTMLtext = "";
+		var shareUrl = serverUrl + "marker/?id=" + id;
 		if (data.updatetime) changeHTMLtext = "<p class='narrow'>Ändrad: " + data.updatetime + "</p>";
 		if (data.commenttime) commentsHTMLtext = "<p class='narrow'>Senaste kommentar: " + data.commenttime + "</p>";  // Not in use!
 		
+		location.replace("#marker/"+ id + "/show");
 		document.title = "Skoterleder.org - " + data.title;
 		ga('send', 'pageview',window.location.hash);
 
@@ -569,8 +575,15 @@ $(document).ready(function() {
 		div.on('click', '#flagDesc', function() {
 			if ($("#flagDesc").val() === "Kort motivering") $("#flagDesc").val("");
 		});
-		
-		
+		div.on('click', '.showShareLink', function() {
+			if (!$('.shareLinkText').length ) {
+				$( ".showShareLink" ).after( "<p><input type='text' value='" + shareUrl +
+					"' class='shareLinkText'></p>" );
+			}
+			location.replace("#marker/"+ id + "/show");
+			return false;
+		});		
+
 		if (data.status != "1") {
 			$("<p>").addClass("alerttext").html("Denna markör är inte aktiv och syns inte på kartan").appendTo(div);
 		}
@@ -587,7 +600,11 @@ $(document).ready(function() {
 		<p class='narrow'><a href='#' class='adminMail textlink'>Ändra denna markör</a> \
 		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
 		<div id='displayInfo'></div> \
-		<p class='narrow'><a href='#marker/"+id+"/show' class='textlink'>Länk hit</a></p>" 
+		<div id='fbshare'> \
+		<div class='fb-share-button' data-href='" + shareUrl + "' \
+		data-type='button_count'></div></div> \
+		<p class='narrow'><a href='#marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
+		"
 		); 
 
 		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
@@ -596,7 +613,10 @@ $(document).ready(function() {
 		
 		$( "#showMarkerBox" ).data( "markerid", id);
 		$( "#showMarkerBox" ).data( "hash", data.hash);
-		
+	
+		if(typeof FB == 'object') {  // Fix problem then lading marker page direct
+			FB.XFBML.parse(document.getElementById('fbshare'));
+		}
 		loadDisqus(id,data.title);
 	}
 	
@@ -1087,6 +1107,13 @@ $(document).ready(function() {
 			showInfo();
 		}
 	}
+
+	function hideInfo() {
+		$('.info').slideUp(400);
+		$('#grayout').hide(10);
+		document.title = "Skoterleder.org - Snöskoterkarta!"
+		updateMapHash();
+	}
 	
 	$(window).resize(function(){
 		moveInfo();
@@ -1159,6 +1186,20 @@ $(document).ready(function() {
 	
 	$(".markerQuery").mouseleave( function() {
 		$(".queryList").slideUp(100);
+	});
+
+	$(".printMap").click( function() {
+		var zoom = map.getZoom();
+		var latlng = map.getCenter();
+		var lat = latlng.lat.toFixed(2);
+		var lng = latlng.lng.toFixed(2);
+		var w= $(window).width();
+		var h= Math.floor(w / 1.45);  // 1.4142
+		
+		w=window.open(serverUrl + 'print/?zoom='+zoom+'&lat='+lat+'&lng='+lng+'&height='+h+'&width='+w);
+		// w.print();
+		// w.close();
+		return false;
 	});
 });
 
@@ -1262,12 +1303,6 @@ function showInfo() {
 	$('#grayout').show(10);
 	$('.info').slideDown(1000);
 	$("#grayout").attr("close","info");
-}
-function hideInfo() {
-	$('.info').slideUp(400);
-	$('#grayout').hide(10);
-	document.title = "Skoterleder.org - Snöskoterkarta!"
-	updateMapHash();
 }
 function moveInfo() {
 	var maxWidth = 570;
@@ -1375,10 +1410,11 @@ function readCookie(name) {
 function eraseCookie(name) {
 	createCookie(name, "", -1);
 }
+
 (function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/sv_SE/all.js#xfbml=1";
-    fjs.parentNode.insertBefore(js, fjs);
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/sv_SE/all.js#xfbml=1&appId="+facebook_appId;
+  fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));

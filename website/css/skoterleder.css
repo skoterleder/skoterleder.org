@@ -21,7 +21,7 @@ html, body, #map {
 }
 h1 {
 	font-family: Helvetica,Arial,sans-serif;
-	font-size: 1.8em;
+	font-size: 2.0em;
 }
 h2 {
 	font-family: Helvetica,Arial,sans-serif;
@@ -234,6 +234,10 @@ label {
 	z-index: 1005;
 	
 }
+#fbshare {
+	margin: 16px 0 12px 10px;
+}
+
 #displayInfo {
 	display: none;
 	margin: 5px;
