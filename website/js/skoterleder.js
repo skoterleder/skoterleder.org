@@ -466,6 +466,7 @@ $(document).ready(function() {
 		ga('send', 'pageview',window.location.hash);
 
 		$("#showMarkerBox").empty();
+		$('#showMarkerBox').css('overflow','auto');
 
 		var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
 		
@@ -473,6 +474,7 @@ $(document).ready(function() {
 			hidebox('#showMarkerBox');
 			document.title = "Skoterleder.org - Snöskoterkarta!"
 			updateMapHash();
+			setTimeout(function(){$("#showMarkerBox").empty()}, 700);
 			return false;
 		});
 
@@ -601,8 +603,9 @@ $(document).ready(function() {
 		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
 		<div id='displayInfo'></div> \
 		<div id='fbshare'> \
-		<div class='fb-share-button' data-href='" + shareUrl + "' \
-		data-type='button_count'></div></div> \
+		<div class='fb-like' data-href='" + shareUrl + "' \
+		data-width='280' data-layout='standard' data-action='like' \
+		data-show-faces='true' data-share='true'></div></div> \
 		<p class='narrow'><a href='#marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		"
 		); 
@@ -618,7 +621,18 @@ $(document).ready(function() {
 			FB.XFBML.parse(document.getElementById('fbshare'));
 		}
 		loadDisqus(id,data.title);
+		setTimeout(check_showMarkerBox_Width, 3000);
 	}
+
+	function check_showMarkerBox_Width() { // Then using facebook the overflow must be visible
+		var divWidth = $('#showMarkerBox')[0].scrollWidth;
+
+		if (divWidth > 400) {
+			$('#showMarkerBox').css('overflow','visible');
+		}
+
+		if ($('#showMarkerBox').css('margin-left') === '0px' ) setTimeout(check_showMarkerBox_Width, 1000);
+	}	
 	
 	function changeMarker(id, hash) { 
 	
