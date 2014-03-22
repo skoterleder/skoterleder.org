@@ -620,7 +620,7 @@ $(document).ready(function() {
 		if(typeof FB == 'object') {  // Fix problem then lading marker page direct
 			FB.XFBML.parse(document.getElementById('fbshare'));
 		}
-		loadDisqus(id,data.title);
+		loadDisqus(id,data.title,'marker');
 		setTimeout(check_showMarkerBox_Width, 3000);
 	}
 
@@ -763,7 +763,7 @@ $(document).ready(function() {
 				
 				});				
 			div.on('click', '.showCommentsButton', function() {
-				loadDisqus(id,data.title);
+				loadDisqus(id,data.title,'marker');
 				$('.showCommentsButton').hide();
 				$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
 				});	
@@ -1117,8 +1117,8 @@ $(document).ready(function() {
 			//	0	1 2		  3		  4
 			map.setView([hashValues[2],hashValues[3]],hashValues[1]); 
 		}
-		if (hashValues[0] === "info") {
-			showInfo();
+		if (hashValues[0] === "info" || hashValues[0] === "!info") {
+			showInfo(hashValues[1],hashValues[2]);
 		}
 	}
 
@@ -1127,6 +1127,7 @@ $(document).ready(function() {
 		$('#grayout').hide(10);
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
+		if ($('#disqus_thread').length) $('#disqus_thread').remove();
 	}
 	
 	$(window).resize(function(){
@@ -1159,7 +1160,6 @@ $(document).ready(function() {
 
 	$(".showInfo").click(function() {
 		showInfo();
-		location.replace("#info");
 		return false;
 	});	
 
@@ -1169,6 +1169,7 @@ $(document).ready(function() {
 		$('#grayout').hide();
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
+		if ($('#disqus_thread').length) $('#disqus_thread').remove();
 	});	
 
 	$(".infoClose").click(function() {
@@ -1176,10 +1177,31 @@ $(document).ready(function() {
 	});	
 
 	$('.collapsible').click(function() {
-		// $(".hidden").hide();// Not working
-		$("."+$(this).attr("collaps")).toggle();
+		var div = $(this).data("collaps");
+		var title = $(this).text();
+		
+		if ($("." + div).css("display") === "none") {
+			$(".hidden").slideUp(200);
+			$("." + div).slideDown();
+			location.replace("#info/" + div);
+			document.title = "Skoterleder.org - " + title;
+			ga('send', 'pageview', '#info/' + div);
+		} else {
+			$("." + div).slideUp(200);
+			location.replace("#info");
+		}
 	});	
 
+	$('.showComments').click(function() {
+		var id = $(this).data( "id");
+		var title = $(this).data( "title");
+		if ($('#disqus_thread').length) $('#disqus_thread').remove();  // Remove old div
+		
+		$("<div id='disqus_thread'>").insertAfter(this);
+		loadDisqus(id,title,'info');
+		return false;
+	});	
+	
 	$('#showNewMarkes').click(function() {
 		loadmarkers("new");
 		ga('send', 'pageview','#New-markers');
@@ -1252,12 +1274,13 @@ function hidebox(div) {
 	}
 }
 
-function loadDisqus(identifier, title) {
+function loadDisqus(identifier, title, type) {
 	title = "Skoterleder.org - " + title;
-	url = serverUrl + "#!marker/" + identifier + "/";
+	if (type === "marker") url = serverUrl + "#!marker/" + identifier + "/";
+	if (type === "info") url = serverUrl + "#!info/" + identifier;
+	console.log("id: "+identifier+" title: "+title+" url"+url);
 	
 	if (window.DISQUS) {
-
 		//if Disqus exists, call it's reset method with new parameters
 		DISQUS.reset({
 			reload: true,
@@ -1265,12 +1288,9 @@ function loadDisqus(identifier, title) {
 				this.page.identifier = identifier;
 				this.page.url = url;
 				this.page.title = title;
-
 			}
 		});
-
 	} else {
-
 		disqus_identifier = identifier; 	//set the identifier argument
 		disqus_url = url; 					//set the permalink argument
 		disqus_title = title;	   
@@ -1308,16 +1328,34 @@ function showAlert(text) {
 	$('#alert').show(1);
 }
 
-function showInfo() {
+function showInfo(div,extra) {
+	var hash = "#info";
+	var title = "Skoterleder.org - Mer Information"
+	var extrahash = "";
+	if (typeof div === 'undefined') {
+		location.replace(hash);
+	} else {
+		$("." + div).slideDown();
+		if (typeof extra != 'undefined') extrahash = '/' + extra;
+		location.replace("#info/" + div + extrahash);
+		// To do, update title!
+	}
 
-	document.title = "Skoterleder.org - Mer Information"
-	ga('send', 'pageview', '#info');
-	
+	document.title = title
+
 	moveInfo();
 	$('#grayout').show(10);
-	$('.info').slideDown(1000);
+	$('.info').slideDown(500);
 	$("#grayout").attr("close","info");
+
+	// Load all images
+	$('.replaceImage').each(function () {
+		$(this).attr('src',$(this).data('load'));
+	});
+
+	ga('send', 'pageview', window.location.hash);
 }
+
 function moveInfo() {
 	var maxWidth = 570;
 	var screenWidth = $(window).width();

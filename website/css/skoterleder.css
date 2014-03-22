@@ -189,7 +189,7 @@ background: transparent;
 	background-color: #FFF;
 }
 .biglink {
-	margin: 10px;
+	margin: 10px 0;
 	border-radius: 18px;
 	-moz-border-radius: 18px;
 	text-align: center;
@@ -203,7 +203,17 @@ background: transparent;
 	text-decoration: none;
 	cursor: pointer;
 }
-
+.showComments  {
+	border: 0px solid #A0A0A0;
+	background: #D8D8D8;
+	padding: 2px 50px;
+	color: black;
+	margin: 10px 0 0 0;
+	border-radius: 4px;
+	text-decoration: none;
+	font-family: arial;
+	line-height: 40px;
+}
 
 
 label {
