@@ -5,7 +5,16 @@ var iconType = [];
 var baseLayer;
 var popup;
 var timeout = new Date().getTime() + 1*60*1000; //add 1 minutes;
-
+var paperRatio = 1.45;
+var rectangle;
+var swHandel;
+var neHandel;
+var seHandel;
+var nwHandel;
+var centerHandel;
+var printIcon;
+var noIcon;
+		
 $(document).ready(function() {
 	
 	$.ajaxSetup({ cache: false });
@@ -55,7 +64,7 @@ $(document).ready(function() {
 		onAdd: function (map) {
 				// create the control container with a particular class name
 				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-layers markerQuery');
-				container.innerHTML += '<a href="#" class="text-bar-links queryLink">Urval</a> \
+				container.innerHTML += '<a href="#" class="text-bar-links queryLink">Mer!</a> \
 					<div class="queryList"> \
 					<h2>Visa:</h2> \
 					<form class=""> \
@@ -74,6 +83,7 @@ $(document).ready(function() {
 					</label> \
 					</div> \
 					</form> \
+					<p><a href="#" class="printMap text-bar-links">Skriv ut kartan</a><p> \
 					</div> \
 				';
 				
@@ -220,8 +230,19 @@ $(document).ready(function() {
 		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
+	iconType['move'] = L.icon({
+		iconUrl: 'images/icons/move.png',
+		iconSize:	 [35, 35], // size of the icon
+		iconAnchor:   [17, 17], // point of the icon which will correspond to marker's location
+		popupAnchor:  [17, 0] // point from which the popup should open relative to the iconAnchor
+	});
+	iconType['corner'] = L.icon({
+		iconUrl: 'images/icons/corner.png',
+		iconSize:	 [14, 14], // size of the icon
+		iconAnchor:   [7, 7], // point of the icon which will correspond to marker's location
+		popupAnchor:  [7, 0] // point from which the popup should open relative to the iconAnchor
+	});	
 
-	
 	// Laddar alla markörer med lite fördröjning.
 	setTimeout(function() {	
 		loadmarkers();
@@ -1081,6 +1102,215 @@ $(document).ready(function() {
 		return false;
 	});
 
+	function initprint(){
+		var div = $("<div>").addClass("").appendTo("#shareBox");
+		$(div).append(" \
+			<h2>Välja format:</h2> \
+			<label><input type='radio' name='ratio' class='changeRatio' value='landscape' checked> Liggande </label> \
+			<label><input type='radio' name='ratio' class='changeRatio' value='portrait'> Stående </label> \
+			<label><input type='radio' name='ratio' value='free'> Fritt </label> \
+			<p class='linkButtonLong preview'><a href='#' class='preview closeMarkerBox'>Förhandsgranska</a></p> \
+			<p class='linkButtonLong abort'><a href='#' class='abort closeMarkerBox'>Avbryt</a></p> \
+			"
+		); 
+		$("#shareBox").slideDown();
+		
+		div.on('click', '.preview', function() {
+			zoom = map.getZoom();
+			bounds = rectangle.getBounds()
+			center = L.latLngBounds(bounds).getCenter();
+			swPix = map.latLngToLayerPoint(L.latLngBounds(bounds).getSouthWest());
+			nePix = map.latLngToLayerPoint(L.latLngBounds(bounds).getNorthEast());	
+			width = nePix.x - swPix.x;
+			height = swPix.y - nePix.y;
+			
+			w=window.open(serverUrl + 'print/?zoom='+zoom+'&lat='+center.lat+'&lng='+center.lng+'&width='+width+'&height='+height);
+			return false;
+		});	
+		div.on('click', '.abort', function() {
+			$("#shareBox").empty();
+			$("#shareBox").hide();
+			map.removeLayer(rectangle);
+			map.removeLayer(swHandel);
+			map.removeLayer(neHandel);
+			map.removeLayer(seHandel);
+			map.removeLayer(nwHandel);
+			map.removeLayer(centerHandel);
+			return false;
+		});	
+		div.on('click', '.changeRatio', function() {
+			c = map.latLngToLayerPoint( centerHandel.getLatLng());
+			bounds = rectangle.getBounds();
+			ne = map.latLngToLayerPoint(L.latLngBounds(bounds).getNorthEast());
+			sw = map.latLngToLayerPoint(L.latLngBounds(bounds).getSouthWest());
+			x = ne.x - sw.x;
+			y = sw.y - ne.y;
+			
+			console.log("cpx:"+c.x+":"+c.y); 
+			var selectedFormat = $("input[type='radio'][name='ratio']:checked").val();
+			if (selectedFormat === "portrait") x = y / paperRatio;
+			if (selectedFormat === "landscape") x = y / (1/paperRatio);
+			console.log(selectedFormat);
+			
+			if (x/y > paperRatio) {
+				//y = screenSize.y -120;
+				//x = y * paperRatio;
+			} else {
+				//x = screenSize.x -150;
+			//	y = x / paperRatio;
+			}
+			newSw = map.layerPointToLatLng([c.x-(x/2) , c.y+(y/2)]);
+			newNe = map.layerPointToLatLng([c.x+(x/2) , c.y-(y/2)]);
+		
+			rectangle.setBounds([newSw,newNe]);
+			moveHandels();
+		});
+		
+		screenSize = map.getSize();
+		center = map.getCenter();
+
+		if (screenSize.x / screenSize.y > paperRatio) {
+			y = screenSize.y -120;
+			x = y * paperRatio;
+		} else {
+			x = screenSize.x -150;
+			y = x / paperRatio;
+		}
+		c = map.latLngToLayerPoint( center );
+		sw = map.layerPointToLatLng([c.x-(x/2) , c.y+(y/2)]);
+		ne = map.layerPointToLatLng([c.x+(x/2) , c.y-(y/2)]);
+	
+		rectangle = L.rectangle([sw,ne], {color: "#444444", weight: 3, fill:true, fillColor:"#D2D6C6",fillOpacity:0.4}).addTo(map);
+
+		swHandel = L.marker(center, 
+			{draggable:true,opacity: 1}).setIcon(iconType['corner']).addTo(map);
+		neHandel = L.marker(center, 
+			{draggable:true,opacity: 1}).setIcon(iconType['corner']).addTo(map);
+		seHandel = L.marker(center, 
+			{draggable:true,opacity: 1}).setIcon(iconType['corner']).addTo(map);
+		nwHandel = L.marker(center, 
+			{draggable:true,opacity: 1}).setIcon(iconType['corner']).addTo(map);
+			
+		centerHandel = L.marker(center, 
+			{draggable:true,opacity: 0.6,title: "Dra för att flytta området",}).setIcon(iconType['move']).addTo(map);
+
+		moveHandels();
+		
+		centerHandel.on('drag', function(e){
+			latlng = centerHandel.getLatLng();
+			bounds = rectangle.getBounds();
+			center = L.latLngBounds(bounds).getCenter();
+			
+			sw = L.latLngBounds(bounds).getSouthWest();
+			ne = L.latLngBounds(bounds).getNorthEast();		
+			
+			var newSw = {};
+			newSw.lat = sw.lat + latlng.lat - center.lat;
+			newSw.lng = sw.lng + latlng.lng - center.lng;
+
+			var newNe = {};
+			newNe.lat = ne.lat + latlng.lat - center.lat;
+			newNe.lng = ne.lng + latlng.lng - center.lng;
+			
+			rectangle.setBounds([newSw,newNe]);
+			moveHandels();
+		});
+
+		swHandel.on('drag', function(e){
+			latlng = swHandel.getLatLng();
+			bounds = rectangle.getBounds();
+			ne = L.latLngBounds(bounds).getNorthEast();
+		
+			swPix = map.latLngToLayerPoint(latlng);
+			nePix = map.latLngToLayerPoint(ne);
+		
+			xPix = nePix.x - swPix.x;
+			yPix = swPix.y - nePix.y;
+			yPix = printRatio(xPix,yPix);
+
+			newSw = map.layerPointToLatLng([swPix.x , nePix.y + yPix]);
+			ne = map.layerPointToLatLng(nePix);
+		
+			rectangle.setBounds([newSw,ne]);
+			moveHandels();
+		});
+		seHandel.on('drag', function(e){
+			latlng = seHandel.getLatLng();
+			bounds = rectangle.getBounds();
+			nw = L.latLngBounds(bounds).getNorthWest();
+		
+			sePix = map.latLngToLayerPoint(latlng);
+			nwPix = map.latLngToLayerPoint(nw);
+		
+			xPix = sePix.x - nwPix.x;
+			yPix = sePix.y - nwPix.y;
+			yPix = printRatio(xPix,yPix);
+
+			newSe = map.layerPointToLatLng([sePix.x , nwPix.y + yPix]);
+			ne = map.layerPointToLatLng(nwPix);
+		
+			rectangle.setBounds([newSe,ne]);
+			moveHandels();
+		});
+		nwHandel.on('drag', function(e){
+			latlng = nwHandel.getLatLng();
+			bounds = rectangle.getBounds();
+			se = L.latLngBounds(bounds).getSouthEast();
+		
+			nwPix = map.latLngToLayerPoint(latlng);
+			sePix = map.latLngToLayerPoint(se);
+		
+			xPix = sePix.x - nwPix.x;
+			yPix = sePix.y - nwPix.y;
+			yPix = printRatio(xPix,yPix);
+
+			newNw = map.layerPointToLatLng([nwPix.x , sePix.y - yPix]);
+			se = map.layerPointToLatLng(sePix);
+		
+			rectangle.setBounds([newNw,se]);
+			moveHandels();
+		});
+		neHandel.on('drag', function(e){
+			latlng = neHandel.getLatLng();
+			bounds = rectangle.getBounds();
+			sw = L.latLngBounds(bounds).getSouthWest();
+		
+			nePix = map.latLngToLayerPoint(latlng);
+			swPix = map.latLngToLayerPoint(sw);
+		
+			xPix = nePix.x - swPix.x;
+			yPix = swPix.y - nePix.y;
+			yPix = printRatio(xPix,yPix);
+
+			newNe = map.layerPointToLatLng([nePix.x , swPix.y - yPix]);
+			sw = map.layerPointToLatLng(swPix);
+		
+			rectangle.setBounds([sw,newNe]);
+			moveHandels();
+		});
+		
+		function moveHandels() {
+			bounds = rectangle.getBounds();
+			sw = L.latLngBounds(bounds).getSouthWest();
+			ne = L.latLngBounds(bounds).getNorthEast();
+			se = L.latLngBounds(bounds).getSouthEast();
+			nw = L.latLngBounds(bounds).getNorthWest();
+			
+			centerHandel.setLatLng(bounds.getCenter());
+			swHandel.setLatLng(sw);
+			neHandel.setLatLng(ne);
+			seHandel.setLatLng(se);
+			nwHandel.setLatLng(nw);
+		}
+
+		function printRatio(x,y) {
+			var selectedFormat = $("input[type='radio'][name='ratio']:checked").val();
+			if (selectedFormat === "landscape") y = x / paperRatio;
+			if (selectedFormat === "portrait") y = x / (1/paperRatio);
+			return y;
+		}	
+	}
+
 	function hashControll(){
 		if (window.location.hash.substr(0,5) == "#zoom") convertOldHash();
 
@@ -1225,17 +1455,8 @@ $(document).ready(function() {
 	});
 
 	$(".printMap").click( function() {
-		var zoom = map.getZoom();
-		var latlng = map.getCenter();
-		var lat = latlng.lat.toFixed(2);
-		var lng = latlng.lng.toFixed(2);
-		var w= $(window).width();
-		var h= Math.floor(w / 1.45);  // 1.4142
-		
-		w=window.open(serverUrl + 'print/?zoom='+zoom+'&lat='+lat+'&lng='+lng+'&height='+h+'&width='+w);
-		// w.print();
-		// w.close();
-		return false;
+		initprint();
+		return;
 	});
 });
 

@@ -244,6 +244,20 @@ label {
 	z-index: 1005;
 	
 }
+#shareBox {
+	right: 0;
+	top: 0;
+	float: right;
+	display: none;
+	z-index: 1005;
+	margin: 10px;
+	padding: 10px;
+	position: absolute;
+	border: 1px solid black;
+	border-radius: 5px;
+	background: rgba(245, 245, 245, 0.95);
+}
+
 #fbshare {
 	margin: 16px 0;
 }
