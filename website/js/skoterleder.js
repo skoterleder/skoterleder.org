@@ -12,9 +12,8 @@ var neHandel;
 var seHandel;
 var nwHandel;
 var centerHandel;
-var printIcon;
-var noIcon;
-		
+var link_marker;
+	
 $(document).ready(function() {
 	
 	$.ajaxSetup({ cache: false });
@@ -27,10 +26,6 @@ $(document).ready(function() {
 	}
 
 	moveAlertbox();
-	
-	if (window.location.hash) {
-		hashControll();
-	}
 	
 	var moreInfoButton = L.Control.extend({
 		options: {
@@ -64,7 +59,7 @@ $(document).ready(function() {
 		onAdd: function (map) {
 				// create the control container with a particular class name
 				var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control-layers markerQuery');
-				container.innerHTML += '<a href="#" class="text-bar-links queryLink">Mer!</a> \
+				container.innerHTML += '<a href="#" class="text-bar-links queryLink">Urval</a> \
 					<div class="queryList"> \
 					<h2>Visa:</h2> \
 					<form class=""> \
@@ -83,14 +78,36 @@ $(document).ready(function() {
 					</label> \
 					</div> \
 					</form> \
-					<p><a href="#" class="printMap text-bar-links">Skriv ut kartan</a><p> \
 					</div> \
 				';
 				
 				return container;
 		}
 	});
-
+	var addShareButton = L.Control.extend({
+		options: {
+				position: 'bottomright'
+		},
+		onAdd: function (map) {
+			var container = L.DomUtil.create('div', 
+				'leaflet-control-share leaflet-bar leaflet-control shareMap');
+				
+			container.innerHTML += '<a href="#" class="leaflet-bar-part leaflet-bar-part-single" title="Dela/Spara kartbild"></a>';
+			return container;
+		}
+	});
+	var addPrintButton = L.Control.extend({
+		options: {
+				position: 'bottomright'
+		},
+		onAdd: function (map) {
+			var container = L.DomUtil.create('div', 
+				'leaflet-control-print leaflet-bar leaflet-control printMap');
+				
+			container.innerHTML += '<a href="#" class="leaflet-bar-part leaflet-bar-part-single" title="Skruv ut kartan"></a>';
+			return container;
+		}
+	});
 	var openOsmLink = L.Control.extend({
 		options: {
 				position: 'bottomleft'
@@ -184,7 +201,8 @@ $(document).ready(function() {
 	map.addControl(layersControl);
 	map.addControl(new openOsmLink()); 
 	map.addControl(new openOsmEditLink());
-
+	map.addControl(new addPrintButton());
+	map.addControl(new addShareButton());
 
 	// Icons from http://mapicons.nicolasmollet.com/
 	icon[1] = 'images/icons/snowmobile-green.png';
@@ -242,12 +260,22 @@ $(document).ready(function() {
 		iconAnchor:   [7, 7], // point of the icon which will correspond to marker's location
 		popupAnchor:  [7, 0] // point from which the popup should open relative to the iconAnchor
 	});	
+	iconType['l'] = L.icon({
+		iconUrl: 'images/icons/map22-1.png',
+		iconSize:	 [22, 33], // size of the icon
+		iconAnchor:   [11, 33], // point of the icon which will correspond to marker's location
+		popupAnchor:  [11, -33] // point from which the popup should open relative to the iconAnchor
+	});
 
 	// Laddar alla markörer med lite fördröjning.
 	setTimeout(function() {	
 		loadmarkers();
 	}, 1000);
-
+	
+	if (window.location.hash) {
+		hashControll();
+	}
+	
 	// Fix map size after return to map page
 	$( document ).delegate("#mapPage", "pageshow", function() {
 		map.invalidateSize(false);
@@ -1102,40 +1130,136 @@ $(document).ready(function() {
 		return false;
 	});
 
-	function initprint(){
+	function initSelectBox(type){
+		console.log($("#shareBox").has( "div" ).length);
+		if ($("#shareBox").has( "div" ).length) return // menu already there.
+		
 		var div = $("<div>").addClass("").appendTo("#shareBox");
-		$(div).append(" \
-			<h2>Välja format:</h2> \
-			<label><input type='radio' name='ratio' class='changeRatio' value='landscape' checked> Liggande </label> \
-			<label><input type='radio' name='ratio' class='changeRatio' value='portrait'> Stående </label> \
-			<label><input type='radio' name='ratio' value='free'> Fritt </label> \
-			<p class='linkButtonLong preview'><a href='#' class='preview closeMarkerBox'>Förhandsgranska</a></p> \
+		
+		if (type === "print") {
+			$(div).append(" \
+			<h2>Utskrift</h2> \
+			<p>Välja format:</p> \
+			<label> \
+				<input type='radio' name='ratio' class='changeRatio' value='landscape' checked> Liggande \
+			</label> \
+			<label> \
+				<input type='radio' name='ratio' class='changeRatio' value='portrait'> Stående \
+			</label> \
+			<label> \
+				<input type='radio' name='ratio' value='free'> Fritt \
+			</label> \
+			<p class='linkButtonLong preview' data-action ='print'> \
+				<a href='#' class='preview closeMarkerBox' data-action ='print'>Förhandsgranska</a> \
+			</p> \
 			<p class='linkButtonLong abort'><a href='#' class='abort closeMarkerBox'>Avbryt</a></p> \
 			"
-		); 
+			); 
+			
+			createSelectArea();
+		}
+		if (type === "share") {
+			var shareUrl = shareMapUrl();
+			var screenSize = map.getSize();
+			
+			$(div).append(" \
+			<h2>Dela:</h2> \
+			<p>Länk:</p> \
+			<p><label for='link_marker'><input id='link_marker' type='checkbox'>Lägg till markör</label></p> \
+			<p><input type='text' value='" + shareUrl +"' class='shareLinkText'></p> \
+			<div id='fbMapShare'> \
+				<div class='fb-share-button' data-href='" + shareUrl + "' \
+				data-type='button'></div> \
+			</div> \
+			<div class='divider-share'></div> \
+			<h2>Bild:</h2> \
+			<p><label for='image_filter'><input id='image_filter' type='checkbox'> \
+			Ange anpassade dimensioner</label></p> \
+			<p>Storlek på bild: \
+				<i class='imgWidth'>" + screenSize.x + "</i> x \
+				<i class='imgHight'>" + screenSize.y + "</i> pix\
+			</p> \
+			<p class='linkButtonLong preview' data-action='share'> \
+				<a href='#' class='preview closeMarkerBox' data-action='share'>Förhandsgranska bild</a> \
+			</p> \
+			<p class='linkButtonLong abort'><a href='#' class='abort closeMarkerBox'>Avbryt</a></p> \
+			"
+			);
+			
+			FB.XFBML.parse(document.getElementById('fbMapShare'));
+
+			div.on('click','#image_filter', function(e){
+				createSelectArea();
+
+				if (!$("#image_filter").is(":checked")) {
+					var screenSize = map.getSize();
+					$(".imgWidth").text(screenSize.x);
+					$(".imgHight").text(screenSize.y);
+				}
+			});
+
+			div.on('click','#link_marker', function() {
+				if ($('#link_marker').is(':checked')) {
+					var center = map.getCenter();
+					link_marker = L.marker(center,{draggable:true,opacity: 1}).setIcon(iconType['l']).addTo(map);
+
+					link_marker.on('dragend', function(e){
+						var center = link_marker.getLatLng();
+						map.panTo(center);
+						updateShareLinks();
+					});
+				} else {
+					map.removeLayer(link_marker);
+				}
+				updateShareLinks();
+				
+			});
+			map.on('drag', function(e){
+				moveLinkMarker();
+			});
+			map.on('zoomend', function(e){
+				moveLinkMarker();
+				updateShareLinks();
+			});
+			map.on('dragend', function(e){
+				updateShareLinks();
+			});
+			$(".shareLinkText").click(function () {
+			   $(this).select();
+			});
+		}
+		
 		$("#shareBox").slideDown();
 		
 		div.on('click', '.preview', function() {
-			zoom = map.getZoom();
-			bounds = rectangle.getBounds()
-			center = L.latLngBounds(bounds).getCenter();
+			var zoom = map.getZoom();
+			if (typeof rectangle != 'undefined') {
+				bounds = rectangle.getBounds();
+			} else {
+				bounds = map.getBounds();
+			}
+			var center = L.latLngBounds(bounds).getCenter();  // toFixed(4)
+			var lat = center.lat.toFixed(3);
+			var lng = center.lng.toFixed(3);
 			swPix = map.latLngToLayerPoint(L.latLngBounds(bounds).getSouthWest());
 			nePix = map.latLngToLayerPoint(L.latLngBounds(bounds).getNorthEast());	
 			width = nePix.x - swPix.x;
 			height = swPix.y - nePix.y;
-			
-			w=window.open(serverUrl + 'print/?zoom='+zoom+'&lat='+center.lat+'&lng='+center.lng+'&width='+width+'&height='+height);
+
+			if ($(".preview").data("action") === "print") {
+				w=window.open(serverUrl + 'print/?zoom='+zoom+'&lat='+lat+'&lng='+lng+'&width='+width+'&height='+height);
+			}			
+			if ($(".preview").data("action") === "share") {
+				w=window.open(serverUrl + 'preview-image/?zoom='+zoom+'&lat='+lat+'&lng='+lng+'&width='+width+'&height='+height);
+			}
 			return false;
-		});	
+		});
 		div.on('click', '.abort', function() {
 			$("#shareBox").empty();
 			$("#shareBox").hide();
-			map.removeLayer(rectangle);
-			map.removeLayer(swHandel);
-			map.removeLayer(neHandel);
-			map.removeLayer(seHandel);
-			map.removeLayer(nwHandel);
-			map.removeLayer(centerHandel);
+
+			removeSelectArea();
+			if (typeof link_marker != 'undefined') map.removeLayer(link_marker);
 			return false;
 		});	
 		div.on('click', '.changeRatio', function() {
@@ -1165,6 +1289,94 @@ $(document).ready(function() {
 			rectangle.setBounds([newSw,newNe]);
 			moveHandels();
 		});
+	}
+	function printRatio(x,y) {
+		var selectedFormat = $("input[type='radio'][name='ratio']:checked").val();
+		if (selectedFormat === "landscape") y = x / paperRatio;
+		if (selectedFormat === "portrait") y = x / (1/paperRatio);
+		return y;
+	}	
+
+	function moveHandels() {
+		bounds = rectangle.getBounds();
+		sw = L.latLngBounds(bounds).getSouthWest();
+		ne = L.latLngBounds(bounds).getNorthEast();
+		se = L.latLngBounds(bounds).getSouthEast();
+		nw = L.latLngBounds(bounds).getNorthWest();
+		
+		centerHandel.setLatLng(bounds.getCenter());
+		swHandel.setLatLng(sw);
+		neHandel.setLatLng(ne);
+		seHandel.setLatLng(se);
+		nwHandel.setLatLng(nw);
+		
+		updateDisplayDimension();
+	}
+	
+	function updateDisplayDimension() {
+		if ($("#image_filter").prop( "checked", true ) && typeof rectangle != 'undefined' ) {
+			var bounds = rectangle.getBounds();
+			var ne = map.latLngToLayerPoint(L.latLngBounds(bounds).getNorthEast());
+			var sw = map.latLngToLayerPoint(L.latLngBounds(bounds).getSouthWest());
+			var x = ne.x - sw.x;
+			var y = sw.y - ne.y;
+			
+			$(".imgWidth").text(x);
+			$(".imgHight").text(y);
+		}
+	}
+
+	function moveLinkMarker() {
+		if ($('#link_marker').is(':checked')) {
+			var center = map.getCenter();
+			link_marker.setLatLng(center);
+		}
+	}
+
+	function updateShareLinks() {
+		var shareUrl = shareMapUrl();
+		$('.shareLinkText').val(shareUrl);
+
+		$('#fbMapShare').after("<div id='fbshareTmp' class='hidden'></div>");
+		$('#fbshareTmp').append("<div class='fb-share-button' data-href='" + shareUrl + "' \
+			data-type='button'></div> \
+			");
+		
+		FB.XFBML.parse(document.getElementById('fbshareTmp'),function(){
+			$('#fbMapShare').remove();
+			$('#fbshareTmp').attr('id','fbMapShare');
+			$('#fbMapShare').show();
+		});
+	}
+
+	function shareMapUrl(){
+		var zoom = map.getZoom();
+		var center = map.getCenter();
+		var icon = "";
+		if ($('#link_marker').is(':checked')) {
+			icon = "&icon=l";
+		}
+		return serverUrl + 'map/?zoom='+zoom+'&lat='+center.lat.toFixed(4)+'&lng='+center.lng.toFixed(4)+icon;
+	}
+
+	function removeSelectArea() {
+		if (typeof rectangle != 'undefined') {
+			map.removeLayer(rectangle);
+			map.removeLayer(swHandel);
+			map.removeLayer(neHandel);
+			map.removeLayer(seHandel);
+			map.removeLayer(nwHandel);
+			map.removeLayer(centerHandel);
+			
+			rectangle = undefined;
+		}	
+	}
+
+	function createSelectArea(){
+		if (typeof rectangle != 'undefined') {
+			removeSelectArea();
+			return;
+		}
 		
 		screenSize = map.getSize();
 		center = map.getCenter();
@@ -1288,27 +1500,6 @@ $(document).ready(function() {
 			rectangle.setBounds([sw,newNe]);
 			moveHandels();
 		});
-		
-		function moveHandels() {
-			bounds = rectangle.getBounds();
-			sw = L.latLngBounds(bounds).getSouthWest();
-			ne = L.latLngBounds(bounds).getNorthEast();
-			se = L.latLngBounds(bounds).getSouthEast();
-			nw = L.latLngBounds(bounds).getNorthWest();
-			
-			centerHandel.setLatLng(bounds.getCenter());
-			swHandel.setLatLng(sw);
-			neHandel.setLatLng(ne);
-			seHandel.setLatLng(se);
-			nwHandel.setLatLng(nw);
-		}
-
-		function printRatio(x,y) {
-			var selectedFormat = $("input[type='radio'][name='ratio']:checked").val();
-			if (selectedFormat === "landscape") y = x / paperRatio;
-			if (selectedFormat === "portrait") y = x / (1/paperRatio);
-			return y;
-		}	
 	}
 
 	function hashControll(){
@@ -1345,7 +1536,12 @@ $(document).ready(function() {
 		if (hashValues[0] === "map") {
 			// #map/9/63.4530/17.3172/o
 			//	0	1 2		  3		  4
-			map.setView([hashValues[2],hashValues[3]],hashValues[1]); 
+			map.setView([hashValues[2],hashValues[3]],hashValues[1]);
+			
+			if (hashValues[4] === "l") {
+				var center = map.getCenter();
+				x = L.marker(center).setIcon(iconType['l']).addTo(map);
+			}
 		}
 		if (hashValues[0] === "info" || hashValues[0] === "!info") {
 			showInfo(hashValues[1],hashValues[2]);
@@ -1455,8 +1651,12 @@ $(document).ready(function() {
 	});
 
 	$(".printMap").click( function() {
-		initprint();
-		return;
+		initSelectBox("print");
+		return false;
+	});
+	$(".shareMap").click( function() {
+		initSelectBox("share");
+		return false;
 	});
 });
 

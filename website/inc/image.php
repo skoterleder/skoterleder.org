@@ -17,7 +17,8 @@ $icons[2] = '../images/icons/information.png';
 $icons[3] = '../images/icons/treedown.png';
 $icons[4] = '../images/icons/caution.png';
 $icons[5] = '../images/icons/fixmap.png';
-
+$icons['l'] = '../images/icons/map22-1.png';
+	
 $x = (($lng + 180) / 360) * pow(2, $zoom);
 $y = (1 - log(tan(deg2rad($lat)) + 1 / cos(deg2rad($lat))) / pi()) /2 * pow(2, $zoom);
 
@@ -52,8 +53,9 @@ for ($yy = floor($yStart); $yy < $yEnd; $yy++) {
 }
 
 if ($icon) {
+	list($iconWidth, $iconHeight) = getimagesize($icons[$icon]);
 	$icon = imagecreatefrompng($icons[$icon]);
-	imagecopy($mapImage, $icon, $width/2-32/2, $height/2-37, 0, 0, 32, 37);
+	imagecopy($mapImage, $icon, ($width/2) - ($iconWidth/2), ($height/2) - $iconHeight, 0, 0, $iconWidth, $iconHeight);
 }
 
 $textcolor = imagecolorallocate($mapImage, 140, 140, 150);

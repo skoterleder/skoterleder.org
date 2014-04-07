@@ -261,6 +261,13 @@ label {
 #fbshare {
 	margin: 16px 0;
 }
+#fbMapShare {
+	margin-top: 14px;
+	margin-bottom: 7px;
+	height: 26px;
+	width: 100px;
+	overflow: hidden;	
+}
 
 #displayInfo {
 	display: none;
@@ -314,7 +321,13 @@ label {
 	font-family: arial;
 	color: gray;
 }
-
+a.more-text-link, a.more-text-link:hover {
+	width: auto!important;
+	text-align: left;
+	font-size: 1.3em;
+	height: 1.3em!important;
+	line-height: 1.3em!important;
+}
 a.textlink:hover {
 	color:black!important;
 }
@@ -401,6 +414,11 @@ a.linkButton {
 	background-color:#E0E0E0;
 	margin: 0 -20px;
 
+}
+.divider-share {
+	height: 1px;
+	background-color: #8B8B8B;
+	margin: 0 -10px;
 }
 
 p.linkButtonLong  {
@@ -529,6 +547,13 @@ th:last-child {
 	font-size: 1.1em!important;
 } 
  
+.leaflet-control-print a {
+	background-image: url(../images/icons/print20.png);
+}
+.leaflet-control-share a {
+	background-image: url(../images/icons/share20.png);
+}
+
 .fb-like {
 	margin-left:10px;
 }

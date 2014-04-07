@@ -1,5 +1,6 @@
 <?php
 include_once 'database_config.php';
+$icon = "";
 
 if(isset($_GET['zoom'])) $zoom = $_GET["zoom"];
 if(isset($_GET['lat'])) $lat = $_GET["lat"];
@@ -10,15 +11,17 @@ if(isset($_GET['icon'])) $icon = $_GET["icon"];
 if(isset($_GET['debug'])) $debug = $_GET["debug"];
 
 if(!preg_match('/^FacebookExternalHit\/.*?/i',$_SERVER['HTTP_USER_AGENT']) AND !$debug){
-	header("Location: ".SERVERADRESS."#map/$zoom/$lat/$lng");
+	if ($icon) $icon = "/l"; 
+	header("Location: ".SERVERADRESS."#map/$zoom/$lat/$lng$icon");
 }
+if ($icon) $icon = "&icon=l";
 
 $width = 470;
 $height = floor($width / 1.9);
 
-$imgUrl1 = SERVERADRESS."image/?zoom=12&lat=$lat&lng=$lng&height=$height&width=$width";
-$imgUrl2 = SERVERADRESS."image/?zoom=11&lat=$lat&lng=$lng&height=$height&width=$width";
-$imgUrl3 = SERVERADRESS."image/?zoom=10&lat=$lat&lng=$lng&height=$height&width=$width";
+$imgUrl1 = SERVERADRESS."image/?zoom=".($zoom-0)."&lat=$lat&lng=$lng&height=$height&width=$width$icon";
+$imgUrl2 = SERVERADRESS."image/?zoom=".($zoom-1)."&lat=$lat&lng=$lng&height=$height&width=$width$icon";
+$imgUrl3 = SERVERADRESS."image/?zoom=".($zoom-2)."&lat=$lat&lng=$lng&height=$height&width=$width$icon";
 
 $title = "Skoterleder.org - Snöskoterkarta!";
 $description = "Skoterkarta för skoteråkare av skoteråkare! Perfekt vid planering inför skoterresan eller ute på leden med kartan i mobilen.";
@@ -31,7 +34,7 @@ $description = "Skoterkarta för skoteråkare av skoteråkare! Perfekt vid plane
 		<title>Skoterleder.org - <?=$title?></title>
 		<meta property="og:title" content="<?=$title?>" />
 		<meta property="og:type" content="website" />
-		<meta property="og:url" content="<?=SERVERADRESS?>map/?zoom=<?=$zoom?>&lat=<?=$lat?>&lng=<?=$lng?>" />
+		<meta property="og:url" content="<?=SERVERADRESS?>map/?zoom=<?=$zoom?>&lat=<?=$lat?>&lng=<?=$lng?><?=$icon?>" />
 		<meta property="og:image" content="<?=$imgUrl1?>" />
 		<meta property="og:image:width" content="<?=$width?>" />
 		<meta property="og:image:height" content="<?=$height?>" />
