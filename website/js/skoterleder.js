@@ -1131,7 +1131,7 @@ $(document).ready(function() {
 	});
 
 	function initSelectBox(type){
-		console.log($("#shareBox").has( "div" ).length);
+		// console.log($("#shareBox").has( "div" ).length);
 		if ($("#shareBox").has( "div" ).length) return // menu already there.
 		
 		var div = $("<div>").addClass("").appendTo("#shareBox");
@@ -1622,6 +1622,9 @@ $(document).ready(function() {
 		var id = $(this).data( "id");
 		var title = $(this).data( "title");
 		if ($('#disqus_thread').length) $('#disqus_thread').remove();  // Remove old div
+
+		$('.showComments').show();
+		$(this).hide();
 		
 		$("<div id='disqus_thread'>").insertAfter(this);
 		loadDisqus(id,title,'info');
@@ -1774,6 +1777,11 @@ function showInfo(div,extra) {
 		$(this).attr('src',$(this).data('load'));
 	});
 
+	if ($('#disqus_thread').length) $('#disqus_thread').remove();  // Remove old div
+	$("<div id='disqus_thread'>").appendTo('#main-info');
+	loadDisqus('info','Information','info');
+	$('.infoComments').hide();
+	
 	ga('send', 'pageview', window.location.hash);
 }
 

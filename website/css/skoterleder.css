@@ -206,13 +206,14 @@ background: transparent;
 .showComments  {
 	border: 0px solid #A0A0A0;
 	background: #D8D8D8;
-	padding: 2px 50px;
+	padding: 4px;
 	color: black;
-	margin: 10px 0 0 0;
-	border-radius: 4px;
+	margin: 10px 0 25px 0;
+	border-radius: 8px;
 	text-decoration: none;
 	font-family: arial;
-	line-height: 40px;
+	text-align: center;
+	display:block;
 }
 
 
