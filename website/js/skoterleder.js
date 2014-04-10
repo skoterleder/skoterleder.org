@@ -320,14 +320,12 @@ $(document).ready(function() {
 		if (e.name === "Google Terräng" ) baseLayer = "t";
 		
 		setTimeout(function() {	
-			console.log(e);
 			if (e.name === "Skoterleder.org" ) {
 				map.removeLayer(overl);
 			} else {
 				map.addLayer(overl);
 			}
 			layersControl._update();
-
 		}, 200);
 		
 		updateMapHash();
@@ -345,7 +343,7 @@ $(document).ready(function() {
 
 		if(new Date().getTime() > timeout) {
 			timeout = new Date().getTime() + 1*60*1000; //add 15 minutes;
-			console.log("New time");
+			// console.log("New time");
 			ga('send', 'pageview',window.location.hash);
 		}
 	}
@@ -373,7 +371,6 @@ $(document).ready(function() {
 		if (loadtime > (new Date().getTime() - 60*1000)) {
 			// Using cached data for 1 minute.
 			dispalyMarker(id,dataCache[id],linkin,show);
-			console.log("Used cached data");
 		} else {
 			$.getJSON('inc/getmarker.php?id='+id, function(data) {
 				data.loadtime = new Date().getTime(); 
@@ -485,7 +482,6 @@ $(document).ready(function() {
 		if (loadtime > (new Date().getTime() - 60*1000)) {
 			// Using cached data for 1 minute.
 			dispalyMarkerPanel(id,dataCache[id]);
-			console.log("Used cached data");
 		} else {
 			$.getJSON('inc/getmarker.php?id='+id, function(data) {
 				data.loadtime = new Date().getTime();
@@ -845,7 +841,6 @@ $(document).ready(function() {
 							$(".error").html("Sparat!");
 							showAlert("Markör Sparad!");
 							hidebox('#showMarkerBox'); // or hashControll();
-							console.log("Sparat ok!");
 							loadmarkers();
 							ga('send', 'pageview','#marker/'+id+'/saved'); //#changeMarker/17
 						}
@@ -1094,7 +1089,6 @@ $(document).ready(function() {
 			data: $("#addMarkerForm").serialize(), // serializes the form's elements.
 			success: function(data)
 			{
-				console.log(data);
 				if (data.substr(0,5) === "error") {
 					$(".error").html(data);
 					$(".error").css('color', 'red');
@@ -1270,11 +1264,11 @@ $(document).ready(function() {
 			x = ne.x - sw.x;
 			y = sw.y - ne.y;
 			
-			console.log("cpx:"+c.x+":"+c.y); 
+			// console.log("cpx:"+c.x+":"+c.y); 
 			var selectedFormat = $("input[type='radio'][name='ratio']:checked").val();
 			if (selectedFormat === "portrait") x = y / paperRatio;
 			if (selectedFormat === "landscape") x = y / (1/paperRatio);
-			console.log(selectedFormat);
+			// console.log(selectedFormat);
 			
 			if (x/y > paperRatio) {
 				//y = screenSize.y -120;
@@ -1702,7 +1696,7 @@ function loadDisqus(identifier, title, type) {
 	title = "Skoterleder.org - " + title;
 	if (type === "marker") url = serverUrl + "#!marker/" + identifier + "/";
 	if (type === "info") url = serverUrl + "#!info/" + identifier;
-	console.log("id: "+identifier+" title: "+title+" url"+url);
+	// console.log("id: "+identifier+" title: "+title+" url"+url);
 	
 	if (window.DISQUS) {
 		//if Disqus exists, call it's reset method with new parameters
@@ -1729,7 +1723,7 @@ function loadDisqus(identifier, title, type) {
 
 function disqus_config() {
 	this.callbacks.onNewComment = [function(comment) {
-		console.log(comment);
+		// console.log(comment);
 		updateCommentsCount(comment.text.replace(/\n/g,"<br>") );
 	}];
 }
@@ -1738,7 +1732,7 @@ function updateCommentsCount(text) {
 	var id = $( "#showMarkerBox" ).data( "markerid");
 	var hash = $( "#showMarkerBox" ).data( "hash");
 	
-	console.log("Send id: " + id + " hash: "+ hash );
+	// console.log("Send id: " + id + " hash: "+ hash );
 	
 	$.ajax({
 		url: "inc/addcomment.php?id=" + id + "&hash=" + hash + "&text=" + text,
