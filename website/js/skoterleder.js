@@ -13,6 +13,7 @@ var seHandel;
 var nwHandel;
 var centerHandel;
 var link_marker;
+var lastHash;
 	
 $(document).ready(function() {
 	
@@ -339,7 +340,7 @@ $(document).ready(function() {
 		var layer = "";
 		if (baseLayer) var layer = "/" + baseLayer
 		
-		location.replace("#map/" + zoom + "/" + lat + "/" + lng + layer); 
+		newHash("#!map/" + zoom + "/" + lat + "/" + lng + layer)
 
 		if(new Date().getTime() > timeout) {
 			timeout = new Date().getTime() + 1*60*1000; //add 15 minutes;
@@ -363,7 +364,7 @@ $(document).ready(function() {
 				.openOn(map);	
 		}
 
-		location.replace("#marker/"+id); 
+		newHash("#!marker/"+id); 
 
 		var loadtime = 0;
 		if (typeof dataCache[id] != 'undefined') loadtime = dataCache[id].loadtime;
@@ -422,12 +423,12 @@ $(document).ready(function() {
 			return false;
 		});
 		container.on('click', '.linkThis', function() {
-			location.replace("#marker/"+id); 
+			newHash("#!marker/"+id); 
 			return false;
 		});		
 		container.on('click', '.linkZoom', function() {
 			map.setView(latlng,11)
-			location.replace("#marker/"+id); 
+			newHash("#!marker/"+id); 
 			return false;
 		});	
 
@@ -447,8 +448,8 @@ $(document).ready(function() {
 			 width='16' height='12' class='iconImg'> \
 			" + data.count + " \
 			</p> \
-			<a href='#marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
-			<a href='#marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
+			<a href='#!marker/"+id+"' class='linkThis textlink floatRight'>Länk hit</a> \
+			<a href='#!marker/"+id+"' class='linkZoom textlink floatRight'>Zoom</a> \
 			</p> \
 			<div class=''> \
 			<p id='popupLinks' class='floatRight'><a href='#' class='okLink linkButton'> \
@@ -464,10 +465,13 @@ $(document).ready(function() {
 		.openOn(map);		
 
 		if (linkin) map.setView(latlng,11);
+
+		if (show === "show") {
+			loadMarkerPanel(id);
+		} else {
+			newHash("#!marker/"+id); 
+		}
 		
-		location.replace("#marker/"+id); 
-		
-		if (show === "show") loadMarkerPanel(id);
 
 	}
 
@@ -506,7 +510,7 @@ $(document).ready(function() {
 		if (data.updatetime) changeHTMLtext = "<p class='narrow'>Ändrad: " + data.updatetime + "</p>";
 		if (data.commenttime) commentsHTMLtext = "<p class='narrow'>Senaste kommentar: " + data.commenttime + "</p>";  // Not in use!
 		
-		location.replace("#marker/"+ id + "/show");
+		newHash("#!marker/"+ id + "/show","new");
 		document.title = "Skoterleder.org - " + data.title;
 		ga('send', 'pageview',window.location.hash);
 
@@ -627,7 +631,7 @@ $(document).ready(function() {
 				$( ".showShareLink" ).after( "<p><input type='text' value='" + shareUrl +
 					"' class='shareLinkText'></p>" );
 			}
-			location.replace("#marker/"+ id + "/show");
+			newHash("#!marker/"+ id + "/show");
 			return false;
 		});		
 
@@ -651,7 +655,7 @@ $(document).ready(function() {
 		<div class='fb-like' data-href='" + shareUrl + "' \
 		data-width='280' data-layout='standard' data-action='like' \
 		data-show-faces='true' data-share='true'></div></div> \
-		<p class='narrow'><a href='#marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
+		<p class='narrow'><a href='#!marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		"
 		); 
 
@@ -698,7 +702,7 @@ $(document).ready(function() {
 			var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
 			
 			document.title = "Skoterleder.org - Ändra - " + data.title;
-			location.replace("#marker/"+ id + "/change/" + hash); 
+			newHash("#!marker/"+ id + "/change/" + hash,"new"); 
 			
 			var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
 
@@ -1502,19 +1506,17 @@ $(document).ready(function() {
 		var hash = window.location.hash.substring(1); //Puts hash in variable, and removes the # character
 		var hashValues = hash.split('/');
 		
+		if (typeof hashValues[2] === 'undefined') hashValues[2] = "";
+		
 		// console.log(hashValues);
 		//  #marker/75/activate/8b625551a7fccbac44eb1991ac3ddae0
-		
-		if (hashValues[0] === "!marker") {   // Opens from from Disqus
-			openMarkerPopup(hashValues[1],"show");
-		}
 		
 		if (hashValues[0] === "mymarkers") {   // Opens from from Disqus
 			myMarkers(hashValues[1]);
 		}
 		
-		if (hashValues[0] === "marker") {
-			if (hashValues[2] === "show"){
+		if (hashValues[0] === "marker" || hashValues[0] === "!marker") {
+			if (hashValues[2] === "show" || hashValues[2].indexOf('comment') > 0 ){
 				openMarkerPopup(hashValues[1],"show");
 			
 			}else if (hashValues[2] === "change" || hashValues[2] === "remove") {
@@ -1527,7 +1529,7 @@ $(document).ready(function() {
 				openMarkerPopup(hashValues[1]);
 			}
 		}
-		if (hashValues[0] === "map") {
+		if (hashValues[0] === "map" || hashValues[0] === "!map") {
 			// #map/9/63.4530/17.3172/o
 			//	0	1 2		  3		  4
 			map.setView([hashValues[2],hashValues[3]],hashValues[1]);
@@ -1603,12 +1605,12 @@ $(document).ready(function() {
 		if ($("." + div).css("display") === "none") {
 			$(".hidden").slideUp(200);
 			$("." + div).slideDown();
-			location.replace("#info/" + div);
+			newHash("#!info/" + div);
 			document.title = "Skoterleder.org - " + title;
 			ga('send', 'pageview', '#info/' + div);
 		} else {
 			$("." + div).slideUp(200);
-			location.replace("#info");
+			newHash("#!info");
 		}
 	});	
 
@@ -1657,6 +1659,10 @@ $(document).ready(function() {
 	});
 });
 
+function newHash(hash){
+	lastHash = hash;
+	location.replace(lastHash); 
+}
 
 function showbox(div) {
 
@@ -1747,15 +1753,15 @@ function showAlert(text) {
 }
 
 function showInfo(div,extra) {
-	var hash = "#info";
+	var hash = "#!info";
 	var title = "Skoterleder.org - Mer Information"
 	var extrahash = "";
 	if (typeof div === 'undefined') {
-		location.replace(hash);
+		newHash(hash);
 	} else {
 		$("." + div).slideDown();
 		if (typeof extra != 'undefined') extrahash = '/' + extra;
-		location.replace("#info/" + div + extrahash);
+		newHash("#!info/" + div + extrahash);
 		// To do, update title!
 	}
 
@@ -1830,8 +1836,7 @@ function convertOldHash(){
 	if (layer === "Google Satelit" ) baseLayer = "/s";
 	if (layer === "Google Terräng" ) baseLayer = "/t";
 	
-	newHash = "#map/"+zoom+"/"+lat+"/"+lng+baseLayer;
-	location.replace(newHash); 
+	newHash("#!map/"+zoom+"/"+lat+"/"+lng+baseLayer);
 }
 
 function decodeEntities(input) {
