@@ -1,3 +1,5 @@
+var version = 999;
+var reloadFlag;
 var markers;
 var dataCache = [];
 var icon = [];
@@ -19,6 +21,7 @@ $(document).ready(function() {
 	
 	$.ajaxSetup({ cache: false });
 	swedishTimeago();
+	checkForUppdates();
 	var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
 	
 	var touchDev = false;
@@ -1577,7 +1580,8 @@ $(document).ready(function() {
 	});	
 
 	$(".alertOk").click(function() {
-		$('#alert').hide(100);
+		$('#alert').hide(1);
+		if (reloadFlag) window.location.reload();
 	});
 
 	$(".showInfo").click(function() {
@@ -1662,6 +1666,22 @@ $(document).ready(function() {
 function newHash(hash){
 	lastHash = hash;
 	location.replace(lastHash); 
+}
+
+function checkForUppdates(){
+	var oldVersion = version;
+	$.getJSON('js/version.json', function(json) {
+		version = json.version;	
+		if (version > oldVersion) {
+			showAlert("Sidan uppdaterad, vänligen ladda om sidan.")
+			reloadFlag = "yes";
+		}
+	})
+	.always(function() {
+		setTimeout(function() {	
+			checkForUppdates()
+		}, 1*60*60*1000);  //1 hour
+	});
 }
 
 function showbox(div) {
