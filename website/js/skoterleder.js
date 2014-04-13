@@ -1,5 +1,10 @@
-var version = 999;
+var version;
+var newVersion;
+var newVersionFlag;
 var reloadFlag;
+var lastActiveTime;
+var lastVersionCheckTime;
+var expires;
 var markers;
 var dataCache = [];
 var icon = [];
@@ -1686,27 +1691,61 @@ $(document).ready(function() {
 		initSelectBox("share");
 		return false;
 	});
+
+    $(window).focus(function() {
+		if ((lastVersionCheckTime + 30*60*1000) < new Date().getTime()) {
+			// Limit version check to 30 minut
+			getVersion();
+		}
+		checkForReload();
+    });
 });
 
 function newHash(hash){
 	lastHash = hash;
+	lastActiveTime = new Date().getTime();
 	location.replace(lastHash); 
 }
 
 function checkForUppdates(){
-	var oldVersion = version;
-	$.getJSON('js/version.json', function(json) {
-		version = json.version;	
-		if (version > oldVersion) {
-			showAlert("Sidan uppdaterad, vänligen ladda om sidan.")
-			reloadFlag = "yes";
+	getVersion();
+
+	setTimeout(function() {	
+		checkForUppdates();
+	}, 1*60*60*1000);  //1 hour
+}
+
+function getVersion(){
+	if (!newVersionFlag) {
+		$.getJSON('js/version.json', function(json) {
+			var oldVersion = version;
+			version = json.version;	
+			expires = json.expires;
+			if (!version) version = newVersion;
+			if (version > oldVersion) newVersionFlag = true;
+			lastVersionCheckTime = new Date().getTime();
+			checkForReload();
+		});
+	}
+}
+function checkForReload(){
+	if (newVersionFlag) {
+		if ((lastActiveTime + 10*60*1000) < new Date().getTime()) {
+			// If user inactive for the last 10 min, reload page
+			ga('send', 'pageview',"auto-reload/"+window.location.hash);
+			setTimeout(function() {	
+				window.location.reload();
+			}, 500);  //0.5 sec delay to make time for analytics
+			return;
 		}
-	})
-	.always(function() {
-		setTimeout(function() {	
-			checkForUppdates()
-		}, 1*60*60*1000);  //1 hour
-	});
+		if (new Date(expires) < new Date().getTime()) {
+			// When expire time passed, displays message: 
+			showAlert("Sidan uppdaterad, vänligen ladda om sidan.");
+			reloadFlag = true;
+			ga('send', 'pageview',"reload/"+window.location.hash);
+			return;
+		}
+	}
 }
 
 function showbox(div) {
