@@ -24,6 +24,28 @@ $(document).ready(function() {
 	checkForUppdates();
 	var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
 	
+	// Leaflet Measure plugin from https://github.com/p-j/leaflet.measure
+	map.addControl(new L.Control.Measure({
+		unitConverter: function(val) {
+			if (val > 50000) {
+				return {
+					unit: 'km',
+					value: Math.round(val / 1000) // Returns 72 km
+				};
+			} else if (val > 1000) {
+				return {
+					unit: 'km',
+					value: Math.round(val / 100) / 10 // Returns 25.2 km
+				};
+			} else {
+				return {
+					unit: 'm',
+					value: Math.round(val) // Returns 9852 m
+				};
+			}
+		}
+	}));
+	
 	var touchDev = false;
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
 		var touchDev = true;
@@ -207,6 +229,9 @@ $(document).ready(function() {
 	map.addControl(new openOsmEditLink());
 	map.addControl(new addPrintButton());
 	map.addControl(new addShareButton());
+	
+	// L.Control.Measure().addTo(map);
+	// https://github.com/IL2HorusTeam/leaflet.measure
 
 	// Icons from http://mapicons.nicolasmollet.com/
 	icon[1] = 'images/icons/snowmobile-green.png';
