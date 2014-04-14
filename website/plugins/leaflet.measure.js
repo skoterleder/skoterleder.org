@@ -14,14 +14,13 @@ L.Control.Measure = L.Control.extend({
 		var className = 'leaflet-control-zoom leaflet-bar leaflet-control',
 			container = L.DomUtil.create('div', className);
 
-		this._createButton('&#8674;', 'Mät avstånd', 'leaflet-control-measure leaflet-bar-part leaflet-bar-part-top-and-bottom', container, this._toggleMeasure, this);
+		this._createButton('Mät avstånd', 'leaflet-control-measure leaflet-bar-part leaflet-bar-part-top-and-bottom', container, this._toggleMeasure, this);
 
 		return container;
 	},
 
-	_createButton: function(html, title, className, container, fn, context) {
+	_createButton: function(title, className, container, fn, context) {
 		var link = L.DomUtil.create('a', className, container);
-		link.innerHTML = html;
 		link.href = '#';
 		link.title = title;
 
