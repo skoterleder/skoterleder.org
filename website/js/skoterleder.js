@@ -470,6 +470,8 @@ $(document).ready(function() {
 		var inactivText =""
 		if (data.status != "1") inactivText ="<p class='alerttext'>Denna markör är inte aktiv och syns inte på kartan</p>";
 		
+		description = zParse.BBCodeToHtml(description);
+		
 		container.html( inactivText + " \
 			<h2>"+title+"</h2><p>"+description.replace(/\r?\n/g, '<br>')+"</p> \
 			<div class='pupupdivider'></div> \
@@ -667,6 +669,8 @@ $(document).ready(function() {
 			newHash("#!marker/"+ id + "/show");
 			return false;
 		});		
+
+		data.description = zParse.BBCodeToHtml(data.description); 
 
 		if (data.status != "1") {
 			$("<p>").addClass("alerttext").html("Denna markör är inte aktiv och syns inte på kartan").appendTo(div);
@@ -1865,7 +1869,13 @@ function showInfo(div,extra) {
 	$("<div id='disqus_thread'>").appendTo('#main-info');
 	loadDisqus('info','Information','info');
 	$('.infoComments').hide();
-	
+
+	if ($('.version').length) $('.version').remove();
+	var reloadPage = ""
+	if (typeof newVersionFlag != 'undefined') reloadPage = " Reloadpage"
+	var showVersion = "<p class='version gray'>Version: "+version+reloadPage+"</p>";
+	$(showVersion).appendTo('#main-info');
+
 	ga('send', 'pageview', window.location.hash);
 }
 

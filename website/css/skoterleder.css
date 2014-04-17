@@ -332,6 +332,10 @@ a.more-text-link, a.more-text-link:hover {
 a.textlink:hover {
 	color:black!important;
 }
+.maxwidthImg {
+    width:100%;
+    max-width:286px;
+}
 
 hr {
 	height: 2px;
