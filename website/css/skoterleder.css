@@ -316,6 +316,13 @@ label {
 	text-decoration: none;
 	color: gray!important;
 }
+.textlinkmini  {
+	display: block;
+	margin-bottom: 8px;
+	font-size:0.8em;
+	text-decoration: none;
+	color: gray!important;
+}
 .gray  {
 	margin: -5px 0 2px 0px;
 	font-size: 0.85em;
