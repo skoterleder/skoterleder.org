@@ -21,6 +21,14 @@ var nwHandel;
 var centerHandel;
 var link_marker;
 var lastHash;
+var olat;
+var olng;
+
+// Unique user id, only used for statistics
+var uid = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+});
 	
 $(document).ready(function() {
 	
@@ -380,6 +388,7 @@ $(document).ready(function() {
 			// console.log("New time");
 			ga('send', 'pageview',window.location.hash);
 		}
+		if (zoom > 7) savelocation(latlng);
 	}
 
 	function openMarkerPopup(a,show) {
@@ -1992,3 +2001,15 @@ function eraseCookie(name) {
   js.src = "//connect.facebook.net/sv_SE/all.js#xfbml=1&appId="+facebook_appId;
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
+
+function savelocation(latlng){
+	// Rounds to .5 for lat and no decimals for lng position. Used for statistics of visiters.
+    var lat = Math.round(latlng.lat*2)/2;
+	var lng = Math.round(latlng.lng);
+
+	if (olat != lat || olng != lng) {
+		$.ajax({url: "inc/savelocation.php?uid="+uid+"&lat="+lat+"&lng="+lng});
+		olat = lat;
+		olng = lng;
+	}
+}
