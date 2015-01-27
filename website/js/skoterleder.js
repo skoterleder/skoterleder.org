@@ -335,7 +335,19 @@ $(document).ready(function() {
 		locateOptions: {
 			maxZoom: 14,
 			enableHighAccuracy: true,
-		}
+		},
+		// range circle
+		circleStyle: {
+			color: '#F9B8D2',
+			fillColor: '#F9B8D2',
+			fillOpacity: 0.40,
+			opacity: 0.7
+        },
+		// inner marker
+		markerStyle: {
+			color: '#CC0000',
+			fillColor: '#CC0000',
+		},
 	}).addTo(map);
 
 	map.on('startfollowing', function() {
