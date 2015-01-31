@@ -335,6 +335,7 @@ $(document).ready(function() {
 		locateOptions: {
 			maxZoom: 14,
 			enableHighAccuracy: true,
+			watch:true,
 		},
 		// range circle
 		circleStyle: {
