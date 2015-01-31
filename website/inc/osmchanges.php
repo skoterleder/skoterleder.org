@@ -1,5 +1,5 @@
 <?php
-include_once 'inc/database_config.php';
+include_once 'database_config.php';
 
 $xml = file_get_contents("php://input") ;
 $row = explode('"', $xml);

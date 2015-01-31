@@ -489,6 +489,26 @@ th:last-child {
 	border-radius: 0 8px 8px 0;
 }
 
+#infoBox {
+	display:block;
+	position:absolute;
+	top:8px;
+	z-index: 1010;
+	background-color: rgba(255, 255, 255, 0.95);
+	-moz-border-radius: 3px;
+	border-radius: 5px;
+	border: solid #D0D0EE 1px;
+	padding: 0;
+	text-align: center;
+}
+#infoBox h4{
+	margin-left: 30px;
+	margin-right: 30px;
+}
+.dateSelected {
+	text-decoration: none;
+	padding: 5px;
+}
 
 .leaflet-container {
 	overflow: hidden!important;
