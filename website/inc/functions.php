@@ -86,7 +86,7 @@ function newcommentmail($id,$text){
 
 	// Additional headers
 	// $headers .= "To: $email . \r\n";
-	$headers .= 'From: Skoterleder.org <henrik@skoterleder.org>' . "\r\n";
+	$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
 	$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
 	
 	mail($to, $subject, $message, $headers);
@@ -156,7 +156,7 @@ function newChangeMarkerMail($id,$nemail){
 
 		// Additional headers
 		// $headers .= "To: $email . \r\n";
-		$headers .= 'From: Skoterleder.org <henrik@skoterleder.org>' . "\r\n";
+		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
 		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
 		
 		mail($to, $subject, $message, $headers);
@@ -235,7 +235,7 @@ function flagMarkerMail($id,$hash,$description){
 
 		// Additional headers
 		// $headers .= "To: $email . \r\n";
-		$headers .= 'From: Skoterleder.org <henrik@skoterleder.org>' . "\r\n";
+		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
 		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
 
 		mail($to, $subject, $message, $headers);
