@@ -204,7 +204,18 @@ $(document).ready(function() {
 				return container;
 		}
 	});
-
+	var addGooglePlayButton = L.Control.extend({
+		options: {
+				position: 'bottomright'
+		},
+		onAdd: function (map) {
+			var container = L.DomUtil.create('div', 'googlePlayBtn');
+				
+			container.innerHTML += '<img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />';
+			return container;
+		}
+	});
+	
 	var skoterleder = new L.tileLayer('http://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 14,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
@@ -240,6 +251,7 @@ $(document).ready(function() {
 	map.addControl(layersControl);
 	map.addControl(new openOsmLink()); 
 	map.addControl(new openOsmEditLink());
+	if (!touchDev) map.addControl(new addGooglePlayButton());
 	map.addControl(new addPrintButton());
 	map.addControl(new addShareButton());
 	
@@ -1716,6 +1728,10 @@ $(document).ready(function() {
 	$(".shareMap").click( function() {
 		initSelectBox("share");
 		return false;
+	});
+	
+	$(".googlePlayBtn").click( function() {
+		showInfo("improve");
 	});
 
     $(window).focus(function() {
