@@ -231,7 +231,6 @@ label {
 	padding: 0;
 	z-index: 1003;
 	display: none;
-	pointer-events: none;
 }
 
 #showMarkerBox {
@@ -301,7 +300,15 @@ label {
 	text-decoration: none;
 	cursor: pointer;
 }
-
+.poiIcons {
+	width: 32px;
+	vertical-align: top;
+	padding-right: 4px;
+	padding-bottom: 3px;
+}
+.selectIconType {
+	border:  2px solid transparent;
+}
 .iconSelected {
 	border: 2px solid #6C8DD3;
 	-moz-border-radius: 2px;
@@ -586,6 +593,28 @@ th:last-child {
 	background-image: url(../images/icons/share20.png);
 }
 
+/* For marker cluster plugin*/
+.marker-cluster-small {
+	background-color: rgba(181, 226, 140, 0.5)!important;
+	}
+.marker-cluster-small div {
+	background-color: rgba(110, 204, 57, 0.5)!important;
+	}
+
+.marker-cluster-medium {
+	background-color: rgba(241, 211, 87, 0.4)!important;
+	}
+.marker-cluster-medium div {
+	background-color: rgba(240, 194, 12, 0.4)!important;
+	}
+
+.marker-cluster-large {
+	background-color: rgba(253, 156, 115, 0.4)!important;
+	}
+.marker-cluster-large div {
+	background-color: rgba(241, 128, 23, 0.4)!important;
+	}
+	
 .fb-like {
 	margin-left:10px;
 }

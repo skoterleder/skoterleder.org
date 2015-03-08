@@ -6,9 +6,13 @@ var lastActiveTime;
 var lastVersionCheckTime;
 var expires;
 var markers;
+var poiIcons;
+var poiIconsLoaded = false;
 var dataCache = [];
 var icon = [];
 var iconType = [];
+var marker = [];
+var iconSize;
 var baseLayer;
 var popup;
 var timeout = new Date().getTime() + 1*60*1000; //add 1 minutes;
@@ -264,7 +268,11 @@ $(document).ready(function() {
 	icon[3] = 'images/icons/treedown.png';
 	icon[4] = 'images/icons/caution.png';
 	icon[5] = 'images/icons/fixmap.png';
-	
+	icon[6] = 'images/icons/parking.png';
+	icon[7] = 'images/icons/coffee.png';
+	icon[500] = 'images/icons/fuel.png',
+	icon[501] = 'images/icons/shelter.png',
+		
 	
 	iconType[0] = L.icon({
 		iconUrl: 'images/icons/question.png',
@@ -274,34 +282,44 @@ $(document).ready(function() {
 	});
 	iconType[1] = L.icon({
 		iconUrl: 'images/icons/snowmobile-green.png',
-		iconSize:	 [32, 37], // size of the icon
-		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[2] = L.icon({
 		iconUrl: 'images/icons/information.png',
-		iconSize:	 [32, 37], // size of the icon
-		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[3] = L.icon({
 		iconUrl: 'images/icons/treedown.png',
-		iconSize:	 [32, 37], // size of the icon
-		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[4] = L.icon({
 		iconUrl: 'images/icons/caution.png',
-		iconSize:	 [32, 37], // size of the icon
-		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
 	iconType[5] = L.icon({
 		iconUrl: 'images/icons/fixmap.png',
-		iconSize:	 [32, 37], // size of the icon
-		iconAnchor:   [16, 37], // point of the icon which will correspond to marker's location
 		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
 	});
+	iconType[6] = L.icon({
+		iconUrl: 'images/icons/parking.png',
+		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
+	});
+	iconType[7] = L.icon({
+		iconUrl: 'images/icons/coffee.png',
+		popupAnchor:  [0, -33] // point from which the popup should open relative to the iconAnchor
+	});
+
+	iconType[500] = L.icon({
+		iconUrl: 'images/icons/fuel.png',
+		iconSize:	 [20, 20], // size of the icon
+		iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+	});
+	iconType[501] = L.icon({
+		iconUrl: 'images/icons/shelter.png',
+		iconSize:	 [20, 20], // size of the icon
+		iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+	});
+		
 	iconType['move'] = L.icon({
 		iconUrl: 'images/icons/move.png',
 		iconSize:	 [35, 35], // size of the icon
@@ -373,7 +391,8 @@ $(document).ready(function() {
 		updateMapHash(); 
 	});
 	map.on('zoomend', function(e) {
-		updateMapHash(); 
+		updateMapHash();
+		dispalyMarkers();
 	});
 	map.on('popupclose', function(e) {
 		updateMapHash(); 
@@ -509,8 +528,8 @@ $(document).ready(function() {
 		container.html( inactivText + " \
 			<h2>"+title+"</h2><p>"+description.replace(/\r?\n/g, '<br>')+"</p> \
 			<div class='pupupdivider'></div> \
-			<p class='textlink'>" + hedline + " av: "+ name + " <br>\
-			" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
+			<p class='textlink created'>" + hedline + " av: "+ name + " </p>\
+			<p class='textlink'>" + created + "&nbsp;&nbsp; <img src='images/icons/comment.png' \
 			 title='Kommentarer' class='iconImg' width='14' height='12'> " + comments + " \
 			 &nbsp;&nbsp; \
 			 <img src='images/icons/open.png' title='Visad " + data.count + " ggr' \
@@ -525,13 +544,21 @@ $(document).ready(function() {
 			Mer information</a> <a href='#' class='cancelLink linkButton'>Stäng</a></p> \
 			</div><div class='clearboth'></div> \
 			");
-
-				//	<a href='#marker/"+id+"/change' rel='external'>Radera/Ändra</a>	</p>\
-
-		popup = L.popup( {offset: new L.Point(0, -27),maxWidth: maxPopupWidth,})
+		
+		var y=-27;
+		if (data.type > 499 ) y=0;
+		
+		popup = L.popup( {offset: new L.Point(0, y),maxWidth: maxPopupWidth,})
 		.setLatLng(latlng)
 		.setContent(container[0])
 		.openOn(map);		
+
+		if ( data.name == "Import" ) {
+			$(".created").html("Importerad från OSM");
+			if ( updatetime ) $(".created").append(", ändrad");
+		}
+
+		
 
 		if (linkin) map.setView(latlng,11);
 
@@ -703,7 +730,7 @@ $(document).ready(function() {
 			newHash("#!marker/"+ id + "/show");
 			return false;
 		});		
-
+		
 		data.description = zParse.BBCodeToHtml(data.description); 
 
 		if (data.status != "1") {
@@ -716,11 +743,12 @@ $(document).ready(function() {
 		<table><tr><td>\
 		<div class='submitterAvatar'>" + avatarlink + " </div> \
 		</td><td class='textlink'>\
-		<p class='narrow'>Skapad av: " + data.name + " </p> \
+		<p class='narrow created'>Skapad av: " + data.name + " </p> \
 		<p class='narrow'>Skapad: " + data.createtime + " </p> " + changeHTMLtext + " \
 		</td></tr></table> \
 		<p class='narrow'><a href='#' class='adminMail textlink'>Ändra denna markör</a> \
 		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
+		<p class='nodinfo narrow'></p> \
 		<div id='displayInfo'></div> \
 		<div id='fbshare'> \
 		<div class='fb-like' data-href='" + shareUrl + "' \
@@ -729,7 +757,24 @@ $(document).ready(function() {
 		<p class='narrow'><a href='#!marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		"
 		); 
-
+		if ( data.name == "Import" ) $(".created").html("Importerad från OSM");
+		if ( data.description == "" && data.type > 499 ) {
+			$(".markerContent h3").after("<p class='textlink'>Denna markör är importerad från OSM, komplettera gärna med mer information. Alla kan ändra denna markör/text.</p>");
+		}
+		if ( data.changeable ) {
+			$(".adminMail").addClass("changeLink").removeClass("adminMail");
+		}
+		
+		if ( data.node ) {
+			$(".nodinfo").append("<a class='textlink' href='http://www.openstreetmap.org/node/"+data.node+"' target='_blank'>Visa nod "+data.node+" på OSM</a>");			
+			$(".nodinfo").css('padding-top',7);
+		}
+		
+		div.on('click', '.changeLink', function() {
+			changeMarker(id);
+			return false;
+		});
+		
 		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
 		$("<div>").attr("id","disqus_thread").appendTo(div);
 		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
@@ -755,7 +800,7 @@ $(document).ready(function() {
 	}	
 	
 	function changeMarker(id, hash) { 
-	
+		if (!hash) hash = "";
 		saveButtonText = "Spara";
 		
 		$("#showMarkerBox").empty();
@@ -833,6 +878,8 @@ $(document).ready(function() {
 							value:'change'
 						}
 					));
+			form.append( "<input id='ctype' type='hidden' name='type' value='"+data.type+"'>" );
+			
 			if (data.status === "-1") form.append( $("<p>").html("OBS! Överväg att skapa ny\
 										markör i stället för att återaktivera en gamla om \
 										ämnet inte är den samma."));
@@ -863,11 +910,38 @@ $(document).ready(function() {
 
 			$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
 			
-			if (data.status === "1") $("<p>").addClass("linkButtonLong removeMarkerButton").text("Inaktivera markör").appendTo(div);
+			if (data.status === "1" && !data.changeable) $("<p>").addClass("linkButtonLong removeMarkerButton").text("Inaktivera markör").appendTo(div);
 			
 			$("<p>").addClass("linkButtonLong showCommentsButton").text("Visa kommentarer").appendTo(div);
 			
 			$('<div>', {id: 'disqus_thread'}).appendTo(div);
+			
+			//  <p class='narrow '>Ändra markörtyp</p>");  
+			
+			if ( data.type < 499 ) {
+				$('#cdescription').after(" \
+				<img src='images/icons/snowmobile-green.png' class='selectIconType icon-1' type='1' title='Information om skoterled'> \
+				<img src='images/icons/information.png' class='selectIconType icon-2' type='2' title='Allmän information'> \
+				<img src='images/icons/treedown.png' class='selectIconType icon-3' type='3' title='Blockerad skoterled'> \
+				<img src='images/icons/caution.png' class='selectIconType icon-4' type='4' title='Varning, fara!'> \
+				<img src='images/icons/fixmap.png' class='selectIconType icon-5' type='5' title='Rapportera kartfel'> \
+				<img src='images/icons/parking.png' class='selectIconType icon-6' type='6' title='Skoterparkering'> \
+				<img src='images/icons/coffee.png' class='selectIconType icon-7' type='7' title='Servering för skoteråkare'> \
+				<img src='images/icons/shelter.png' class='selectIconType poiIcons  icon-501' type='501' title='Vindskydd eller liknande'> \
+				<img src='images/icons/fuel.png' class='selectIconType poiIcons  icon-500' type='500' title='Bensinstation tillgänglig med skoter'> \
+				");
+				$('.icon-'+data.type).addClass("iconSelected");
+			}
+			
+			div.on('click', '.selectIconType', function() {
+				console.log($(this).attr("type"));
+				$('.selectIconType').removeClass( "iconSelected" )
+				$(this).addClass( "iconSelected" );
+				
+				// $(".iconText").html($(this).attr("title"));
+				$("#ctype").val($(this).attr("type"));
+				
+			});
 			
 			div.on('click', '.closeMarkerBox', function() {
 				hidebox('#showMarkerBox');
@@ -917,6 +991,7 @@ $(document).ready(function() {
 							showAlert("Markör Sparad!");
 							hidebox('#showMarkerBox'); // or hashControll();
 							loadmarkers();
+							dataCache[id] = 'undefined';
 							ga('send', 'pageview','#marker/'+id+'/saved'); //#changeMarker/17
 						}
 					},
@@ -1042,6 +1117,7 @@ $(document).ready(function() {
 			document.title = "Skoterleder.org - Mina markörer";
 			
 			$("#listBox").empty();
+			$('#listBox').css('overflow','auto');
 
 			var div = $("<div>").addClass("markerContent").appendTo("#listBox");
 			
@@ -1118,35 +1194,65 @@ $(document).ready(function() {
 	function loadmarkers(q) {
 		if (!q) q = "";
 		
-		if (markers) {
-			map.removeLayer(markers);
-			markers = new L.MarkerClusterGroup();
-			
-			if (popup) map.removeLayer(popup);
-		} else {
-			markers = new L.MarkerClusterGroup();
-		}
-		
 		$.getJSON('inc/data.php?q='+q, function(points) {
+			marker.length = 0
 			for(var i=0;i<points.marker.length;i++){
-				var point = points.marker[i];
-				markers.addLayer(new L.marker(point.coordinates, point.properties).setIcon(iconType[point.icon]));
+				marker[i] = points.marker[i];
 			}
+			iconSize = "";
+			dispalyMarkers();
 		})
 		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
 				showAlert("Error loading marker");
 				console.log(jqXHR.responseText);
 				console.log(textStatus);
 		});
-
-		map.addLayer(markers);
-
-		markers.on('click', function (a) {  
-			openMarkerPopup(a);
-		});			
-
+	}
+	
+	function dispalyMarkers() {
+		if ( marker.length === 0 ) return;  // Markers not loaded
+		var zoom = map.getZoom();
+		var size = 0;
+		if ( zoom > 9 && iconSize != "large" ) { size = 100; iconSize = "large"; }
+		if ( zoom === 9 && iconSize != "medium" ) { size = 80; iconSize = "medium"; }
+		if ( zoom < 9 && iconSize != "smal" ) { size = 70; iconSize = "smal"; }
+		if ( size === 0 ) return;
+		
+		if ( markers ) map.removeLayer(markers);
+		markers = new L.MarkerClusterGroup({ maxClusterRadius: 70 });
+		
+		if ( !poiIconsLoaded ) poiIcons = new L.MarkerClusterGroup({ maxClusterRadius: 20 });
+		
+		var x=32, y=37;
+		var z = size / 100;
+		for (var i=1; i < 8; i++) {
+			iconType[i].options.iconSize = [x * z, y * z]; // size of the icon
+			iconType[i].options.iconAnchor = [x*z/2, y * z]; // point of the icon which will correspond to marker's location
+		}
+		
+		for (var i=0; i < marker.length; i++) {
+			var point = marker[i];
+			if ( point.icon < 499 ) {
+				markers.addLayer(new L.marker(point.coordinates, point.properties).setIcon(iconType[point.icon]));
+			} else if ( !poiIconsLoaded ) { // Only runs first time
+				poiIcons.addLayer(new L.marker(point.coordinates, point.properties).setIcon(iconType[point.icon]));
+			}
 		}
 
+		map.addLayer(markers);
+		markers.on('click', function (a) { openMarkerPopup(a); });	
+
+		if ( !poiIconsLoaded ) {
+			poiIcons.on('click', function (a) {  
+				openMarkerPopup(a);
+			});
+			poiIconsLoaded = true;
+		}
+		
+		if ( zoom <= 9 && map.hasLayer(poiIcons) ) map.removeLayer(poiIcons);
+		if ( zoom > 9 && !map.hasLayer(poiIcons) ) map.addLayer(poiIcons);
+	}
+	
 	$("#addMarkerForm").submit(function(form) {
 
 		var name = $("#name").val();
