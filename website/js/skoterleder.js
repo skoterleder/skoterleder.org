@@ -802,6 +802,7 @@ $(document).ready(function() {
 	function changeMarker(id, hash) { 
 		if (!hash) hash = "";
 		saveButtonText = "Spara";
+		var message = "";
 		
 		$("#showMarkerBox").empty();
 		$("<p>").text("Laddar...").appendTo("#showMarkerBox");
@@ -830,68 +831,25 @@ $(document).ready(function() {
 			}
 			if (data.status === "-1") {
 				saveButtonText = "Spara och återaktivera";
+				message = "<p>OBS! Överväg att skapa ny \
+								markör i stället för att återaktivera en gamla om \
+								ämnet inte är den samma. </p>"
 				$("<p>").addClass("alerttext").html("Markören är inte aktiv").appendTo(div);
 			}
 			
-			var form = $("<form>", 
-						{ action:'#', id: "changeMarkerForm" }
-					);
-			form.append( $("<label>", {for:'ctitle'}).text("Rubrik"));
-			form.append( $("<input>", 
-						{ 
-							type:'text', 
-							name:'title', 
-							id:'ctitle' ,
-							value: decodeEntities(data.title)
-						}
-					));
-
-			form.append( $("<label>", {for:'cdescription'}).text("Beskrivning"));
-			form.append( $("<textarea>", 
-						{ 
-							name:'description', 
-							id:'cdescription',
-							rows:6,
-						}
-					)); // cdescription .text(decodeEntities(data.description).replace(/(\r\n|\r|\n)/g, '\r\n')));
-
-			form.append( $("<input>", 
-						{ 
-							type:'hidden', 
-							name:'id', 
-							id:'cid',
-							value: id
-						}
-					));
-			form.append( $("<input>", 
-						{ 
-							type:'hidden', 
-							name:'hash', 
-							id:'chash',
-							value: hash
-						}
-					));
-			form.append( $("<input>", 
-						{ 
-							type:'hidden', 
-							name:'action', 
-							value:'change'
-						}
-					));
-			form.append( "<input id='ctype' type='hidden' name='type' value='"+data.type+"'>" );
-			
-			if (data.status === "-1") form.append( $("<p>").html("OBS! Överväg att skapa ny\
-										markör i stället för att återaktivera en gamla om \
-										ämnet inte är den samma."));
-			
-			form.append( $("<input>", 
-						{ 
-							type:'submit',
-							value:saveButtonText,
-							class:'inputbutton floatRight'
-						}
-					));
-
+			var form = " \
+			<form action='#' id ='changeMarkerForm'> \
+			<label for='ctitle'>Rubrik</label> \
+			<input type='text' name='title' id='ctitle' value='"+decodeEntities(data.title) + "' \
+			<label for='cdescription'>Beskrivning</label> \
+			<textarea name='description' id='cdescription' rows='6'></textarea> \
+			<input type='hidden' name='id' id='cid' value='" + id + "'> \
+			<input type='hidden' name='hash' id:'chash' value='" + hash + "'> \
+			<input type='hidden' name='action' value='change' >\
+			<input id='ctype' type='hidden' name='type' value='"+data.type+"'> \
+			" + message +"\
+			<input type='submit' value='" + saveButtonText + "' class='inputbutton floatRight'> \
+			";
 			$(form).appendTo(div);
 			
 			$("#cdescription").val(decodeEntities(data.description).replace(/(\r\n|\r|\n)/g, '\r\n'));
@@ -916,8 +874,6 @@ $(document).ready(function() {
 			
 			$('<div>', {id: 'disqus_thread'}).appendTo(div);
 			
-			//  <p class='narrow '>Ändra markörtyp</p>");  
-			
 			if ( data.type < 499 ) {
 				$('#cdescription').after(" \
 				<img src='images/icons/snowmobile-green.png' class='selectIconType icon-1' type='1' title='Information om skoterled'> \
@@ -934,13 +890,11 @@ $(document).ready(function() {
 			}
 			
 			div.on('click', '.selectIconType', function() {
-				console.log($(this).attr("type"));
 				$('.selectIconType').removeClass( "iconSelected" )
 				$(this).addClass( "iconSelected" );
 				
 				// $(".iconText").html($(this).attr("title"));
 				$("#ctype").val($(this).attr("type"));
-				
 			});
 			
 			div.on('click', '.closeMarkerBox', function() {
