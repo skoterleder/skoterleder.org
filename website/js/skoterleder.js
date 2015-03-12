@@ -270,9 +270,9 @@ $(document).ready(function() {
 	icon[5] = 'images/icons/fixmap.png';
 	icon[6] = 'images/icons/parking.png';
 	icon[7] = 'images/icons/coffee.png';
-	icon[500] = 'images/icons/fuel.png',
-	icon[501] = 'images/icons/shelter.png',
-		
+	icon[500] = 'images/icons/fuel.png';
+	icon[501] = 'images/icons/shelter.png';
+	icon[502] = 'images/icons/wildernesshut.png';
 	
 	iconType[0] = L.icon({
 		iconUrl: 'images/icons/question.png',
@@ -319,7 +319,12 @@ $(document).ready(function() {
 		iconSize:	 [20, 20], // size of the icon
 		iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
 	});
-		
+	iconType[502] = L.icon({
+		iconUrl: 'images/icons/wildernesshut.png',
+		iconSize:	 [20, 20], // size of the icon
+		iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+	});
+	
 	iconType['move'] = L.icon({
 		iconUrl: 'images/icons/move.png',
 		iconSize:	 [35, 35], // size of the icon

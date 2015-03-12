@@ -21,6 +21,7 @@ $icons[6] = '../images/icons/parking.png';
 $icons[7] = '../images/icons/coffee.png';
 $icons[500] = '../images/icons/fuel.png';
 $icons[501] = '../images/icons/shelter.png';
+$icons[502] = '../images/icons/wildernesshut.png';
 $icons['l'] = '../images/icons/map22-1.png';
 	
 $x = (($lng + 180) / 360) * pow(2, $zoom);
