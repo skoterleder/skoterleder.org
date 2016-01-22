@@ -242,6 +242,91 @@ function flagMarkerMail($id,$hash,$description){
 	}
 }
 
+function newGPXcommentmail($id,$text){
+	global $db;
+	
+	/* Prepare statement */ 
+	$sql='SELECT email, name, trackname, perfname, perfemail FROM gpxtrack WHERE id = ?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('i',$id);
+
+	$stmt->execute();
+
+	$stmt->bind_result($email, $name, $trackname, $perfname, $perfemail);
+	$stmt->fetch();
+	$stmt->close();
+	$db->close();	
+
+	mb_internal_encoding('UTF-8');
+	
+	if ( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
+		$to      = $email;
+		$subject = "Ny kommentar till spår: $trackname";
+		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
+
+		$open_url  	= SERVERADRESS . "gpx/#!track/$id";
+		
+		$message = '
+		<html>
+		<body>
+			<p><b>Hej '.$name.'!</b></p>
+			<p> </p>
+			<p>En ny kommentar har skrivits om spåret som du laddat upp på skoterleder.org</p>
+			<br><p>Kommentar:</p><br>
+			<p><cite>'.$text.'</cite></p><br><br>
+			<p>Läs och svara på kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
+			<br><br><br>
+			<p>Med vänliga hälsningar</p>
+			<p>Skoterleder.org</p>
+		</body>
+		</html>
+		';
+
+		// To send HTML mail, the Content-type header must be set
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
+		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
+		
+		mail($to, $subject, $message, $headers);
+	}
+	if ( filter_var($perfemail, FILTER_VALIDATE_EMAIL) && $perfemail != $email ) {
+		$to      = $perfemail;
+		$subject = "Ny kommentar till spår: $trackname";
+		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
+
+		$open_url  	= SERVERADRESS . "gpx/#!track/$id";
+		
+		$message = '
+		<html>
+		<body>
+			<p><b>Hej '.$perfname.'!</b></p>
+			<p> </p>
+			<p>En ny kommentar har skrivits om spåret som du anmält dig som införare till på skoterleder.org</p>
+			<br><p>Kommentar:</p><br>
+			<p><cite>'.$text.'</cite></p><br><br>
+			<p>Läs och svara på kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
+			<br><br><br>
+			<p>Med vänliga hälsningar</p>
+			<p>Skoterleder.org</p>
+		</body>
+		</html>
+		';
+
+		// To send HTML mail, the Content-type header must be set
+		$headers  = 'MIME-Version: 1.0' . "\r\n";
+		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
+		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
+		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
+		
+		mail($to, $subject, $message, $headers);
+	}
+}
 
 
 

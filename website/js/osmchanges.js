@@ -205,8 +205,10 @@ $(document).ready(function() {
 		
 		if (zoom < 6 && areaText) {
 			map.removeLayer(areaText);
+			console.log("remove layer");
 		} else {
 			if ( areaText ) map.addLayer(areaText);
+			console.log("add layer");
 		}
 		
 		newHash("#!map/" + zoom + "/" + lat + "/" + lng + layer)
@@ -294,7 +296,7 @@ $(document).ready(function() {
 			
 			for(var i=0;i<points.areas.length;i++){
 				var area = points.areas[i];
-				var content = "<p>Changed tiles: " + area.t + "</p><p>Name: " + area.n + "</p>";
+				var content = "<p>Changed tiles: " + area.t + "</p><p>Tid: " + area.m + "</p><p>Name: " + area.n + "</p>";
 				var color = "#fa0";
 				
 				var fill =  (area.t / 500)+0.2;
@@ -304,7 +306,8 @@ $(document).ready(function() {
 				
 				areaRect.addLayer( L.rectangle(area.bb,{fillOpacity:fill, color: color, weight: 1}).bindPopup(content) );
 				
-				var icon = L.divIcon({className:'p', html:area.t});
+                if ( area.m < 1 ) area.m = "";
+				var icon = L.divIcon({className:'p', html:area.t+"<br>"+area.m});
 				areaText.addLayer( L.marker(L.latLngBounds(area.bb).getCenter(), {icon: icon}) );
 			
 			}
@@ -350,7 +353,7 @@ $(document).ready(function() {
 			for(var i=0;i<points.areas.length;i++){
 				var area = points.areas[i];
 				var content = "<p>Area: " + area.bb + "</p>";
-			
+
 				var fill =  0.2 + area.v/maxValue/1.5;
 				if ( area.a ) fill = 0.6; 
 				
