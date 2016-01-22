@@ -1,4 +1,6 @@
 <?php
+include_once 'database_config.php';
+
 header ('Content-Type: image/png');
 
 $icon="";
@@ -45,12 +47,11 @@ for ($yy = floor($yStart); $yy < $yEnd; $yy++) {
 	$firstcol=0;
 	$firstcolInv=1;
 	for ($xx = floor($xStart); $xx < $xEnd; $xx++) {
-		$tile = imagecreatefrompng('http://tiles.skoterleder.org/tiles/'.$zoom.'/'.$xx.'/'.$yy.'.png');
+		$tile = imagecreatefrompng(TILESPATH.$zoom.'/'.$xx.'/'.$yy.'.png');
 		imagecopy($mapImage, $tile, ($col*256-$xoffset)*$firstcol, ($row*256-$yoffset)*$firstrow, $xoffset*$firstcolInv, $yoffset*$firstrowInv, 256, 256);
 		$col++;
 		$firstcolInv=0;
 		$firstcol=1;
-		// echo "<br>".'http://tiles.skoterleder.org/tiles/11/'.$xx.'/'.$yy.'.png';
 	}
 	$firstrow=1;
 	$firstrowInv=0;

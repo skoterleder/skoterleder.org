@@ -8,6 +8,7 @@ define("PASSWORD", "");									// The database password.
 define("DATABASE", "");									// The database name.
 define("SERVERADRESS", "http://skoterleder.org/");	// The server adress.
 define('SECRET_KEY', "");								// Change this to a unique phrase.
+define('TILESPATH', "");
 
 global $db;
 
