@@ -80,16 +80,7 @@ function newcommentmail($id,$text){
 	</html>
 	';
 
-	// To send HTML mail, the Content-type header must be set
-	$headers  = 'MIME-Version: 1.0' . "\r\n";
-	$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-
-	// Additional headers
-	// $headers .= "To: $email . \r\n";
-	$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
-	$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
-	
-	mail($to, $subject, $message, $headers);
+	sendMail($to, $subject, $message);
 }
 
 function newChangeMarkerMail($id,$nemail){
@@ -117,7 +108,6 @@ function newChangeMarkerMail($id,$nemail){
 
 		$name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
 		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
-		$description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
 		
 		$to      = $email;
 		$subject = "Din markör: $title";
@@ -150,16 +140,7 @@ function newChangeMarkerMail($id,$nemail){
 		</html>
 		';
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-
-		// Additional headers
-		// $headers .= "To: $email . \r\n";
-		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
-		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
-		
-		mail($to, $subject, $message, $headers);
+		sendMail($to, $subject, $message);
 	}
 }
 function flagMarkerMail($id,$hash,$description){
@@ -229,16 +210,7 @@ function flagMarkerMail($id,$hash,$description){
 		</html>
 		';
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-
-		// Additional headers
-		// $headers .= "To: $email . \r\n";
-		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
-		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
-
-		mail($to, $subject, $message, $headers);
+		sendMail($to, $subject, $message);
 	}
 }
 
@@ -287,13 +259,7 @@ function newGPXcommentmail($id,$text){
 		</html>
 		';
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
-		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
-		
-		mail($to, $subject, $message, $headers);
+		sendMail($to, $subject, $message);
 	}
 	if ( filter_var($perfemail, FILTER_VALIDATE_EMAIL) && $perfemail != $email ) {
 		$to      = $perfemail;
@@ -318,16 +284,18 @@ function newGPXcommentmail($id,$text){
 		</html>
 		';
 
-		// To send HTML mail, the Content-type header must be set
-		$headers  = 'MIME-Version: 1.0' . "\r\n";
-		$headers .= 'Content-type: text/html; charset=UTF-8' . "\r\n";
-		$headers .= 'From: Skoterleder.org <info@skoterleder.org>' . "\r\n";
-		$headers .= 'Bcc: henrik_rosvall@yahoo.se' . "\r\n";
-		
-		mail($to, $subject, $message, $headers);
+		sendMail($to, $subject, $message);
 	}
 }
 
+function sendMail($to, $subject, $message) {
 
+	$hash = md5($to.SECRET_KEY.$subject);
+	$url = MAILPATH."?hash=$hash&&to=$to&subject=".urlencode($subject)."&message=".urlencode($message);
+	
+	$result = file_get_contents($url);
 
+	echo $result;
+	exit();
+}
 ?>
