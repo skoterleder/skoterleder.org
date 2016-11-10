@@ -296,6 +296,5 @@ function sendMail($to, $subject, $message) {
 	$result = file_get_contents($url);
 
 	echo $result;
-	exit();
 }
 ?>
