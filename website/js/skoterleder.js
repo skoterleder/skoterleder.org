@@ -357,34 +357,6 @@ $(document).ready(function() {
 	$( document ).delegate("#mapPage", "pageshow", function() {
 		map.invalidateSize(false);
 	});
-	
-	// add location control to global name space for testing only
-	// on a production site, omit the "lc = "!
-	lc = L.control.locate({
-		follow: true,
-		onLocationError: function(err) {showAlert("Kunde inte hitta din position")},
-		strings: {
-			title: "Visa var jag är",  // title of the locate control
-			popup: "Du är inom ca {distance} {unit} från denna punkt.",  // text to appear if user clicks on circle
-		},
-		locateOptions: {
-			maxZoom: 14,
-			enableHighAccuracy: true,
-			watch:true,
-		},
-		// range circle
-		circleStyle: {
-			color: '#F9B8D2',
-			fillColor: '#F9B8D2',
-			fillOpacity: 0.40,
-			opacity: 0.7
-        },
-		// inner marker
-		markerStyle: {
-			color: '#CC0000',
-			fillColor: '#CC0000',
-		},
-	}).addTo(map);
 
 	map.on('startfollowing', function() {
 		map.on('dragstart', lc.stopFollowing);
