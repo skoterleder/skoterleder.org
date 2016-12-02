@@ -135,9 +135,9 @@ $(document).ready(function() {
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
 
-	var ggl = new L.Google("ROADMAP");
-	var ggh = new L.Google("HYBRID");
-	var ggt = new L.Google("TERRAIN");
+	var ggl = new L.gridLayer.googleMutant({type:'roadmap'});
+	var ggh = new L.gridLayer.googleMutant({type:'hybrid'});
+	var ggt = new L.gridLayer.googleMutant({type:'terrain'});
 
 	map.addLayer(skoterleder);
 	var layersControl = new L.Control.Layers( {
@@ -205,10 +205,8 @@ $(document).ready(function() {
 		
 		if (zoom < 6 && areaText) {
 			map.removeLayer(areaText);
-			console.log("remove layer");
 		} else {
 			if ( areaText ) map.addLayer(areaText);
-			console.log("add layer");
 		}
 		
 		newHash("#!map/" + zoom + "/" + lat + "/" + lng + layer)
@@ -296,7 +294,7 @@ $(document).ready(function() {
 			
 			for(var i=0;i<points.areas.length;i++){
 				var area = points.areas[i];
-				var content = "<p>Changed tiles: " + area.t + "</p><p>Tid: " + area.m + "</p><p>Name: " + area.n + "</p>";
+				var content = "<p>Changed tiles: " + area.t + "</p><p>Name: " + area.n + "</p>";
 				var color = "#fa0";
 				
 				var fill =  (area.t / 500)+0.2;
@@ -306,8 +304,7 @@ $(document).ready(function() {
 				
 				areaRect.addLayer( L.rectangle(area.bb,{fillOpacity:fill, color: color, weight: 1}).bindPopup(content) );
 				
-                if ( area.m < 1 ) area.m = "";
-				var icon = L.divIcon({className:'p', html:area.t+"<br>"+area.m});
+				var icon = L.divIcon({className:'p', html:area.t});
 				areaText.addLayer( L.marker(L.latLngBounds(area.bb).getCenter(), {icon: icon}) );
 			
 			}
@@ -353,7 +350,7 @@ $(document).ready(function() {
 			for(var i=0;i<points.areas.length;i++){
 				var area = points.areas[i];
 				var content = "<p>Area: " + area.bb + "</p>";
-
+			
 				var fill =  0.2 + area.v/maxValue/1.5;
 				if ( area.a ) fill = 0.6; 
 				
