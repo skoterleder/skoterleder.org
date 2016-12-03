@@ -604,7 +604,7 @@ $(document).ready(function() {
 	}
 
 	function dispalyMarkerPanel(id,data) {
-		var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
+		var avatarlink  = "<img src='https://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
 		var changeHTMLtext = "";
 		var commentsHTMLtext = "";
 		var shareUrl = serverUrl + "marker/?id=" + id;
@@ -821,7 +821,7 @@ $(document).ready(function() {
 			// console.log(data);
 			map.setView(data.latlng,11);
 			// data.description = data.description.replace(/<br ?\/?>/g, "");
-			var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
+			var avatarlink  = "<img src='https://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
 			
 			document.title = "Skoterleder.org - Ändra - " + data.title;
 			newHash("#!marker/"+ id + "/change/" + hash,"new"); 
@@ -1071,7 +1071,7 @@ $(document).ready(function() {
 		
 		$.getJSON('inc/data.php?ehash='+ehash, function(data) {
 		
-			var avatarlink  = "<img src='http://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
+			var avatarlink  = "<img src='https://www.gravatar.com/avatar/" + data.md5 + "?d=retro&s=50.jpg' class='floatLeft'>";
 			
 			document.title = "Skoterleder.org - Mina markörer";
 			
@@ -1912,7 +1912,7 @@ function loadDisqus(identifier, title, type) {
 
 		//append the Disqus embed script to HTML
 		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
 		jQuery('head').append(dsq);
 
 	}
