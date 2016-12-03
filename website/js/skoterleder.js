@@ -362,7 +362,7 @@ $(document).ready(function() {
 	// on a production site, omit the "lc = "!
 	lc = L.control.locate({
 		follow: true,
-		onLocationError: function(err) {showAlert("Kunde inte hitta din position")},
+		onLocationError: function(err) {showAlert("Kunde inte hitta din position<br><p class='textlinkmini'>"+err.message+"</p>");console.log(err);},
 		strings: {
 			title: "Visa var jag är",  // title of the locate control
 			popup: "Du är inom ca {distance} {unit} från denna punkt.",  // text to appear if user clicks on circle
