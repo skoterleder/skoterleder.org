@@ -996,6 +996,11 @@ $(document).ready(function() {
 						hidebox('#showMarkerBox');
 						loadmarkers();
 					}
+					if (action === "uptodate") {
+						openMarkerPopup(id);
+						showAlert("Markören bekräftad");
+						hidebox('#showMarkerBox');
+					}
 				} else if(data === "Ok:0") {  // Markören är troligen redan aktiverad.
 					if (action === "activate") openMarkerPopup(id); 
 				} else {
@@ -1660,7 +1665,10 @@ $(document).ready(function() {
 			
 			} else if (hashValues[2] === "activate")  {
 				ajaxUpdateMarker(hashValues[1],hashValues[3],hashValues[2]);
-			
+
+			} else if (hashValues[2] === "uptodate")  {
+				ajaxUpdateMarker(hashValues[1],hashValues[3],hashValues[2]);
+
 			} else {
 				openMarkerPopup(hashValues[1]);
 			}
