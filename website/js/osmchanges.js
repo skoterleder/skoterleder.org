@@ -118,11 +118,11 @@ $(document).ready(function() {
 		}
 	});
 
-	var skoterleder = new L.tileLayer('http://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
+	var skoterleder = new L.tileLayer('https://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 14,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
-	var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+	var osm = new L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
@@ -554,7 +554,7 @@ function loadDisqus(identifier, title, type) {
 
 		//append the Disqus embed script to HTML
 		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-		dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+		dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
 		jQuery('head').append(dsq);
 
 	}
@@ -591,11 +591,6 @@ function showInfo(div,extra) {
 	$('.replaceImage').each(function () {
 		$(this).attr('src',$(this).data('load'));
 	});
-
-	if ($('#disqus_thread').length) $('#disqus_thread').remove();  // Remove old div
-	$("<div id='disqus_thread'>").appendTo('#main-info');
-	loadDisqus('info','Information','info');
-	$('.infoComments').hide();
 
 	ga('send', 'pageview', window.location.hash);
 }
