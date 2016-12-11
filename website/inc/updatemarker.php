@@ -78,7 +78,10 @@ if ($action == "change") {
 	if ( $newType > 0 ) $type = $newType;
 	if ( $hash == "" ) $hash= "null";
 
-	$sql='UPDATE marker SET status=1,title=?, description=?, updatetime=now(), type=? WHERE id=? AND ( hash=? OR changeable IS TRUE )';
+	$days = 30;
+	if ( $type > 5) $days = 60;  // For Markers of: Parking, coffee, Fule, Shelter and Wildernesshut
+
+	$sql='UPDATE marker SET status=1,title=?, description=?, updatetime=now(), type=?, expirationtime = NOW() + INTERVAL ? DAY, notification=0 WHERE id=? AND ( hash=? OR changeable IS TRUE )';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  echo "error";
@@ -86,10 +89,37 @@ if ($action == "change") {
 	}
 		
 	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-	$stmt->bind_param('ssiis',$title,$description,$type,$id,$hash);
+	$stmt->bind_param('ssiiis',$title,$description,$type,$days,$id,$hash);
 	$stmt->execute();
 }
 
+if ($action == "uptodate") {
+
+	$sql='SELECT type FROM marker WHERE id = ?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+	$stmt->bind_param('i',$id);
+	$stmt->execute();
+	$stmt->bind_result($type);	
+	$stmt->fetch();
+	$stmt->close();
+	
+	$days = 30;
+	if ( $type > 5) $days = 60;  // For Markers of: Parking, coffee, Fule, Shelter and Wildernesshut
+	
+	$sql='UPDATE marker SET notification=0, expirationtime = NOW() + INTERVAL ? DAY, status=1 WHERE id=? AND hash=?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  echo "error";
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+	 
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('iis',$days,$id,$hash);
+	$stmt->execute();
+}
 
 echo "Ok:".$stmt->affected_rows;
 

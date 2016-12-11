@@ -20,7 +20,7 @@ $hash = md5("SECRET_KEY".time());
 $ehash = md5("SECRET_KEY".$email);
 
 /* Prepare statement */
-$sql='INSERT INTO marker (title,description, lat, lng, type, name, email,hash,ehash) VALUES (?,?,?,?,?,?,?,?,?)';
+$sql='INSERT INTO marker (title,description, lat, lng, type, name, email,hash,ehash,expirationtime) VALUES (?,?,?,?,?,?,?,?,?,TIMESTAMPADD(DAY,30,NOW()))';
 $stmt = $db->prepare($sql);
 if($stmt === false) {
   trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -44,7 +44,6 @@ mb_internal_encoding('UTF-8');
 
 $to      = $email;
 $subject = "Ny markör: $title";
-$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
 
 $open_url  	= SERVERADRESS . "#marker/$id";
 $change_url = SERVERADRESS . "#marker/$id/change/$hash";
