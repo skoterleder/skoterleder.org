@@ -19,13 +19,14 @@
 			Perfekt vid planering inför skoterresan eller ute på leden med kartan i mobilen. 
 			Sidan fungerar bra på mobila enheter!" />
 
-		<link rel="stylesheet" href="plugins/leaflet.1.0.1/leaflet.css" />
+		<link rel="stylesheet" href="plugins/leaflet.1.0.2/leaflet.css" />
 		<link rel="stylesheet" href="css/skoterleder.css" />
-		<script src="plugins/leaflet.1.0.1/leaflet.js"></script> 
+		<script src="plugins/leaflet.1.0.2/leaflet.js"></script> 
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> 
 		<script src="https://maps.googleapis.com/maps/api/js" async defer></script>
 		<script src="js/variables.js"></script>
-		<script type="text/javascript" src="plugins/Leaflet.GoogleMutant/Leaflet.GoogleMutant.js"></script>
+		<script src="plugins/es6-promise.auto.min.js"></script>
+		<script src="plugins/Leaflet.GoogleMutant/Leaflet.GoogleMutant.js"></script>
 		<script src="plugins/jquery.timeago.js"></script>
 		
 		<link rel="stylesheet" href="plugins/markercluser/MarkerCluster.css" />
@@ -118,7 +119,7 @@
 				<h3>Mäta på kartan</h3>
 				<p class="gray">Henrik 2014-04-14</p>
 				<img src="images/ajax-loader.gif" data-load="images/3newicons.png" 
-					class="floatRight replaceImage" "
+					class="floatRight replaceImage"
 					alt="Mäta, Dela och Skruv ut knppar" />
 					
 				<p>Kartan har fått tre stycken nya knappar. Det är mätverktyg, dela kartbild och
@@ -317,7 +318,6 @@
 
 		<div id="newMarkerBox">
 			<h3>Skapa ny markör</h3>
-			<p>
 			<form action="#" id="addMarkerForm">
 				<label for="title">Rubrik</label>
 				<input id='title' type='text' name='title' value=''>
@@ -360,7 +360,6 @@
 				<p>Ett aktiveringsbrev skickas till din epostadress där du måste aktivera markören innan den syns på kartan.</p>
 				<p>Även länk för att ändra och ta bort markören finns i brevet.</p>
 			</form>
-			</p>
 		</div>
 
 		<div id="showMarkerBox"></div>
