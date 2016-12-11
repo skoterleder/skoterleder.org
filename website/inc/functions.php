@@ -45,7 +45,6 @@ function newcommentmail($id,$text){
 	
 	$to      = $email;
 	$subject = "Ny kommentar till markör: $title";
-	$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
 
 	$open_url  	= SERVERADRESS . "#marker/$id/show";
 	$change_url = SERVERADRESS . "#marker/$id/change/$hash";
@@ -101,7 +100,6 @@ function newChangeMarkerMail($id,$nemail){
 	$stmt->bind_result($email,$name,$title,$hash,$ehash);
 	$stmt->fetch();
 	$stmt->close();
-	$db->close();	
 
 	if ($email) {
 		mb_internal_encoding('UTF-8');
@@ -111,7 +109,6 @@ function newChangeMarkerMail($id,$nemail){
 		
 		$to      = $email;
 		$subject = "Din markör: $title";
-		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
 
 		$open_url  	= SERVERADRESS . "#marker/$id/show";
 		$change_url = SERVERADRESS . "#marker/$id/change/$hash";
@@ -161,7 +158,6 @@ function flagMarkerMail($id,$hash,$description){
 	$stmt->bind_result($email,$name,$title,$hash,$ehash);
 	$stmt->fetch();
 	$stmt->close();
-	$db->close();	
 
 	if ($email) {
 		mb_internal_encoding('UTF-8');
@@ -172,7 +168,6 @@ function flagMarkerMail($id,$hash,$description){
 		
 		$to      = $email;
 		$subject = "Flaggad markör: $title";
-		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
 
 		$open_url  	= SERVERADRESS . "#marker/$id/show";
 		$change_url = SERVERADRESS . "#marker/$id/change/$hash";
@@ -232,15 +227,12 @@ function newGPXcommentmail($id,$text){
 	$stmt->bind_result($email, $name, $trackname, $perfname, $perfemail);
 	$stmt->fetch();
 	$stmt->close();
-	$db->close();	
 
 	mb_internal_encoding('UTF-8');
 	
 	if ( filter_var($email, FILTER_VALIDATE_EMAIL) ) {
 		$to      = $email;
 		$subject = "Ny kommentar till spår: $trackname";
-		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
-
 		$open_url  	= SERVERADRESS . "gpx/#!track/$id";
 		
 		$message = '
@@ -264,8 +256,6 @@ function newGPXcommentmail($id,$text){
 	if ( filter_var($perfemail, FILTER_VALIDATE_EMAIL) && $perfemail != $email ) {
 		$to      = $perfemail;
 		$subject = "Ny kommentar till spår: $trackname";
-		$subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
-
 		$open_url  	= SERVERADRESS . "gpx/#!track/$id";
 		
 		$message = '
@@ -290,11 +280,29 @@ function newGPXcommentmail($id,$text){
 
 function sendMail($to, $subject, $message) {
 
-	$hash = md5($to.SECRET_KEY.$subject);
-	$url = MAILPATH."?hash=$hash&&to=$to&subject=".urlencode($subject)."&message=".urlencode($message);
-	
+	$subjectMime = mb_encode_mimeheader($subject, 'UTF-8', 'B');
+	$hash = md5($to.SECRET_KEY.$subjectMime);
+	$url = MAILPATH."?hash=$hash&&to=$to&subject=".urlencode($subjectMime)."&message=".urlencode($message);
+
 	$result = file_get_contents($url);
 
-	echo $result;
+	saveMail($to,$subject,$message,$result);
+	return $result;
+}
+
+function saveMail($to,$subject,$message,$result){
+	global $db;
+
+	$sql='INSERT INTO messages (`email`, `subject`, `message`, `result`) VALUES (?,?,?,?)';
+	$stmt = $db->prepare($sql);
+
+	if($stmt === false) {
+	  echo "error";
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	$stmt->bind_param('ssss',$to,$subject,$message,$result);
+	$stmt->execute();
+	$stmt->close();
 }
 ?>
