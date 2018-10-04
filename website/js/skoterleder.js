@@ -220,19 +220,23 @@ $(document).ready(function() {
 		}
 	});
 	
-	var skoterleder = new L.tileLayer('http://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
+	var skoterleder = new L.tileLayer('https://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 14,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
+	var topografisk = new L.tileLayer('https://api.lantmateriet.se/open/topowebb-ccby/v1/wmts/token/382a0381-7b89-352b-9e8c-26964c1cdf8e/?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=topowebb&STYLE=default&TILEMATRIXSET=3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png', {
+		maxZoom: 15,
+		attribution: 'Karta från Lantmäteriet '
+	});	
 	var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 18,
 		attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
-	var overl = new L.tileLayer('http://overl.skoterleder.org/tiles/{z}/{x}/{y}.png', {
+	var overl = new L.tileLayer('https://overl.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 16,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
-	var info = new L.tileLayer('http://overl.skoterleder.org/info/{z}/{x}/{y}.png', {
+	var info = new L.tileLayer('https://overl.skoterleder.org/info/{z}/{x}/{y}.png', {
 		maxZoom: 16,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
@@ -244,6 +248,7 @@ $(document).ready(function() {
 	map.addLayer(skoterleder);
 	var layersControl = new L.Control.Layers( {
 				'Skoterleder.org':skoterleder, 
+				'Topografisk':topografisk, 
 				'Open Street Map':osm, 
 				'Google Road':ggl, 'Google Satelit':ggh, 'Google Terräng':ggt},
 				{'Visa skoterleder':overl, 'Visa information':info }
