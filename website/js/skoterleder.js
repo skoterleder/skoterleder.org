@@ -221,23 +221,31 @@ $(document).ready(function() {
 	});
 	
 	var skoterleder = new L.tileLayer('https://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
-		maxZoom: 14,
+		maxZoom: 16,
+		maxNativeZoom: 14,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
 	var topografisk = new L.tileLayer('https://api.lantmateriet.se/open/topowebb-ccby/v1/wmts/token/382a0381-7b89-352b-9e8c-26964c1cdf8e/?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=topowebb&STYLE=default&TILEMATRIXSET=3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png', {
-		maxZoom: 15,
+		maxZoom: 16,
+		maxNativeZoom: 15,
 		attribution: 'Karta från Lantmäteriet '
 	});	
+    var bingLayer = new L.tileLayer.bing({
+		bingMapsKey:"Ahv_frErjDVU-aphfIzfHIZI2AVteKBJ_w_z20cABFjxkqOpdGusSpCCwTrFRn-Q",
+		maxZoom: 18
+	});
 	var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-		maxZoom: 18,
+		maxZoom: 16,
 		attribution: '© <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
 	var overl = new L.tileLayer('https://overl.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 16,
+		maxNativeZoom: 16,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
 	var info = new L.tileLayer('https://overl.skoterleder.org/info/{z}/{x}/{y}.png', {
 		maxZoom: 16,
+		maxNativeZoom: 16,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
 
@@ -249,6 +257,7 @@ $(document).ready(function() {
 	var layersControl = new L.Control.Layers( {
 				'Skoterleder.org':skoterleder, 
 				'Topografisk':topografisk, 
+				'Bing Maps':bingLayer,
 				'Open Street Map':osm, 
 				'Google Road':ggl, 'Google Satelit':ggh, 'Google Terräng':ggt},
 				{'Visa skoterleder':overl, 'Visa information':info }
@@ -410,10 +419,12 @@ $(document).ready(function() {
 
 	map.on('baselayerchange', function(e) {
 		baseLayer = "";
+		if (e.name === "Topografisk" ) baseLayer = "lt";
+		if (e.name === "Bing Maps" ) baseLayer = "bs";
 		if (e.name === "Open Street Map" ) baseLayer = "o";
-		if (e.name === "Google Road" ) baseLayer = "g";
-		if (e.name === "Google Satelit" ) baseLayer = "s";
-		if (e.name === "Google Terräng" ) baseLayer = "t";
+		if (e.name === "Google Road" ) baseLayer = "gr";
+		if (e.name === "Google Satelit" ) baseLayer = "gs";
+		if (e.name === "Google Terräng" ) baseLayer = "gt";
 		
 		setTimeout(function() {	
 			if (e.name === "Skoterleder.org" ) {
@@ -423,8 +434,9 @@ $(document).ready(function() {
 			}
 			layersControl._update();
 		}, 200);
-		
+
 		updateMapHash();
+		gatrack('send', 'pageview','baselayerchange/'+baseLayer);
 	});
 
 	function updateMapHash(){
@@ -440,7 +452,7 @@ $(document).ready(function() {
 		if(new Date().getTime() > timeout) {
 			timeout = new Date().getTime() + 1*60*1000; //add 15 minutes;
 			// console.log("New time");
-			ga('send', 'pageview',window.location.hash);
+			gatrack('send', 'pageview',window.location.hash);
 		}
 		if (zoom > 7) savelocation(latlng);
 	}
@@ -504,7 +516,7 @@ $(document).ready(function() {
 		var created = jQuery.timeago(showtime);			
 		
 		document.title = "Skoterleder.org - " + title;
-		ga('send', 'pageview',window.location.hash);
+		gatrack('send', 'pageview',window.location.hash);
 		
 		var container = $('<div />');
 		
@@ -618,7 +630,7 @@ $(document).ready(function() {
 		
 		newHash("#!marker/"+ id + "/show","new");
 		document.title = "Skoterleder.org - " + data.title;
-		ga('send', 'pageview',window.location.hash);
+		gatrack('send', 'pageview',window.location.hash);
 
 		$("#showMarkerBox").empty();
 		$('#showMarkerBox').css('overflow','auto');
@@ -817,7 +829,7 @@ $(document).ready(function() {
 		$("#showMarkerBox").empty();
 		$("<p>").text("Laddar...").appendTo("#showMarkerBox");
 		
-		ga('send', 'pageview','#changeMarker/'+id);
+		gatrack('send', 'pageview','#changeMarker/'+id);
 		
 		$.getJSON('inc/getmarker.php?id='+id, function(data) { 
 
@@ -956,7 +968,7 @@ $(document).ready(function() {
 							hidebox('#showMarkerBox'); // or hashControll();
 							loadmarkers();
 							dataCache[id] = 'undefined';
-							ga('send', 'pageview','#marker/'+id+'/saved'); //#changeMarker/17
+							gatrack('send', 'pageview','#marker/'+id+'/saved'); //#changeMarker/17
 						}
 					},
 					error: function(data){
@@ -1039,7 +1051,7 @@ $(document).ready(function() {
 
 		container.on('click', '.okLink', function() {
 			showbox('#newMarkerBox');
-			ga('send', 'pageview','#newmarker');
+			gatrack('send', 'pageview','#newmarker');
 		});
 		container.on('click', '.cancelLink', function() {
 			map.removeLayer(addMarker)
@@ -1757,7 +1769,7 @@ $(document).ready(function() {
 			$("." + div).slideDown();
 			newHash("#!info/" + div);
 			document.title = "Skoterleder.org - " + title;
-			ga('send', 'pageview', '#info/' + div);
+			gatrack('send', 'pageview', '#info/' + div);
 		} else {
 			$("." + div).slideUp(200);
 			newHash("#!info");
@@ -1779,15 +1791,15 @@ $(document).ready(function() {
 	
 	$('#showNewMarkes').click(function() {
 		loadmarkers("new");
-		ga('send', 'pageview','#New-markers');
+		gatrack('send', 'pageview','#New-markers');
 	});
 	$('#removeAllMarkers').click(function() {
 		map.removeLayer(markers);
-		ga('send', 'pageview','#Remove-markers');
+		gatrack('send', 'pageview','#Remove-markers');
 	});
 	$('#showAllMarkers').click(function() {
 		loadmarkers();
-		ga('send', 'pageview','#All-markers');
+		gatrack('send', 'pageview','#All-markers');
 	});
 	 
 	$(".queryLink").click( function() {
@@ -1852,7 +1864,7 @@ function checkForReload(){
 	if (newVersionFlag) {
 		if ((lastActiveTime + 10*60*1000) < new Date().getTime()) {
 			// If user inactive for the last 10 min, reload page
-			ga('send', 'pageview',"auto-reload/"+window.location.hash);
+			gatrack('send', 'pageview',"auto-reload/"+window.location.hash);
 			setTimeout(function() {	
 				window.location.reload();
 			}, 500);  //0.5 sec delay to make time for analytics
@@ -1862,7 +1874,7 @@ function checkForReload(){
 			// When expire time passed, displays message: 
 			showAlert("Sidan uppdaterad, vänligen ladda om sidan.");
 			reloadFlag = true;
-			ga('send', 'pageview',"reload/"+window.location.hash);
+			gatrack('send', 'pageview',"reload/"+window.location.hash);
 			return;
 		}
 	}
@@ -1992,7 +2004,7 @@ function showInfo(div,extra) {
 	var showVersion = "<p class='version gray'>Version: "+version+reloadPage+"</p>";
 	$(showVersion).appendTo('#main-info');
 
-	ga('send', 'pageview', window.location.hash);
+	gatrack('send', 'pageview', window.location.hash);
 }
 
 function moveInfo() {
@@ -2118,5 +2130,13 @@ function savelocation(latlng){
 		$.ajax({url: "inc/savelocation.php?uid="+uid+"&lat="+lat+"&lng="+lng});
 		olat = lat;
 		olng = lng;
+	}
+}
+function gatrack(a,b,c) {
+	try { 
+		ga(a, b, c);
+	}
+	catch (e) {
+		console.log("Track error");
 	}
 }

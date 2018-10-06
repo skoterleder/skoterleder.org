@@ -1,4 +1,5 @@
 <?php
+ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 include_once 'database_config.php';
 
 $xml = file_get_contents("php://input") ;
@@ -6,6 +7,7 @@ $row = explode('"', $xml);
 
 $user = "";
 $lat = "";
+echo "osmchanges.php start\n";
 
 $db->query("START TRANSACTION");
 
@@ -47,4 +49,6 @@ for ($i = 0; $i < count($row); ++$i) {
 }
 
 $db->query("COMMIT");
+
+echo "osmchanges.php done\n\n";
 ?>
