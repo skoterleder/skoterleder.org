@@ -1706,7 +1706,7 @@ $(document).ready(function() {
 	}
 
 	function hideInfo() {
-		$('.info').slideUp(400);
+		$('.content-box').slideUp(400);
 		$('#grayout').hide(10);
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
@@ -1985,8 +1985,9 @@ function showInfo(div,extra) {
 
 	moveInfo();
 	$('#grayout').show(10);
-	$('.info').slideDown(500);
-	$("#grayout").attr("close","info");
+	$('.info').show();
+	$('.content-box').slideDown(500);
+	$("#grayout").attr("close","content-box");
 
 	// Load all images
 	$('.replaceImage').each(function () {
@@ -2011,7 +2012,7 @@ function moveInfo() {
 	var maxWidth = 570;
 	var screenWidth = $(window).width();
 	var divheight = $(window).height()-40;
-	var top = ($(window).height() - $('.info').outerHeight()) /2;
+	var top = ($(window).height() - $('.content-box').outerHeight()) /2;
 	var left = 0;
 	var top = 0;
 	
@@ -2025,7 +2026,7 @@ function moveInfo() {
 		top = 15;
 	}
 		
-	$('.info').css({
+	$('.content-box').css({
 		position:'absolute',
 		top: top,
 		left: left,
