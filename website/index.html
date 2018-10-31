@@ -55,13 +55,15 @@
 		<div data-role="page" id="mapPage">
 			<div data-role="content" id="map"></div>
 		</div>
-		<div id="main-info" class="info scrollbox">
+		<div id="main-info" class="content-box">
+			<div class="dynamic-text">
+			</div>
+		<div class="info">	
 			<div class="header">
 				<p class="infoClose infoCloseRight">X</p>
 				<h1>Skoterleder.org</h1>
 				<p>Kartan för skoteråkare, av skoteråkare!</p>
 			</div>
-
 			<h2 class="collapsible" data-collaps="about">Om skoterleder.org</h2>
 			<div class="hidden collapsdata about">
 				<p>Skoterleder.org är en öppen och fri karta där alla kan bidra med skoterleder.</p>
@@ -316,6 +318,7 @@
 			<a href="#" class="showComments infoComments" data-id="info" data-title="Information">Visa kommentarer</a>
 
 		</div>
+		</div>
 
 		<div id="newMarkerBox">
 			<h3>Skapa ny markör</h3>
@@ -370,6 +373,7 @@
 		<div id="alert"><p class="alertText"></p><p class="alertOk">OK</p></div>
 		<div id="grayout"></div>
 
+		<script src="js/skoterleder-ux.js"></script>
 		<script src="js/skoterleder.js"></script>
 		<script src="js/db-date.js"></script>
 		<script src="js/analytics.js"></script>
