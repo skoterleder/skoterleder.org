@@ -27,6 +27,7 @@ var link_marker;
 var lastHash;
 var olat;
 var olng;
+var touchDev, userEmail, $userName;
 
 // Unique user id, only used for statistics
 var uid = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
@@ -63,12 +64,13 @@ $(document).ready(function() {
 		}
 	}));
 	
-	var touchDev = false;
+	touchDev = false;
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
-		var touchDev = true;
+		touchDev = true;
 	}
 
 	moveAlertbox();
+	getUser();
 	
 	var moreInfoButton = L.Control.extend({
 		options: {
@@ -82,7 +84,17 @@ $(document).ready(function() {
 				return container;
 		}
 	});
-
+	var userButton = L.Control.extend({
+		options: {
+				position: 'topright'
+		},
+		onAdd: function (map) {
+				// create the control container with a particular class name
+				var container = L.DomUtil.create('div', 'leaflet-bar' );
+				container.innerHTML += '<a href="#" class="openUserPage text-bar-links">Min sida</a>';
+				return container;
+		}
+	});
 	var addMarkerControllButton = L.Control.extend({
 		options: {
 				position: 'topright'
@@ -264,6 +276,7 @@ $(document).ready(function() {
 			);
 
 	map.addControl(new moreInfoButton()); 
+	map.addControl(new userButton());
 	map.addControl(new addMarkerControllButton()); 
 	map.addControl(new addQueryButton());
 	map.addControl(layersControl);
@@ -1703,11 +1716,17 @@ $(document).ready(function() {
 		if (hashValues[0] === "info" || hashValues[0] === "!info") {
 			showInfo(hashValues[1],hashValues[2]);
 		}
+		if (hashValues[0] === "!mypage" || hashValues[0] === "!login") {
+			setTimeout(function() {	
+				showUserPage(hashValues[1]);
+			}, 300);
+		}
 	}
 
 	function hideInfo() {
 		$('.content-box').slideUp(400);
 		$('#grayout').hide(10);
+		$('.info').hide();
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
 		if ($('#disqus_thread').length) $('#disqus_thread').remove();
@@ -1747,10 +1766,17 @@ $(document).ready(function() {
 		return false;
 	});	
 
+	$('.openUserPage').click(function(){
+		showUserPage();
+		return false;
+	});
+
 	$("#grayout").click(function() {
 		var toclose = $("#grayout").attr("close");
 		$('.'+toclose).hide();
 		$('#grayout').hide();
+		$('.info').hide();
+		$('.dynamic-text').hide();
 		document.title = "Skoterleder.org - Snöskoterkarta!"
 		updateMapHash();
 		if ($('#disqus_thread').length) $('#disqus_thread').remove();
@@ -1982,7 +2008,8 @@ function showInfo(div,extra) {
 	}
 
 	document.title = title
-
+	$(".dynamic-text").empty();
+	
 	moveInfo();
 	$('#grayout').show();
 	$('.info').show();
@@ -2003,18 +2030,19 @@ function showInfo(div,extra) {
 	var reloadPage = ""
 	if (typeof newVersionFlag != 'undefined') reloadPage = " Reloadpage"
 	var showVersion = "<p class='version gray'>Version: "+version+reloadPage+"</p>";
-	$(showVersion).appendTo('#main-info');
+	$(showVersion).appendTo('.info');
 
 	gatrack('send', 'pageview', window.location.hash);
 }
 
-function moveInfo() {
-	var maxWidth = 570;
+function moveInfo(maxWidth=570) {
 	var screenWidth = $(window).width();
 	var divheight = $(window).height()-40;
 	var top = ($(window).height() - $('.content-box').outerHeight()) /2;
 	var left = 0;
 	var top = 0;
+
+	if ( maxWidth > screenWidth ) maxWidth = screenWidth-20;
 	
 	if (screenWidth < 600 ){
 		divWidth = screenWidth-20;

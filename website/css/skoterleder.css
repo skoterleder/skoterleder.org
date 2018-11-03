@@ -19,6 +19,10 @@ html, body, #map {
 #mapPage  {
 	height: 100%;
 }
+#mapMini {
+	padding: 0;
+	margin: 0; 
+}
 h1 {
 	font-family: Helvetica,Arial,sans-serif;
 	font-size: 2.0em;
@@ -85,7 +89,7 @@ li {
 	top:20%;
 	min-width: 200px;
 	max-width: 400px;
-	z-index: 1010;
+	z-index: 1070;
 	background-color: rgba(255, 255, 255, 0.95);
 	-moz-border-radius: 3px;
 	border-radius: 5px;
@@ -126,7 +130,6 @@ li {
 .dynamic-text {
 	display:none;
 }
-
 .info {
 	display:none;
 }
@@ -157,6 +160,22 @@ background: transparent;
 }
 .header  h1 {
 	color: #fff;
+}
+
+.markerListItem {
+	cursor: pointer;
+}
+.markerListItem:hover {
+	background: #eee;
+}
+
+.inputText {
+	padding: 5px;
+}
+.inputSubmit {
+    padding: 4px 35px;
+    margin: 0px 10px;
+	font-size: 1.1em;
 }
 
 .collapsible {
@@ -458,6 +477,19 @@ p.linkButtonLong  {
 	clear: both;
 	text-align: center;
 }
+
+.linkButtonMid  {
+	border: 0px solid #A0A0A0;
+	background: #D8D8D8;
+	padding: 0.4em;
+	color: black;
+	margin: 10px 0 0 0;
+	width: 50%;
+	border-radius: 4px;
+	clear: both;
+	text-align: center;
+}
+
 .closeMarkerBox{
 	font-family: arial;
 	text-decoration: none;

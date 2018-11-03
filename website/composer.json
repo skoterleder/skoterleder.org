@@ -1,6 +1,7 @@
 {
     "require": {
         "phpmailer/phpmailer": "^6.0",
-        "league/oauth2-google": "^2.2"
+        "league/oauth2-google": "^2.2",
+        "delight-im/auth": "^8.1"
     }
 }
