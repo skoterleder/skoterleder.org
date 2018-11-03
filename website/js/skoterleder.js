@@ -1984,7 +1984,7 @@ function showInfo(div,extra) {
 	document.title = title
 
 	moveInfo();
-	$('#grayout').show(10);
+	$('#grayout').show();
 	$('.info').show();
 	$('.content-box').slideDown(500);
 	$("#grayout").attr("close","content-box");

@@ -123,6 +123,13 @@ li {
 	-moz-border-radius: 8px;
 	border-radius: 8px;
 }	
+.dynamic-text {
+	display:none;
+}
+
+.info {
+	display:none;
+}
 
 .infoCloseRight {
 	cursor: pointer;
@@ -629,5 +636,5 @@ th:last-child {
 	display: none;
 	background-color: #000;
 	filter: alpha(opacity = 55);
-	opacity:.80;
+	opacity:.70;
 }
