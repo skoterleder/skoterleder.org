@@ -1,4 +1,9 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\OAuth;
+use League\OAuth2\Client\Provider\Google;
+require __DIR__ . '../../vendor/autoload.php';
+
 function convert_UTF8($str) {  	// Används när data sparas till databasen
 	$str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
 	return $str;
@@ -281,10 +286,55 @@ function newGPXcommentmail($id,$text){
 function sendMail($to, $subject, $message) {
 
 	$subjectMime = mb_encode_mimeheader($subject, 'UTF-8', 'B');
-	$hash = md5($to.SECRET_KEY.$subjectMime);
-	$url = MAILPATH."?hash=$hash&&to=$to&subject=".urlencode($subjectMime)."&message=".urlencode($message);
+	date_default_timezone_set("Europe/Stockholm");
 
-	$result = file_get_contents($url);
+	//Create a new PHPMailer instance
+	$mail = new PHPMailer;
+	$mail->isSMTP();
+	$mail->SMTPDebug = 0;
+	$mail->Host = 'smtp.gmail.com';
+	$mail->Port = 587;
+	$mail->SMTPSecure = 'tls';
+	$mail->SMTPAuth = true;
+	$mail->AuthType = 'XOAUTH2';
+	$email = 'info@skoterleder.org';
+	$clientId = CLIENTID;
+	$clientSecret = CLIENTSECRET;
+	$refreshToken = REFRESHTOKEN;
+
+	$provider = new Google(
+		[
+			'clientId' => $clientId,
+			'clientSecret' => $clientSecret,
+		]
+	);
+
+	$mail->setOAuth(
+		new OAuth(
+			[
+				'provider' => $provider,
+				'clientId' => $clientId,
+				'clientSecret' => $clientSecret,
+				'refreshToken' => $refreshToken,
+				'userName' => $email,
+			]
+		)
+	);
+
+	$mail->isHTML(true); 
+	$mail->CharSet = 'utf-8';
+	$mail->setFrom($email, 'Skoterlder.org');
+	$mail->addAddress($to);
+	$mail->addBCC('henrik_rosvall@yahoo.se');
+	$mail->Subject = $subjectMime;
+	$mail->Body    = $message;
+
+	//send the message, check for errors
+	if (!$mail->send()) {
+		$result = "Error";
+	} else {
+		$result = "ok";
+	}
 
 	saveMail($to,$subject,$message,$result);
 	return $result;

@@ -19,12 +19,12 @@ $(document).ready(function() {
 });
 
 function showInfo() {
-	ga('send', 'pageview');
+	gatrack('send', 'pageview');
 	
 	moveInfo();
 	$('#grayout').show(10);
-	$('.info').slideDown(10);
-	$("#grayout").attr("close","info");
+	$('.content-box').slideDown(10);
+	$("#grayout").attr("close","content-box");
 }
 
 function loadDisqus(identifier, title) {
@@ -66,7 +66,7 @@ function disqus_config() {
 }
 
 function hideInfo() {
-	$('.info').slideUp(400);
+	$('.content-box').slideUp(400);
 	$('#grayout').hide(10);
 	updateMapHash();
 }
@@ -74,7 +74,7 @@ function moveInfo() {
 	var maxWidth = 570;
 	var screenWidth = $(window).width();
 	var divheight = $(window).height()-40;
-	var top = ($(window).height() - $('.info').outerHeight()) /2;
+	var top = ($(window).height() - $('.content-box').outerHeight()) /2;
 	var left = 0;
 	var top = 0;
 	
@@ -88,7 +88,7 @@ function moveInfo() {
 		top = 15;
 	}
 		
-	$('.info').css({
+	$('.content-box').css({
 		position:'absolute',
 		top: top,
 		left: left,
@@ -107,4 +107,13 @@ function moveAlertbox () {
 		position:'absolute',
 		left: (($(window).width() - $('#alert').outerWidth()) /2 )
 	});
+}
+
+function gatrack(a,b,c) {
+	try { 
+		ga(a, b, c);
+	}
+	catch (e) {
+		console.log("Track error");
+	}
 }
