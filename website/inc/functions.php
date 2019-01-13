@@ -323,7 +323,7 @@ function sendMail($to, $subject, $message) {
 
 	$mail->isHTML(true); 
 	$mail->CharSet = 'utf-8';
-	$mail->setFrom($email, 'Skoterlder.org');
+	$mail->setFrom($email, 'Skoterleder.org');
 	$mail->addAddress($to);
 	$mail->addBCC('henrik_rosvall@yahoo.se');
 	$mail->Subject = $subjectMime;
