@@ -1,3 +1,4 @@
+var map;
 var version;
 var newVersion;
 var newVersionFlag;
@@ -40,7 +41,7 @@ $(document).ready(function() {
 	$.ajaxSetup({ cache: false });
 	swedishTimeago();
 	checkForUppdates();
-	var map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
+	map = new L.Map('map', {center: new L.LatLng(64, 16), zoom: 6});
 	
 	// Leaflet Measure plugin from https://github.com/p-j/leaflet.measure
 	map.addControl(new L.Control.Measure({
@@ -276,13 +277,13 @@ $(document).ready(function() {
 			);
 
 	map.addControl(new moreInfoButton()); 
+	map.addControl(new addMarkerControllButton());
 	map.addControl(new userButton());
-	map.addControl(new addMarkerControllButton()); 
 	map.addControl(new addQueryButton());
 	map.addControl(layersControl);
 	map.addControl(new openOsmLink()); 
 	map.addControl(new openOsmEditLink());
-	if (!touchDev) map.addControl(new addGooglePlayButton());
+	// if (!touchDev) map.addControl(new addGooglePlayButton());
 	map.addControl(new addPrintButton());
 	map.addControl(new addShareButton());
 	
@@ -501,8 +502,9 @@ $(document).ready(function() {
 				dispalyMarker(id,data,linkin,show);
 			})
 			.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
-					alert(jqXHR.responseText);
-					alert(textStatus);
+				//alert(jqXHR.responseText);
+				//alert(textStatus);
+				popup.setContent("Laddar &nbsp;&nbsp;<img src='images/ajax-loader.gif'  width='16' height='16'><br>" + jqXHR.responseText + " " + textStatus + " " + errorThrown)
 			});	
 		}
 	}
@@ -651,54 +653,20 @@ $(document).ready(function() {
 		var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
 		
 		div.on('click', '.closeMarkerBox', function() {
+			closeMarkerBox()
+		});
+		
+		function closeMarkerBox() {
 			hidebox('#showMarkerBox');
 			document.title = "Skoterleder.org - Snöskoterkarta!"
 			updateMapHash();
 			setTimeout(function(){$("#showMarkerBox").empty()}, 700);
 			return false;
-		});
+		}
 
-		div.on('click', '.adminMail', function() {
-			$("#displayInfo").empty();
-			$("#displayInfo").append(" \
-			<p>För att ändra denna markör krävs en ändra länk.</p> \
-			<p>Länken skickas bara till skaparen av markören, fylli din mailadress nedan.</p> \
-			<form action='#' id='adminMail'><input id='nemail' type='text' name='email' value='Din e-post adress'>\
-			<p><input type='submit' value='Skicka' class='inputbutton'> \
-			<input type='button' value='Avbryt' class='close inputbutton'></p>\
-			<input type='hidden' name='id' value='" + id + "'></form> \
-			<p>Som icke skapare av markören kan du föreslå ändringar via kommentars fältet.</p> \
-			");
-
-			if (readCookie("email")) $("#nemail").val(readCookie("email"));
-			$("#displayInfo").slideDown();
-
-			$("#adminMail").submit(function(form) {
-				$("#displayInfo").append("<h4>Skickar...</h4>");
-
-				$.ajax({
-					type: "GET",
-					url: "inc/markermail.php",
-					data: $("#adminMail").serialize(), // serializes the form's elements.
-					success: function(data)
-					{
-						$("#displayInfo").append("<h3>E-post skickat till dig</h3>");
-						
-						setTimeout(function() {	
-							$("#displayInfo").slideUp( "slow", function() {
-								$("#displayInfo").empty();
-							});
-						}, 1500);
-						return false;
-					},
-					error: function(data){
-						$("#displayInfo").append("<b>Kopplingsfel eller liknande, försök igen senare!</b>");
-						// $(".error").html("Kopplingsfel eller liknande, försök igen senare!");
-						return false;
-					}
-				});
-				return false; 
-			});
+		div.on('click', '.changeMarkerLink', function() {
+			closeMarkerBox();
+			showUserPage(id);
 			return false;
 		});
 		div.on('click', '.adminFlag', function() {
@@ -774,6 +742,19 @@ $(document).ready(function() {
 		$("<h3>").html(data.title).appendTo(div);
 		$("<p>").html(data.description.replace(/\r?\n/g, '<br>')).appendTo(div);
 
+		if ( data.isUsers == 1 ) {
+			changeMarkerLink = "<a href='#' class='changeMarkerLink textlink'>Ändra denna markör</a>"
+		}
+		if ( data.isUsers == -1 ) {
+			changeMarkerLink = "<a href='#' class='changeMarkerLink textlink'>Du är ej inloggad</a>"
+		}
+		if ( data.isUsers == 0 ) {
+			changeMarkerLink = "<span class='textlink'>Ej din markör</span>"
+		}
+		if ( data.changeable ) {
+			changeMarkerLink = "<a href='#' class='changeLink textlink'>Ändra denna markör</a>"
+		}
+
 		$(div).append(" \
 		<table><tr><td>\
 		<div class='submitterAvatar'>" + avatarlink + " </div> \
@@ -781,7 +762,7 @@ $(document).ready(function() {
 		<p class='narrow created'>Skapad av: " + data.name + " </p> \
 		<p class='narrow'>Skapad: " + data.createtime + " </p> " + changeHTMLtext + " \
 		</td></tr></table> \
-		<p class='narrow'><a href='#' class='adminMail textlink'>Ändra denna markör</a> \
+		<p class='narrow'>" + changeMarkerLink + " \
 		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
 		<p class='nodinfo narrow'></p> \
 		<div id='displayInfo'></div> \
@@ -796,10 +777,6 @@ $(document).ready(function() {
 		if ( data.description == "" && data.type > 499 ) {
 			$(".markerContent h3").after("<p class='textlink'>Denna markör är importerad från OSM, komplettera gärna med mer information. Alla kan ändra denna markör/text.</p>");
 		}
-		if ( data.changeable ) {
-			$(".adminMail").addClass("changeLink").removeClass("adminMail");
-		}
-		
 		if ( data.node ) {
 			$(".nodinfo").append("<a class='textlink' href='http://www.openstreetmap.org/node/"+data.node+"' target='_blank'>Visa nod "+data.node+" på OSM</a>");			
 			$(".nodinfo").css('padding-top',7);
@@ -875,7 +852,7 @@ $(document).ready(function() {
 			var form = " \
 			<form action='#' id ='changeMarkerForm'> \
 			<label for='ctitle'>Rubrik</label> \
-			<input type='text' name='title' id='ctitle' value='"+decodeEntities(data.title) + "' \
+			<input type='text' name='title' id='ctitle' value='"+decodeEntities(data.title) + "'> \
 			<label for='cdescription'>Beskrivning</label> \
 			<textarea name='description' id='cdescription' rows='6'></textarea> \
 			<input type='hidden' name='id' id='cid' value='" + id + "'> \
@@ -1044,7 +1021,7 @@ $(document).ready(function() {
 		});
 	}
 	
-	function addNewMarker() {
+	window.addNewMarker = function addNewMarker() {
 		if (typeof addMarker != 'undefined') {
 			if (addMarker._icon) { // There is already a icon on screen, move it to new center of map
 				addMarker.setLatLng(map.getCenter());
@@ -1056,22 +1033,55 @@ $(document).ready(function() {
 				return false;
 			}
 		}
-			
+
+		$.ajax({
+			dataType: "json",
+			url: "inc/getuser.php",
+			success: function(data)
+				{
+					userEmail = data.userEmail;
+					userName  = data.userName;
+					console.log("userEmail:" + userEmail + " userName:" + userName);
+					
+					if (userEmail) {
+						container.html("\
+							<p>Flytta markören till rätt plats och klicka sedan på ok för att fylla på med mera information.</p>\
+							<p><a href='#' class='okLink inputbutton'>OK</a> <a href='#' class='cancelLink inputbutton'>Avbryt</a></p>\
+						");
+					} else {
+						container.html("\
+							<p>För att kunna skapa markörer behöver du vara inloggad på sidan.</p>\
+							<p><a href='#' class='loginLink inputbutton'>Logga in</a> <a href='#' class='cancelLink inputbutton'>Avbryt</a></p>\
+						");
+					}
+					return;
+				},
+				error: function(data){
+					console.log("GetUser error:" + data);
+					return false;
+				}
+			});
+
+
+		
 		if (readCookie("name")  && !$("#name").val())  $("#name").val(readCookie("name"));
-		if (readCookie("email") && !$("#email").val()) $("#email").val(readCookie("email"));
 		
 		var container = $('<div />');
+		container.html("<p>Kontaktar servern för att kunna skapa markören. Vänligen vänta, eller kontrollera att du är ansluten till Internet.</p>");
 
 		container.on('click', '.okLink', function() {
 			showbox('#newMarkerBox');
 			gatrack('send', 'pageview','#newmarker');
 		});
 		container.on('click', '.cancelLink', function() {
-			map.removeLayer(addMarker)
+			map.removeLayer(addMarker);
 			hidebox('#newMarkerBox');
 		});
-
-		container.html("<p>Flytta markören till rätt plats och klicka sedan på ok för att fylla på med mera information.</p><p><a href='#' class='okLink inputbutton'>OK</a> <a href='#' class='cancelLink inputbutton'>Avbryt</a></p>");
+		container.on('click', '.loginLink', function() {
+			//map.removeLayer(addMarker)
+			//hidebox('#newMarkerBox');
+			showUserPage("newMarker");
+		});
 
 		addMarker = L.marker(map.getCenter(), {
 			draggable:true,
@@ -1185,7 +1195,7 @@ $(document).ready(function() {
 		
 	}
 	
-	function loadmarkers(q) {
+	window.loadmarkers = function loadmarkers(q) {
 		if (!q) q = "";
 		
 		$.getJSON('inc/data.php?q='+q, function(points) {
@@ -1250,9 +1260,7 @@ $(document).ready(function() {
 	$("#addMarkerForm").submit(function(form) {
 
 		var name = $("#name").val();
-		var email = $("#email").val();
 		createCookie("name",name,30);
-		createCookie("email",email,30);
 		
 		$(".error").css('color', 'green');
 		$(".error").css('color', '');
@@ -1277,18 +1285,14 @@ $(document).ready(function() {
 					hidebox('#newMarkerBox');
 
 					var latlng = [$("#lat").val(),$("#lng").val()];
-					var icon = $("#type").val();
 					
-					tmpMarker = L.marker(latlng, {
-						opacity: 0.3,
-						}).addTo(map).bindPopup("Kontrollera din mail för att<br>aktivera din nya markör!").setIcon(iconType[icon]);
-						
-					setTimeout(  // Öppnar upp poppupen med lite fördröjning för att få det att funka bra!
-						function() 
-						{	
-							tmpMarker.openPopup();
-							map.removeLayer(addMarker);
-						}, 300);
+					loadmarkers();
+					var zoom = map.getZoom();
+					if ( zoom > 12 ) zoom = 12;
+					map.setView(latlng,12);
+					map.removeLayer(addMarker)
+					
+					showAlert("Din nya markör är nu sparad och visas för alla.");
 				}
 			},
 			error: function(data){
@@ -1721,6 +1725,12 @@ $(document).ready(function() {
 				showUserPage(hashValues[1]);
 			}, 300);
 		}
+		if (hashValues[0] === "confirmemail") {
+			confirmemail(hashValues[1],hashValues[2]);
+		}
+		if (hashValues[0] === "resetpassword") {
+			verifyResetPassword(hashValues[1],hashValues[2]);
+		}
 	}
 
 	function hideInfo() {
@@ -1933,7 +1943,9 @@ function hidebox(div) {
 	if ($(div).css( "marginLeft" ) === "0px") {
 		$(".leaflet-control-zoom").animate({ 
 			marginLeft: "-=" + width + "px",
-			}, 500 );
+			}, 500, function() {
+				$(".leaflet-control-zoom").css({marginLeft:'10px'});
+			});
 		$(div).animate({
 			marginLeft: "-=" + width + "px",
 			}, 500 );
@@ -2037,7 +2049,7 @@ function showInfo(div,extra) {
 
 function moveInfo(maxWidth=570) {
 	var screenWidth = $(window).width();
-	var divheight = $(window).height()-40;
+	// var divheight = $(window).height()-40;
 	var top = ($(window).height() - $('.content-box').outerHeight()) /2;
 	var left = 0;
 	var top = 0;
@@ -2046,9 +2058,9 @@ function moveInfo(maxWidth=570) {
 	
 	if (screenWidth < 600 ){
 		divWidth = screenWidth-20;
-		divheight = $(window).height()-20;
+		// divheight = $(window).height()-20;
 	} else {
-		divheight = $(window).height()-40;
+		// divheight = $(window).height()-40;
 		divWidth = maxWidth;
 		left = (screenWidth - (divWidth+20)) /2 ;
 		top = 15;
@@ -2059,8 +2071,7 @@ function moveInfo(maxWidth=570) {
 		top: top,
 		left: left,
 		width: divWidth,
-		height: divheight,
-	});
+	});   // height: divheight,
 }
 
 function moveAlertbox () {

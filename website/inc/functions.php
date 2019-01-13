@@ -283,6 +283,49 @@ function newGPXcommentmail($id,$text){
 	}
 }
 
+function sendConfirmeMail($email,$selector,$token){
+	$subject = "Verifiera din epostadress";
+	$url = SERVERADRESS.'#confirmemail/' . \urlencode($selector) . '/' . \urlencode($token);
+	$to = $email;
+	
+	$message = '
+	<html>
+	<body>
+		<p>Du har skapat ett konto till skoterleder.org med e-postadressen <b>'.$email.'.</b></p>
+		<p>Klicka på länken för att aktivera ditt konto: <a href="'.$url.'">'.$url.'</a>
+		(går det inte att klicka på länken kan du kopiera den och klistra in den direkt till din webbläsare)</p>
+		<br>
+		<br>
+		<p>Med vänliga hälsningar</p>
+		<a href='.SERVERADRESS.'>Skoterleder.org</a></p>
+	</body>
+	</html>
+	';
+	sendMail($to, $subject, $message);
+}
+
+function resetpasswordMail($email,$selector,$token){
+	$subject = "Återställande av lösenord";
+	$url = SERVERADRESS.'#resetpassword/' . \urlencode($selector) . '/' . \urlencode($token);
+	$to = $email;
+
+	$message = '
+	<html>
+	<body>
+		<p>Du kan återställa ditt lösenord till Skoterleder.org genom att klicka på länken nedan:
+		<br><br>
+		<a href="'.$url.'">'.$url.'</a>
+		<br>
+		(går det inte att klicka på länken kan du kopiera den och klistra in den direkt till din webbläsare)</p>
+		<br>
+		<br>
+		<p>Med vänliga hälsningar<br>
+		<a href='.SERVERADRESS.'>Skoterleder.org</a></p>
+	</body>
+	</html>
+	';
+	sendMail($to, $subject, $message);
+}
 function sendMail($to, $subject, $message) {
 
 	$subjectMime = mb_encode_mimeheader($subject, 'UTF-8', 'B');
@@ -323,7 +366,7 @@ function sendMail($to, $subject, $message) {
 
 	$mail->isHTML(true); 
 	$mail->CharSet = 'utf-8';
-	$mail->setFrom($email, 'Skoterlder.org');
+	$mail->setFrom($email, 'Skoterleder.org');
 	$mail->addAddress($to);
 	$mail->addBCC('henrik_rosvall@yahoo.se');
 	$mail->Subject = $subjectMime;

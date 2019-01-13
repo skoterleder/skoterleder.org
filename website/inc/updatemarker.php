@@ -1,18 +1,29 @@
 <?php
 include_once 'database_config.php';
 include_once 'functions.php';
+require __DIR__ . '../../vendor/autoload.php';
+
+$pdp_db = new \PDO('mysql:dbname='.DATABASE.';host=localhost;charset=utf8mb4', USER, PASSWORD);
+$auth = new \Delight\Auth\Auth($pdp_db);
+
+$userEmail = $auth->getEmail();
+$userName = $auth->getUsername();
+
+if ( $userEmail == "" ) $userEmail = "null";
 
 $title="";
 $description="";
 $newType="";
+$affected_rows = "";
+$hash = "";
 
-if(isset($_GET['id'])) 			$id = 			convert_UTF8($_GET["id"]);
-if(isset($_GET['hash'])) 		$hash = 		convert_UTF8($_GET["hash"]);
-if(isset($_GET['action'])) 		$action = 		convert_UTF8($_GET["action"]);
-if(isset($_GET['title'])) 		$title = 		convert_UTF8($_GET["title"]);
-if(isset($_GET['description'])) $description = 	convert_UTF8($_GET["description"]);
-if(isset($_GET['hash']))		$hash = 		convert_UTF8($_GET["hash"]);
-if(isset($_GET['type']))		$newType = 		convert_UTF8($_GET["type"]);
+if(isset($_REQUEST['id'])) 			$id = 			convert_UTF8($_REQUEST["id"]);
+if(isset($_REQUEST['hash'])) 		$hash = 		convert_UTF8($_REQUEST["hash"]);
+if(isset($_REQUEST['action'])) 		$action = 		convert_UTF8($_REQUEST["action"]);
+if(isset($_REQUEST['title'])) 		$title = 		convert_UTF8($_REQUEST["title"]);
+if(isset($_REQUEST['description']))	$description = 	convert_UTF8($_REQUEST["description"]);
+if(isset($_REQUEST['type']))		$newType = 		convert_UTF8($_REQUEST["type"]);
+if(isset($_REQUEST['name']))		$name = 		convert_UTF8($_REQUEST["name"]);
 
 
 if (!$description || !$title AND $action == "update") {
@@ -23,6 +34,7 @@ if (!$description || !$title AND $action == "update") {
 
 if ($action == "activate") {
 
+	//To do!!!
 	$sql='UPDATE marker SET status=1 WHERE id=? AND hash=?';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
@@ -33,11 +45,13 @@ if ($action == "activate") {
 	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
 	$stmt->bind_param('is',$id,$hash);
 	$stmt->execute();
+	$affected_rows = $stmt->affected_rows;
+	$stmt->close();
 }
 
 if ($action == "remove") {
 
-	$sql='UPDATE marker SET status=-1 WHERE id=? AND hash=?';
+	$sql='UPDATE marker SET status=-1 WHERE id=? AND ( hash=? OR email=? )';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  echo "error";
@@ -45,8 +59,10 @@ if ($action == "remove") {
 	}
 	 
 	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-	$stmt->bind_param('is',$id,$hash);
+	$stmt->bind_param('iss',$id,$hash,$userEmail);
 	$stmt->execute();
+	$affected_rows = $stmt->affected_rows;
+	$stmt->close();
 }
 
 if ($action == "change") {
@@ -62,17 +78,28 @@ if ($action == "change") {
 	$stmt->bind_result($oStatus,$oTitle,$oDescription,$oName,$oCreatetime,$oCommenttime,$oUpdatetime,$oEmail,$oLat,$oLng,$oComments,$oHash,$oEhash,$oType,$oNode,$oChangeable);	
 	$stmt->fetch();
 	$stmt->close();
-	
-	// Save a copy on old marker nuu
-	$sql='INSERT INTO marker (status,orgid,title,description,lat,lng,type,name,email,hash,ehash,createtime,updatetime,node,changeable) VALUES (2,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
-	$stmt = $db->prepare($sql);
-	if($stmt === false) {
-	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+
+	if ( $oChangeable != 1 AND $oHash != $hash and $userEmail != $oEmail ) {
+			echo "oChangeable: $oChangeable<br>";
+			echo "$hash<br>";
+			echo "$oHash<br>";
+			echo "$userEmail<br>";
+			echo "$oEmail<br>";
+			die('Wrong user');
 	}
-	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-	$stmt->bind_param('issddissssssii',$id,$oTitle,$oDescription,$oLat,$oLng,$oType,$oName,$oEmail,$oHash,$oEhash,$oCreatetime,$oUpdatetime,$oNode,$oChangeable);
-	$stmt->execute();
-	$stmt->close();
+
+	if ( $title != $oTitle || $description != $oDescription || $name != $oName || $newType != $oType ) {
+		// Save a copy off old marker
+		$sql='INSERT INTO marker (status,orgid,title,description,lat,lng,type,name,email,hash,ehash,createtime,updatetime,node,changeable) VALUES (2,?,?,?,?,?,?,?,?,?,?,?,?,?,?)';
+		$stmt = $db->prepare($sql);
+		if($stmt === false) {
+		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+		}
+		/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+		$stmt->bind_param('issddissssssii',$id,$oTitle,$oDescription,$oLat,$oLng,$oType,$oName,$oEmail,$oHash,$oEhash,$oCreatetime,$oUpdatetime,$oNode,$oChangeable);
+		$stmt->execute();
+		$stmt->close();
+	}
 
 	$type = $oType;
 	if ( $newType > 0 ) $type = $newType;
@@ -81,7 +108,7 @@ if ($action == "change") {
 	$days = 30;
 	if ( $type > 5) $days = 60;  // For Markers of: Parking, coffee, Fule, Shelter and Wildernesshut
 
-	$sql='UPDATE marker SET status=1,title=?, description=?, updatetime=now(), type=?, expirationtime = NOW() + INTERVAL ? DAY, notification=0 WHERE id=? AND ( hash=? OR changeable IS TRUE )';
+	$sql='UPDATE marker SET status=1,title=?, description=?, name=?, updatetime=now(), type=?, expirationtime = NOW() + INTERVAL ? DAY, notification=0, expires=null  WHERE id=? AND ( hash=? OR email=? OR changeable IS TRUE )';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  echo "error";
@@ -89,8 +116,10 @@ if ($action == "change") {
 	}
 		
 	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-	$stmt->bind_param('ssiiis',$title,$description,$type,$days,$id,$hash);
+	$stmt->bind_param('sssiiiss',$title,$description,$name,$type,$days,$id,$hash,$userEmail);
 	$stmt->execute();
+	$affected_rows = $stmt->affected_rows;
+	$stmt->close();
 }
 
 if ($action == "uptodate") {
@@ -119,10 +148,11 @@ if ($action == "uptodate") {
 	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
 	$stmt->bind_param('iis',$days,$id,$hash);
 	$stmt->execute();
+	
+	$affected_rows = $stmt->affected_rows;
+	$stmt->close();
 }
 
-echo "Ok:".$stmt->affected_rows;
-
-$stmt->close();
+echo "Ok:".$affected_rows;
 
 ?>
