@@ -124,7 +124,7 @@ function loadMyPage(openMarker){
 						}, 800);
 					} else {
 						$(".resultPassChange").empty();
-						$(".resultPassChange").append( "<h3>Fel: " + data.result + "</h3>");
+						$(".resultPassChange").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 					}
 				},
 				error: function(data){
@@ -509,10 +509,10 @@ function loadLoginPage(openMarker) {
 			<p><label for='newPassword'>Ange ett nytt lösenord: (Min 8 tecken)</label>\
 			<input id='newPassword' type='password' name='password' class='inputText'></p>\
 			<p><input type='submit' value='Skapa konto' class='floatRight inputSubmit'></p>\
+			<p class='result'></p> \
 			<p></p>\
 			<p>Godkänn att skoterleder kan komma att skicka nyhetsbrev till dig: <input type='checkbox' name='newsletter' value='1' checked></p>\
 			<p>Efter att du registrerat dig får du ett mail med en länk där du bekärfta din e-postadress.</p>\
-			<p class='result'></p> \
 		</div>\
 		</form>\
 	</div>\
@@ -573,7 +573,7 @@ function loadLoginPage(openMarker) {
 						}, 800);
 					} else {
 						$(".result").empty();
-						$(".result").append( "<h3>Fel: " + data.result + "</h3>");
+						$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 					}
 				},
 				error: function(data){
@@ -605,7 +605,7 @@ function loadLoginPage(openMarker) {
 					return;
 				}
 				if ( data.result === "-1" ) {
-					$(".result").append( "<h3>Fel lösenord eller e-postadress</h3>");
+					$(".result").append( "<h3 class='alerttext'>Fel lösenord eller e-postadress</h3>");
 					return;
 				}
 				if ( data.result === "-2" ) {
@@ -627,7 +627,7 @@ function loadLoginPage(openMarker) {
 									return;
 								}
 								$(".result").empty();
-								$(".result").append( "<h3>Fel: " + data.result + "</h3>");
+								$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 							},
 							error: function(data){
 								$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>");
@@ -657,9 +657,10 @@ function loadLoginPage(openMarker) {
 				$(".result").empty();
 				if ( data.result === "ok" ) {
 					showAlert("Kontrollera din e-post för att verifiera din inloggning");
+					$(".result").css('color', 'red');
 					setTimeout(function() { closeContenBox(); }, 500);
 				}
-				$(".result").append( "<h3>Fel: " + data.result + "</h3>");
+				$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 			},
 			error: function(data){
 				$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>" );
@@ -819,7 +820,7 @@ function verifyResetPassword(selector,token) {
 							return false;
 						} else {
 							$(".result").empty();
-							$(".result").append( "<h3>Fel: " + data.result + "</h3>");
+							$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 						}
 					},
 					error: function(data){
