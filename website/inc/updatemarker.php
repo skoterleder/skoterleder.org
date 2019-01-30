@@ -80,11 +80,6 @@ if ($action == "change") {
 	$stmt->close();
 
 	if ( $oChangeable != 1 AND $oHash != $hash and $userEmail != $oEmail ) {
-			echo "oChangeable: $oChangeable<br>";
-			echo "$hash<br>";
-			echo "$oHash<br>";
-			echo "$userEmail<br>";
-			echo "$oEmail<br>";
 			die('Wrong user');
 	}
 
