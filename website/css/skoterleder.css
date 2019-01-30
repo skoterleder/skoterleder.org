@@ -64,8 +64,8 @@ li {
 .hidden {
 	display:none;
 }
-.clearboth{
-	clear:both;
+.clearboth {
+	clear: both;
 }
 
 #navwrappr {
@@ -120,6 +120,7 @@ li {
 	overflow:auto;
 	display:none;
 	position:absolute;
+	max-height: 94%;
 	padding:10px;
 	margin:0;
 	z-index: 1050;
@@ -132,6 +133,10 @@ li {
 }
 .info {
 	display:none;
+}
+.center {
+    display: block;
+    margin: 0 auto;
 }
 
 .infoCloseRight {
@@ -169,8 +174,30 @@ background: transparent;
 	background: #eee;
 }
 
+.markerListSelected {
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background: #eee;
+}
+#markerContent {
+    background: #ddd;
+    padding: 8px;
+	border-bottom-right-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+.markerListHeder {
+	background: #ededed;
+	padding: 9px;
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+.markerListHeder.red {
+	background: #de9797; 
+}
+
+
 .inputText {
-	padding: 5px;
+	#padding: 5px;
 }
 .inputSubmit {
     padding: 4px 35px;
@@ -245,6 +272,7 @@ background: transparent;
 
 label {
 	display: block;
+	font-family: Helvetica,Arial,sans-serif;
 }
 
 #listBox {
@@ -262,7 +290,7 @@ label {
 #showMarkerBox {
 	margin-left:-333px;
 	width: 333px;
-	height:100%;
+	max-height:100%;
 	top: 0px;
 	position: absolute;
 	overflow:auto;
@@ -348,6 +376,7 @@ label {
 	margin: 0 5px;
 	text-decoration: none;
 	color: gray!important;
+	cursor: pointer;
 }
 .textlinkmini  {
 	display: block;
@@ -404,10 +433,22 @@ hr {
 }
 
 input[type="text"] {
-	width: 95%
+	width: 95%;
+	font-family: arial;
+	padding: 3px;
+	font-size: 1em;
 }
+input[type="password"]  {
+	font-family: arial;
+	padding: 3px;
+	font-size: 1em;
+}
+
 textarea#description  , textarea#cdescription, textarea#flagDesc   {
 	width: 95%;
+	font-family: arial;
+	padding: 3px;
+	font-size: 1em;
 }
 
 .removeMarkerButton {
@@ -476,6 +517,8 @@ p.linkButtonLong  {
 	border-radius: 4px;
 	clear: both;
 	text-align: center;
+	font-family: arial;
+    cursor: pointer;
 }
 
 .linkButtonMid  {
