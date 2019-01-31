@@ -75,7 +75,7 @@ function loadMyPage(openMarker) {
 		<p class='logoutLink linkButtonLong '>Logga ut</p>\
 		<p class='result'></p> \
 	</div>\
-	<p class='return-login linkButtonLong'><a href='#' class='closeMarkerBox'>Åter till kartan</a></p>\
+	<p class='return-login biglink'><a href='#' class='closeMarkerBox'>Åter till kartan</a></p>\
 	");
 
 	$(".return-login").click(function () {
