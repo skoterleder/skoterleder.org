@@ -3,40 +3,39 @@ function closeContenBox() {
 	$('#grayout').hide();
 	$('.dynamic-text').hide();
 	document.title = "Skoterleder.org - Snöskoterkarta!"
-	location.replace("#"); 
+	location.replace("#");
 }
 
 function showUserPage(openMarker) {
 	$(".dynamic-text").empty();
 	$(".dynamic-text").append("<br/><br/><img src='images/ajax-loader.gif' width='16' height='16' class='center'><br/><br/>");
 	moveInfo();
-	
+
 	$.ajax({
 		dataType: "json",
 		url: "inc/getuser.php",
-		success: function(data)
-		{
+		success: function (data) {
 			$(".dynamic-text").empty();
-			
+
 			userEmail = data.userEmail;
-			userName  = data.userName;
-			
+			userName = data.userName;
+
 			if (userEmail) {
 				var hash = "#!mypage";
 				var title = "Skoterleder.org - Min sida"
-				loadMyPage(openMarker);	
+				loadMyPage(openMarker);
 			} else {
 				var hash = "#!login";
 				var title = "Skoterleder.org - Login"
 				//if ( loadLoginPage(openMarker) ) loadMyPage(openMarker);
 				loadLoginPage(openMarker);
 			}
-			
+
 			newHash(hash);
 			document.title = title
 			moveInfo();
 		},
-		error: function(data){
+		error: function (data) {
 			console.log("GetUser error:" + data);
 		}
 	});
@@ -45,18 +44,18 @@ function showUserPage(openMarker) {
 	$('#grayout').show();
 	$('.dynamic-text').show();
 	$('.content-box').slideDown(500);
-	$("#grayout").attr("close","content-box");
+	$("#grayout").attr("close", "content-box");
 }
 
-function loadMyPage(openMarker){
-	
-	if (openMarker == "newMarker" ) {
+function loadMyPage(openMarker) {
+
+	if (openMarker == "newMarker") {
 		closeContenBox();
 		map.removeLayer(addMarker);
 		addNewMarker();
 		return
 	}
-		
+
 	$(".dynamic-text").empty();
 	$(".dynamic-text").append(" \
 	<div class='header'> \
@@ -79,14 +78,14 @@ function loadMyPage(openMarker){
 	<p class='return-login linkButtonLong'><a href='#' class='closeMarkerBox'>Åter till kartan</a></p>\
 	");
 
-	$(".return-login").click( function() {
+	$(".return-login").click(function () {
 		closeContenBox();
 	});
 
-	$(".changePassword").click( function() {
+	$(".changePassword").click(function () {
 
 		$(".changePassword").hide(500);
-		
+
 		var form = " \
 				<form action='#' id ='changePasswordForm'> \
 				<h3>Byte av lösnord</h3> \
@@ -103,53 +102,52 @@ function loadMyPage(openMarker){
 				</form> \
 		";
 		$(form).insertAfter(".changePassword");
-	
-		$("#changePasswordForm").submit(function(form) {
+
+		$("#changePasswordForm").submit(function (form) {
 			$(".resultPassChange").empty();
-			$(".resultPassChange").append( "<p>Sparar...</p>");
-			
+			$(".resultPassChange").append("<p>Sparar...</p>");
+
 			$.ajax({
 				dataType: "json",
 				url: "inc/changepassword.php",
-				method : "post",
+				method: "post",
 				data: $("#changePasswordForm").serialize(),
-				success: function(data)
-				{
+				success: function (data) {
 					$(".resultPassChange").empty();
-					
-					if ( data.result === "ok" ) {
+
+					if (data.result === "ok") {
 						showAlert("Lösenord ändrat");
-						setTimeout(function() {	
+						setTimeout(function () {
 							closeForm();
 						}, 800);
 					} else {
 						$(".resultPassChange").empty();
-						$(".resultPassChange").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
+						$(".resultPassChange").append("<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 					}
 				},
-				error: function(data){
+				error: function (data) {
 					$(".resultPassChange").html("Kopplingsfel eller liknande, försök igen senare!");
 				}
 			});
 
 			return false;
 		});
-		
-		$(".closeChangePasswordForm").click( function() {
+
+		$(".closeChangePasswordForm").click(function () {
 			closeForm();
 		});
-		
+
 		function closeForm() {
-			$("#changePasswordForm").hide(500, function() {
+			$("#changePasswordForm").hide(500, function () {
 				$(".changePassword").show(500);
-				$("#changePasswordForm").empty();    
+				$("#changePasswordForm").empty();
 			});
 		}
 	});
 
-		
-	$(".yourMarkersList").click( function() {
-		if ( $(".yourMarkersList").hasClass("open") ) {
+
+	$(".yourMarkersList").click(function () {
+		if ($(".yourMarkersList").hasClass("open")) {
 			$(".yourMarkersList").removeClass("open");
 			$(".markerList").hide(600);
 		} else {
@@ -158,8 +156,8 @@ function loadMyPage(openMarker){
 		}
 	});
 
-	$(".administration").click( function() {
-		if ( $(".administration").hasClass("open") ) {
+	$(".administration").click(function () {
+		if ($(".administration").hasClass("open")) {
 			$(".administration").removeClass("open");
 			$('.administrationForm').hide(600);
 		} else {
@@ -170,146 +168,146 @@ function loadMyPage(openMarker){
 		}
 	});
 
-	$(".logoutLink").click( function() {
+	$(".logoutLink").click(function () {
 		$(".result").empty();
-		$.getJSON('inc/logout.php', function(data) {
-			if ( data.result === "ok" ) {
-				$(".logoutLink").after( "<h3>Du är nu utloggad</h3>");
+		$.getJSON('inc/logout.php', function (data) {
+			if (data.result === "ok") {
+				$(".logoutLink").after("<h3>Du är nu utloggad</h3>");
 				getUser();
-				setTimeout(function() {	closeContenBox(); }, 1500);
+				setTimeout(function () { closeContenBox(); }, 1500);
 			}
 		})
-		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
-				$(".logoutLink").after( "<h4>Kan ej ansluta till databasen/server...</h4>");
-		});	
+			.error(function (jqXHR, textStatus, errorThrown) { /* assign handler */
+				$(".logoutLink").after("<h4>Kan ej ansluta till databasen/server...</h4>");
+			});
 	});
-	
+
 	listMarkerssss(openMarker);
 }
 
-	function listMarkerssss (openMarker){
-		$(".markerList").empty();
-		$(".markerList").append("Laddar... <img src='images/ajax-loader.gif' width='16' height='16'>");
-		var openMarkerNumber = -1;
-	
-		$.getJSON('inc/listmymarkers.php', function(data) {
-		
-			$(".markerList").empty();
-			if ( data == -1 ) {
-				console.log("-1 error");
-				showUserPage(openMarker);
-				return false;
-			}
-			
-			var div = $("<div>").addClass(""); // .appendTo("#listBox");
-			
-			div.on('click', '.editClick', function() {
-				changeMarker($(this).data('id'),$(this).data('hash'));
-				return false;
-			});
-			div.on('click', '.showClick', function() {
-				loadMarkerPanel($(this).data('id'));
-				return false;
-			});
+function listMarkerssss(openMarker) {
+	$(".markerList").empty();
+	$(".markerList").append("Laddar... <img src='images/ajax-loader.gif' width='16' height='16'>");
+	var openMarkerNumber = -1;
 
-			div.on('click', '.markerListItem', function() {
-				expandMarkerListItem(data,$(this).data('i'));
-				return false;
-			});
-			
-			var heder ="";
-			for(var i=0;i<data.marker.length;i++){
-				var point = data.marker[i];
-			
-				var dim="";
-				if (point.properties.status != "1") dim=" dim ";
-				
-				var lastupdated = jQuery.timeago(point.properties.updatetime);	
-				
-				if ( point.properties.expires == 1 && heder != "expires" ) {
-					heder = "expires";
-					$(div).append(" \
+	$.getJSON('inc/listmymarkers.php', function (data) {
+
+		$(".markerList").empty();
+		if (data == -1) {
+			console.log("-1 error");
+			showUserPage(openMarker);
+			return false;
+		}
+
+		var div = $("<div>").addClass(""); // .appendTo("#listBox");
+
+		div.on('click', '.editClick', function () {
+			changeMarker($(this).data('id'), $(this).data('hash'));
+			return false;
+		});
+		div.on('click', '.showClick', function () {
+			loadMarkerPanel($(this).data('id'));
+			return false;
+		});
+
+		div.on('click', '.markerListItem', function () {
+			expandMarkerListItem(data, $(this).data('i'));
+			return false;
+		});
+
+		var heder = "";
+		for (var i = 0; i < data.marker.length; i++) {
+			var point = data.marker[i];
+
+			var dim = "";
+			if (point.properties.status != "1") dim = " dim ";
+
+			var lastupdated = jQuery.timeago(point.properties.updatetime);
+
+			if (point.properties.expires == 1 && heder != "expires") {
+				heder = "expires";
+				$(div).append(" \
 						<div class='markerListHeder red'> \
 						<h2>Markörer som behöver förnyas/bekräftas:</h2>\
 						<p class='' >\
 						Om du inte bekräftar följande markörer kommer de att inaktiveras den 2019-03-01 och sedan raderas efter 6 månader.\
 						</p>\
 						</div>\
-					");					
-				}
-				
-				if ( point.properties.expires != 1 && point.properties.status == 1 && heder != "active" ) {
-					heder = "active";
-					$(div).append(" \
+					");
+			}
+
+			if (point.properties.expires != 1 && point.properties.status == 1 && heder != "active") {
+				heder = "active";
+				$(div).append(" \
 						<div class='markerListHeder'> \
 						<h2>Aktiva markörer:</h2>\
 						<p class='' >\
 						</p>\
 						</div>\
-					");					
-				}
-				if ( point.properties.expires != 1 && point.properties.status < 1 && heder != "inactive" ) {
-					heder = "inactive";
-					$(div).append(" \
+					");
+			}
+			if (point.properties.expires != 1 && point.properties.status < 1 && heder != "inactive") {
+				heder = "inactive";
+				$(div).append(" \
 						<div class='markerListHeder'> \
 						<h2>Ej Aktiva</h2>\
 						<p class='' >\
 						Ej aktiva markörer visas inte på kartan och raderas automatiskt efter 12 månader sedan den senast ändrades.\
 						</p>\
 						</div>\
-					");					
-				}
-				
-				$(div).append(" \
+					");
+			}
+
+			$(div).append(" \
 					<p class='markerListItem item" + i + "' data-i='" + i + "' >\
 						#" + point.properties.id + "\
 						<img src='" + icon[point.icon] + "' class='iconImg" + dim + "'> " + point.properties.title + " \
 						(Ändrad " + lastupdated + ") \
 					</p>\
 				");
-				
-				$("<div>").addClass("clearboth line").appendTo(div);
-				if ( openMarker == point.properties.id ) openMarkerNumber = i;
-			}
-			
-			if (data.marker.length == 0) {
-				$(div).append(" \
+
+			$("<div>").addClass("clearboth line").appendTo(div);
+			if (openMarker == point.properties.id) openMarkerNumber = i;
+		}
+
+		if (data.marker.length == 0) {
+			$(div).append(" \
 					<div class=''> \
 					<p class='' >\
 					Du har inga markörer.\
 					</p>\
 					</div>\
-				");		
-			}
-			$(div).appendTo(".markerList");
-			if ( openMarkerNumber != -1  ) expandMarkerListItem(data,openMarkerNumber);
+				");
+		}
+		$(div).appendTo(".markerList");
+		if (openMarkerNumber != -1) expandMarkerListItem(data, openMarkerNumber);
 
-		})
-		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
-			$(".markerList").append( "<h3>Kan ej ansluta till databasen/server...</h3>" );
-		});		
+	})
+		.error(function (jqXHR, textStatus, errorThrown) { /* assign handler */
+			$(".markerList").append("<h3>Kan ej ansluta till databasen/server...</h3>");
+		});
 
-	}
+}
 
-function expandMarkerListItem(data,index){
+function expandMarkerListItem(data, index) {
 
-	if ( $(".item"+index).hasClass( "markerListSelected") ) {  //Close already open Marker
+	if ($(".item" + index).hasClass("markerListSelected")) {  //Close already open Marker
 		$("#mapMini").remove();
 		$("#markerContent").remove();
-		$('.markerListItem').removeClass( "markerListSelected");
+		$('.markerListItem').removeClass("markerListSelected");
 		return false;
 	}
-	
-	$('.markerListItem').removeClass( "markerListSelected");
-	$(".item" + index).addClass( "markerListSelected" );
-	
+
+	$('.markerListItem').removeClass("markerListSelected");
+	$(".item" + index).addClass("markerListSelected");
+
 	$("#mapMini").remove();
 	$("#markerContent").remove();
-	
-	var div = $(".item"+index).after("<div id='markerContent'><div id='mapMini'></div></div>");
-	
-	$("#mapMini").height( Math.floor( $(window).height()*0.3) );
-	var mapMini = L.map('mapMini', {center: new L.LatLng(64, 16), zoom: 6});
+
+	var div = $(".item" + index).after("<div id='markerContent'><div id='mapMini'></div></div>");
+
+	$("#mapMini").height(Math.floor($(window).height() * 0.3));
+	var mapMini = L.map('mapMini', { center: new L.LatLng(64, 16), zoom: 6 });
 
 	new L.tileLayer('https://tiles.skoterleder.org/tiles/{z}/{x}/{y}.png', {
 		maxZoom: 16,
@@ -325,16 +323,16 @@ function expandMarkerListItem(data,index){
 	var description = point.properties.description;
 	var type = point.properties.type;
 	var name = point.properties.name;
-	
+
 	var opacity = 1;
-	if ( status < 1 ) opacity = 0.5;
+	if (status < 1) opacity = 0.5;
 	var size = 100;
-	var x=32, y=37;
+	var x = 32, y = 37;
 	var z = size / 100;
 	iconType[point.icon].options.iconSize = [x * z, y * z]; // size of the icon
-	iconType[point.icon].options.iconAnchor = [x*z/2, y * z];
-	
-	var tmpMarker = L.marker(point.coordinates,{opacity: opacity}).setIcon(iconType[point.icon]).addTo(mapMini);
+	iconType[point.icon].options.iconAnchor = [x * z / 2, y * z];
+
+	var tmpMarker = L.marker(point.coordinates, { opacity: opacity }).setIcon(iconType[point.icon]).addTo(mapMini);
 	mapMini.setView(point.coordinates, 12);
 
 	$("#markerContent").append("<h2>Ändra på markören</h2><p class='InfoText'></p>");
@@ -363,10 +361,10 @@ function expandMarkerListItem(data,index){
 			<h3>Rubrik</h3> \
 			<input type='text' name='title' id='ctitle' value='" + decodeEntities(title) + "'> \
 			<h3>Beskrivning</h3> \
-			<textarea name='description' id='cdescription' rows='6'>" + description + "</textarea> \
+			<textarea name='description' id='cdescription' maxlength='50' rows='6'>" + description + "</textarea> \
 			<input type='hidden' name='id' id='cid' value='" + id + "'> \
 			<input type='hidden' name='action' id='actionType' value='change' >\
-			<input id='ctype' type='hidden' name='type' value='"+type+"'> \
+			<input id='ctype' type='hidden' name='type' value='"+ type + "'> \
 			" + message + "\
 			<p class='clearboth'> \
 				<img src='images/icons/snowmobile-green.png' class='selectIconType icon-1' type='1' title='Information om skoterled'> \
@@ -397,80 +395,79 @@ function expandMarkerListItem(data,index){
 	";
 	$(form).appendTo("#markerContent");
 
-	$('.icon-'+type).addClass("iconSelected");
-	$(".iconText").html($('.icon-'+type).attr("title"));
-	
-	if ( status < 1 ) $('.removeMarkerButton').remove();
-	
-	$('.selectIconType').click(function() {
-		$('.selectIconType').removeClass( "iconSelected" )
-		$(this).addClass( "iconSelected" );
-		
+	$('.icon-' + type).addClass("iconSelected");
+	$(".iconText").html($('.icon-' + type).attr("title"));
+
+	if (status < 1) $('.removeMarkerButton').remove();
+
+	$('.selectIconType').click(function () {
+		$('.selectIconType').removeClass("iconSelected")
+		$(this).addClass("iconSelected");
+
 		$(".iconText").html($(this).attr("title"));
 		$("#ctype").val($(this).attr("type"));
 	});
-	$(".zoomMarkerButton").click( function() {
-		map.setView(point.coordinates,13);
+	$(".zoomMarkerButton").click(function () {
+		map.setView(point.coordinates, 13);
 		return false;
 	});
-	$(".closeExpandMarker").click( function() {
+	$(".closeExpandMarker").click(function () {
 		closeExpandMarker();
 		return false;
 	});
-	$('.showCommentsButton').click(function() {
-		loadDisqus(id,data.title,'marker');
+	$('.showCommentsButton').click(function () {
+		loadDisqus(id, data.title, 'marker');
 		$('.showCommentsButton').hide();
-	});	
-	$('.removeMarkerButton').click(function() {
+	});
+	$('.removeMarkerButton').click(function () {
 		$(".error").css('color', '');
 		$(".error").html("Sparar... <img src='images/ajax-loader.gif' width='16' height='16'>");
-		
+
 		$('#actionType').val('remove');
-		
+
 		updateMarker();
 	});
 
-	$("#changeMarkerForm").submit(function(form) {
+	$("#changeMarkerForm").submit(function (form) {
 		$(".error").css('color', '');
 		$(".error").html("Sparar... <img src='images/ajax-loader.gif' width='16' height='16'>");
-		
+
 		updateMarker();
 
 		return false;
 	});
-	
-	function updateMarker(){
+
+	function updateMarker() {
 		$.ajax({
 			url: "inc/updatemarker.php",
-			method : "post",
+			method: "post",
 			data: $("#changeMarkerForm").serialize(),
-			success: function(data)
-			{
-				if (data.substr(0,5) === "error") {
+			success: function (data) {
+				if (data.substr(0, 5) === "error") {
 					$(".error").html(data);
 					$(".error").css('color', 'red');
 				} else {
 					$(".error").html("Markör Sparas... <img src='images/ajax-loader.gif' width='16' height='16'>");
 					$(".savebutton").prop('disabled', true);
 					loadmarkers();
-					setTimeout(function() { closeExpandMarker(true); }, 2500);							
-					
+					setTimeout(function () { closeExpandMarker(true); }, 2500);
+
 					dataCache[id] = 'undefined';
-					gatrack('send', 'pageview','#marker/'+id+'/saved'); //#changeMarker/17
+					gatrack('send', 'pageview', '#marker/' + id + '/saved'); //#changeMarker/17
 				}
 			},
-			error: function(data){
+			error: function (data) {
 				$(".error").html("Kopplingsfel eller liknande, försök igen senare!");
 			}
 		});
 	}
 
-	function closeExpandMarker(reloadloadMyPage){
-		$("#markerContent").slideUp( "slow", function() {
+	function closeExpandMarker(reloadloadMyPage) {
+		$("#markerContent").slideUp("slow", function () {
 			$("#mapMini").remove();
 			$("#markerContent").remove();
-			$('.markerListItem').removeClass( "markerListSelected");
-			if ( reloadloadMyPage ) loadMyPage();
+			$('.markerListItem').removeClass("markerListSelected");
+			if (reloadloadMyPage) loadMyPage();
 		});
 	}
 }
@@ -518,25 +515,25 @@ function loadLoginPage(openMarker) {
 	</div>\
 	<p class='return-login biglink'>Åter till kartan</p>\
 	");
-	
+
 	if (touchDev) {
-		$('.inputText').css('padding','10px');
+		$('.inputText').css('padding', '10px');
 	}
 
-	$(".return-login").click( function() {
+	$(".return-login").click(function () {
 		closeContenBox();
 	});
-	$(".create-login").click( function() {
+	$(".create-login").click(function () {
 		$(".result").empty();
 		$('.create-form').show(600);
 		$('.login-form').hide(200);
 	});
-	$(".do-login").click( function() {
+	$(".do-login").click(function () {
 		$(".result").empty();
 		$('.create-form').hide(600);
 		$('.login-form').show(200);
 	});
-	$(".forgetLink").click( function() {
+	$(".forgetLink").click(function () {
 		$('.forgetLink').hide();
 		$("#loginForm").replaceWith("\
 		<form action='#' id='resettPassForm'>\
@@ -552,128 +549,124 @@ function loadLoginPage(openMarker) {
 		");
 
 		if (touchDev) {
-			$('.inputText').css('padding','10px');
+			$('.inputText').css('padding', '10px');
 		}
 
-		$("#resettPassForm").submit(function(form) {
-			
+		$("#resettPassForm").submit(function (form) {
+
 			$(".result").empty();
 			$(".result").append("<h4>Skickar...</h4>");
 			$.ajax({
 				dataType: "json",
 				url: "inc/forget.php",
-				method : "post",
+				method: "post",
 				data: $("#resettPassForm").serialize(),
-				success: function(data)
-				{
-					if ( data.result === "ok" ) {
+				success: function (data) {
+					if (data.result === "ok") {
 						showAlert("Kontrollera din e-post för att återställa lösenord");
-						setTimeout(function() {	
+						setTimeout(function () {
 							closeContenBox();
 						}, 800);
 					} else {
 						$(".result").empty();
-						$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
+						$(".result").append("<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 					}
 				},
-				error: function(data){
+				error: function (data) {
 					console.log("GetUser error:" + data);
 					return false;
 				}
 			});
-		return false;
+			return false;
 		});
 	});
-		
 
-	
-	$("#loginForm").submit(function(form) {
+
+
+	$("#loginForm").submit(function (form) {
 		$(".result").empty();
 		$(".result").append("Loggar in... ");
 		$.ajax({
 			dataType: "json",
 			url: "inc/login.php",
-			method : "post",
+			method: "post",
 			data: $("#loginForm").serialize(),
-			success: function(data)
-			{
+			success: function (data) {
 				$(".result").empty();
-				if ( data.result === "ok" ) {
+				if (data.result === "ok") {
 					getUser();
 					closeContenBox();
-					setTimeout(function() { showUserPage(openMarker); }, 500);
+					setTimeout(function () { showUserPage(openMarker); }, 500);
 					return;
 				}
-				if ( data.result === "-1" ) {
-					$(".result").append( "<h3 class='alerttext'>Fel lösenord eller e-postadress</h3>");
+				if (data.result === "-1") {
+					$(".result").append("<h3 class='alerttext'>Fel lösenord eller e-postadress</h3>");
 					return;
 				}
-				if ( data.result === "-2" ) {
-					$(".result").append( "<h3>E-postadressen är ej verifierad, kolla din e-post</h3>");
-					$(".result").append( "<p><a href='#' class='resend'>Skicka verifierings e-post igen.</a></p>");
-					$('.resend').css('color','gray');
-					
-					$(".resend").click( function() {
+				if (data.result === "-2") {
+					$(".result").append("<h3>E-postadressen är ej verifierad, kolla din e-post</h3>");
+					$(".result").append("<p><a href='#' class='resend'>Skicka verifierings e-post igen.</a></p>");
+					$('.resend').css('color', 'gray');
+
+					$(".resend").click(function () {
 						var email = $("#loginEmail").val();
 						$.ajax({
 							dataType: "json", url: "inc/resendconfirmation.php",
-							method : "post",
-							data: { email: email},
-							success: function(data)
-							{
-								if ( data.result === "ok" ) {
+							method: "post",
+							data: { email: email },
+							success: function (data) {
+								if (data.result === "ok") {
 									showAlert("Kontrollera din e-post för att verifiera din inloggning");
-									setTimeout(function() { closeContenBox(); }, 500);
+									setTimeout(function () { closeContenBox(); }, 500);
 									return;
 								}
 								$(".result").empty();
-								$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
+								$(".result").append("<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 							},
-							error: function(data){
-								$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>");
+							error: function (data) {
+								$(".result").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 							}
 						});
 					});
-				}				
+				}
 			},
-			error: function(data){
-				$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>");
+			error: function (data) {
+				$(".result").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 			}
 		});
-		return false; 
+		return false;
 	});
-	
-	$("#signupForm").submit(function(form) {
+
+	$("#signupForm").submit(function (form) {
 		$(".result").empty();
 		$(".result").append("<h4>Skickar...</h4>");
 
 		$.ajax({
 			dataType: "json",
 			url: "inc/createlogin.php",
-			method : "post",
+			method: "post",
 			data: $("#signupForm").serialize(),
-			success: function(data)
-			{
+			success: function (data) {
 				$(".result").empty();
-				if ( data.result === "ok" ) {
+				if (data.result === "ok") {
 					showAlert("Kontrollera din e-post för att verifiera din inloggning");
 					$(".result").css('color', 'red');
-					setTimeout(function() { closeContenBox(); }, 500);
+					setTimeout(function () { closeContenBox(); }, 500);
 				}
-				$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
+				$(".result").append("<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 			},
-			error: function(data){
-				$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>" );
+			error: function (data) {
+				$(".result").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 			}
 		});
-		return false; 
+		return false;
 	});
 }
 
-function confirmemail(selector,token) {
+function confirmemail(selector, token) {
 	$(".dynamic-text").empty();
 	$('#grayout').show();
-	$("#grayout").attr("close","content-box");
+	$("#grayout").attr("close", "content-box");
 	$('.dynamic-text').show();
 	$(".dynamic-text").append("Laddar sidan...");
 	moveInfo();
@@ -681,12 +674,11 @@ function confirmemail(selector,token) {
 	$.ajax({
 		dataType: "json",
 		url: "inc/verifyemail.php",
-		method : "post",
-		data: { selector: selector, token: token},
-		success: function(data)
-		{
+		method: "post",
+		data: { selector: selector, token: token },
+		success: function (data) {
 			$(".dynamic-text").empty();
-			
+
 			$(".dynamic-text").append(" \
 				<div class='header'> \
 					<h1>Skoterleder.org</h1> \
@@ -694,8 +686,8 @@ function confirmemail(selector,token) {
 				</div> \
 				<h2 class='collapsible do-login'>Verifiering av e-postadress.</h2>\
 			");
-			
-			if ( data.result === "ok" ) {
+
+			if (data.result === "ok") {
 				$(".dynamic-text").append(" \
 					<div class='collapsdata'>\
 						<p><br>\
@@ -717,40 +709,39 @@ function confirmemail(selector,token) {
 						</p>\
 						<p class='linkButtonLong close'><a href='#' class='closeMarkerBox'>Stäng</a></p>\
 					</div>\
-				");	
+				");
 			}
-			
+
 			$('.content-box').slideDown(500);
 			moveInfo();
-			
-			$(".close").click( function() {
+
+			$(".close").click(function () {
 				closeContenBox();
 			});
 		},
-		error: function(data){
-			$(".dynamic-text").append( "<h3>Kan ej ansluta till databasen/server...</h3>" );
+		error: function (data) {
+			$(".dynamic-text").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 		}
 	});
 }
 
 
-function verifyResetPassword(selector,token) {
+function verifyResetPassword(selector, token) {
 	$(".dynamic-text").empty();
 	$('#grayout').show();
-	$("#grayout").attr("close","content-box");
+	$("#grayout").attr("close", "content-box");
 	$('.dynamic-text').show();
 	$(".dynamic-text").append("Laddar sidan...");
 	moveInfo();
-	
+
 	$.ajax({
 		dataType: "json",
 		url: "inc/forget.php",
-		method : "post",
-		data: { selector: selector, token: token, action: 'canReset'},
-		success: function(data)
-		{
+		method: "post",
+		data: { selector: selector, token: token, action: 'canReset' },
+		success: function (data) {
 			$(".dynamic-text").empty();
-			
+
 			$(".dynamic-text").append(" \
 				<div class='header'> \
 					<h1>Skoterleder.org</h1> \
@@ -758,8 +749,8 @@ function verifyResetPassword(selector,token) {
 				</div> \
 				<h2 class='collapsible do-login'>Återställning av lösenord</h2>\
 			");
-			
-			if ( data.result === "ok" ) {
+
+			if (data.result === "ok") {
 				$(".dynamic-text").append(" \
 				<div class='collapsdata'>\
 					<p><br></p>\
@@ -769,8 +760,8 @@ function verifyResetPassword(selector,token) {
 					<form action='#' id='resetPasswordForm'>\
 					<p><input type='password' name='password' class='inputText'></p>\
 					<p><input type='submit' value='Spara lösenord' class='floatRight inputSubmit'</p>\
-					<input type='hidden' name='selector' value='" + selector+ "'>\
-					<input type='hidden' name='token' value='" + token+ "'>\
+					<input type='hidden' name='selector' value='" + selector + "'>\
+					<input type='hidden' name='token' value='" + token + "'>\
 					<input type='hidden' name='action' value='resetPassword'>\
 					</form>\
 					<p class='result'></p> \
@@ -778,7 +769,7 @@ function verifyResetPassword(selector,token) {
 				</div>\
 				");
 			} else {
-				var	msg = "";
+				var msg = "";
 
 				$(".dynamic-text").append(" \
 				<div class='collapsdata'>\
@@ -792,47 +783,46 @@ function verifyResetPassword(selector,token) {
 					</p>\
 					<p class='linkButtonLong closeMarkerBox closeExpandMarker'><a href='#' class='closeMarkerBox'>Stäng</a></p> \
 				</div>\
-				");	
+				");
 			}
-			
+
 			$('.content-box').slideDown(500);
 			moveInfo();
-			
-			$(".closeMarkerBox").click( function() {
+
+			$(".closeMarkerBox").click(function () {
 				closeContenBox();
 			});
 
 
-			$("#resetPasswordForm").submit(function(form) {
+			$("#resetPasswordForm").submit(function (form) {
 				$(".result").empty();
 				$(".result").append("<h4>Skickar...</h4>");
 
 				$.ajax({
 					dataType: "json",
 					url: "inc/forget.php",
-					method : "post",
+					method: "post",
 					data: $("#resetPasswordForm").serialize(),
-					success: function(data)
-					{
-						if ( data.result === "ok" ) {
+					success: function (data) {
+						if (data.result === "ok") {
 							showAlert("Lösenord är ändrat");
 							closeContenBox();
 							return false;
 						} else {
 							$(".result").empty();
-							$(".result").append( "<h3 class='alerttext'>Fel: " + data.result + "</h3>");
+							$(".result").append("<h3 class='alerttext'>Fel: " + data.result + "</h3>");
 						}
 					},
-					error: function(data){
-						$(".result").append( "<h3>Kan ej ansluta till databasen/server...</h3>");
+					error: function (data) {
+						$(".result").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 						return false;
 					}
 				});
-				return false; 
+				return false;
 			});
 		},
-		error: function(data){
-			$(".dynamic-text").append( "<h3>Kan ej ansluta till databasen/server...</h3>" );
+		error: function (data) {
+			$(".dynamic-text").append("<h3>Kan ej ansluta till databasen/server...</h3>");
 		}
 	});
 }
@@ -841,12 +831,11 @@ function getUser() {
 	$.ajax({
 		dataType: "json",
 		url: "inc/getuser.php",
-		success: function(data)
-		{
+		success: function (data) {
 			userEmail = data.userEmail;
-			userName  = data.userName;
+			userName = data.userName;
 		},
-		error: function(data){
+		error: function (data) {
 			console.log("GetUser error:" + data);
 		}
 	});
