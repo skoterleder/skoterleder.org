@@ -363,7 +363,7 @@ function expandMarkerListItem(data,index){
 			<h3>Rubrik</h3> \
 			<input type='text' name='title' id='ctitle' value='" + decodeEntities(title) + "'> \
 			<h3>Beskrivning</h3> \
-			<textarea name='description' id='cdescription' maxlength='50' rows='6'>" + description + "</textarea> \
+			<textarea name='description' id='cdescription' rows='6'>" + description + "</textarea> \
 			<input type='hidden' name='id' id='cid' value='" + id + "'> \
 			<input type='hidden' name='action' id='actionType' value='change' >\
 			<input id='ctype' type='hidden' name='type' value='"+type+"'> \
