@@ -14,6 +14,7 @@ var popup;
 var timeout = new Date().getTime() + 1*60*1000; //add 1 minutes;
 var lastHash = '';
 var orgTitle;
+var areaText;
 
 // Unique user id, only used for statistics
 var uid = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
@@ -153,9 +154,6 @@ $(document).ready(function() {
 	map.addControl(new openOsmLink()); 
 	map.addControl(new openOsmEditLink());
 	
-	
-	// loadmarkers();
-	
 	if (window.location.hash) {
 		hashControll();
 	}
@@ -238,27 +236,27 @@ $(document).ready(function() {
 	if ( $( "#main-info" ).hasClass( "showChanges" ) ) loadDates();
 
 	function loadDates() {
-		$(".leaflet-tile-pane").css("opacity",'0.6');
+		$(".leaflet-tile-pane").css("opacity",'0.7');
 
 		$.getJSON('inc/osmdata.php', function(data) {
 			
 			var html = "";
 			var container = $("<p>").appendTo("#infoBox");
 			
-			container.on('click', '.dateSelected', function() {
-				loadmarkers($(this).data("date"));
+			container.on('click', '.dateClick', function() {
+				loadUpdates($(this).data("date"));
 				return false;
 			});			
 			for(var i=0;i<data.dates.length;i++){
 				var lastDate = data.dates[i].date;
-				html += " <a href='#' class='dateSelected' data-date='"+lastDate+"'>";
+				html += " <a href='#' class='dateSelected dateClick ds-"+lastDate+"' data-date='"+lastDate+"'>";
 				html += lastDate + "</a> ";
 			}
 			
 			container.html( html );
 			moveSelectDateBox();
 			
-			loadmarkers(lastDate)
+			loadUpdates(lastDate);
 		})
 		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
 				showAlert("Error loading data");
@@ -267,30 +265,89 @@ $(document).ready(function() {
 		});
 	}
 
-	function loadmarkers(q) {
-		if (!q) q = "";
+	function loadUpdates(date){
+		$( ".updates" ).remove();
+		$( ".layerNames" ).remove();
+		$(".dateClick").removeClass("alerttext");
+		$(".ds-"+date).addClass("alerttext");
 		
-		if (markers) {
-			map.removeLayer(markers);
+		$.getJSON('inc/osmdata.php?d='+date, function(data) {
+
+			html = "";
+			for(var i=0;i<data.updates.length;i++){
+				var updateTime = data.updates[i].time;
+				var updateId = data.updates[i].id;
+				html += " <a href='#' class='dateSelected updateSelected cl-"+updateId+"' data-id='"+updateId+"' data-layer='"+updateTime+"'>";
+				html += updateTime + "</a> ";
+			}
+		
+			$("#infoBox").append("<p class='updates'>"+html+"</p>");
+			
+			$(".updateSelected").click( function() {
+				updateId = $(this).data("id");
+				loadLayers(updateId);
+			});
+						
+			loadChanges(data);
+		})
+		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
+				showAlert("Error loading data");
+				console.log(jqXHR.responseText);
+				console.log(textStatus);
+		});
+	
+	// loadLayers(lastDate);
+	}
+	
+	function loadLayers(id) {
+
+		console.log("Id:"+id);
+
+		$( ".layerNames" ).remove();
+		$(".updateSelected").removeClass("alerttext");
+		$(".cl-"+id).addClass("alerttext");
+
+		$.getJSON('inc/osmdata.php?id='+id, function(points) {
+			
+			loadChanges(points);
+
+			var html = "";
+			var container = $("<p class='layerNames'>").appendTo("#infoBox");
+			
+			container.on('click', '.layerSelected', function() {
+				loadAreas($(this).data("id"),$(this).data("layer"));
+				return false;
+			});
+			for(var i=0;i<points.layer.length;i++){
+				var layerName = points.layer[i].name;
+				html += " <a href='#' class='layerSelected cl-"+layerName+"' data-id='"+id+"' data-layer='"+layerName+"'>";
+				html += layerName + "</a> ";
+			}
+			container.html( html );
+			
+			if ( points.layer.length > 0 ) loadAreas(id,points.layer[0].name);
+			
+		})
+		.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
+				showAlert("Error loading data");
+				console.log(jqXHR.responseText);
+				console.log(textStatus);
+		});
+	}
+	
+	function loadAreas(id,layer) {
+		if (areaRect) {
 			map.removeLayer(areaRect);
 			map.removeLayer(areaText);
 		}
 		
-		markers  = new L.MarkerClusterGroup( {maxClusterRadius:12,disableClusteringAtZoom:11} ).addTo(map);
 		areaRect = new L.layerGroup().addTo(map);
 		areaText = new L.layerGroup().addTo(map);
 		
-		$.getJSON('inc/osmdata.php?d='+q, function(points) {
-			for(var i=0;i<points.change.length;i++){
-				var point = points.change[i];
-				var content = "";
-				content += "<h3>OpenStreetMap data</h3>";
-				content += "<p>Ändad av <a href='http://www.openstreetmap.org/user/";
-				content += point.u + "' target='_blank'>" + point.u + "</a></p><p>I ändringsset ";
-				content += "<a href='http://www.openstreetmap.org/changeset/" ;
-				content += point.cs + "' target='_blank'>" + point.cs + "</a></p>";
-				markers.addLayer( new L.circleMarker(point.c, {color: 'red', fillColor: 'red',fillOpacity:0.3}).bindPopup(content) );
-			}
+		$(".layerSelected").removeClass("alerttext");
+		$(".cl-"+layer).addClass("alerttext");
+		
+		$.getJSON('inc/osmdata.php?id='+id+'&l='+layer, function(points) {
 			
 			for(var i=0;i<points.areas.length;i++){
 				var area = points.areas[i];
@@ -301,6 +358,8 @@ $(document).ready(function() {
 				if (fill > 0.5) fill = 0.5;
 				
 				if (area.t == 0) color = "#777";
+				if (area.t == -1) color = "#aaa";
+				if (area.t == -2) color = "#a50";
 				
 				areaRect.addLayer( L.rectangle(area.bb,{fillOpacity:fill, color: color, weight: 1}).bindPopup(content) );
 				
@@ -319,6 +378,22 @@ $(document).ready(function() {
 		updateMapHash();
 	}
 
+	function loadChanges(points){
+
+		if (markers) map.removeLayer(markers);
+		markers  = new L.MarkerClusterGroup( {maxClusterRadius:12,disableClusteringAtZoom:11} ).addTo(map);
+		
+		for(var i=0;i<points.change.length;i++){
+			var point = points.change[i];
+			var content = "";
+			content += "<h3>OpenStreetMap data</h3>";
+			content += "<p>Ändad av <a href='http://www.openstreetmap.org/user/";
+			content += point.u + "' target='_blank'>" + point.u + "</a></p><p>I ändringsset ";
+			content += "<a href='http://www.openstreetmap.org/changeset/" ;
+			content += point.cs + "' target='_blank'>" + point.cs + "</a></p>";
+			markers.addLayer( new L.circleMarker(point.c, {color: 'red', fillColor: 'red',fillOpacity:0.3}).bindPopup(content) );
+		}
+	}
 
 	if ( $( "#main-info" ).hasClass( "showUser" ) ) {
 		loadlocationsUpdate();

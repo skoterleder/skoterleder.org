@@ -2,6 +2,8 @@
 ini_set('max_execution_time', 300); //300 seconds = 5 minutes
 include_once 'database_config.php';
 
+if(isset($_POST['id'])) $id = $_POST["id"];
+
 $xml = file_get_contents("php://input") ;
 $row = explode('"', $xml);
 
@@ -30,14 +32,14 @@ for ($i = 0; $i < count($row); ++$i) {
 		echo "lat: $lat lng: $lng changeset: $changeset user: $user \n";
 		
 		/* Prepare statement */
-		$sql='INSERT INTO osmchange (lat, lng, changeset, user, uid,create_date) VALUES (?,?,?,?,?,CURDATE())';
+		$sql='INSERT INTO osmchange (lat, lng, changeset, user, uid,create_date,update_id) VALUES (?,?,?,?,?,CURDATE(),?)';
 		$stmt = $db->prepare($sql);
 		if($stmt === false) {
 		  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
 		}
 		 
 		/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-		$stmt->bind_param('ddisi',$lat,$lng,$changeset,$user,$uid);
+		$stmt->bind_param('ddisis',$lat,$lng,$changeset,$user,$uid,$id);
 		 
 		/* Execute statement */
 		$stmt->execute();

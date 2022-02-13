@@ -2047,7 +2047,8 @@ function showInfo(div,extra) {
 	gatrack('send', 'pageview', window.location.hash);
 }
 
-function moveInfo(maxWidth=570) {
+function moveInfo() {
+	var maxWidth=570;
 	var screenWidth = $(window).width();
 	// var divheight = $(window).height()-40;
 	var top = ($(window).height() - $('.content-box').outerHeight()) /2;

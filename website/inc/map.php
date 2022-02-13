@@ -1,6 +1,7 @@
 <?php
 include_once 'database_config.php';
 $icon = "";
+$debug = "";
 
 if(isset($_GET['zoom'])) $zoom = $_GET["zoom"];
 if(isset($_GET['lat'])) $lat = $_GET["lat"];

@@ -25,7 +25,7 @@ $HTMLlink = '<a href="'.$imgMapLink.'"><img src="'.$imgUrl1.'" width="'.$width.'
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2.0, user-scalable=yes" />
-		<title>Skoterleder.org</title>
+		<title>Förhandsgranska bild</title>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<style type="text/css">
 			body {
