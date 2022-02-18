@@ -381,6 +381,12 @@ $(document).ready(function() {
 		hashControll();
 	}
 	
+	showAlertMap(" \
+	Välkommen! Kartan uppdateras av användarna och felaktigheter kan förekomma.<br /> \
+	Lokala regler och lagar ska följas.	Respektera skyltning av leder och andra förbud.<br /> \
+	Webbsidan använder kakor (cookies). Klicka här för att godkänna. \
+	");
+	
 	// Fix map size after return to map page
 	$( document ).delegate("#mapPage", "pageshow", function() {
 		map.invalidateSize(false);
@@ -1046,6 +1052,7 @@ $(document).ready(function() {
 					if (userEmail) {
 						container.html("\
 							<p>Flytta markören till rätt plats och klicka sedan på ok för att fylla på med mera information.</p>\
+							<p>Tänk på att alla kan se markörer som du skapar och det ska vara av allmänt intresse.\
 							<p><a href='#' class='okLink inputbutton'>OK</a> <a href='#' class='cancelLink inputbutton'>Avbryt</a></p>\
 						");
 					} else {
@@ -1766,6 +1773,10 @@ $(document).ready(function() {
 		updateMapHash();
 	});	
 
+	$("#alertMap").click(function() {
+		$('#alertMap').hide(1);
+	});
+	
 	$(".alertOk").click(function() {
 		$('#alert').hide(1);
 		if (reloadFlag) window.location.reload();
@@ -2004,6 +2015,11 @@ function showAlert(text) {
 	$(".alertText").html(text);
 	moveAlertbox();
 	$('#alert').show(1);
+}
+
+function showAlertMap(text) {
+	$(".alertMapText").html(text);
+	$('#alertMap').show(500);
 }
 
 function showInfo(div,extra) {
