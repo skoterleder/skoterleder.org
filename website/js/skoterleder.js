@@ -381,11 +381,14 @@ $(document).ready(function() {
 		hashControll();
 	}
 	
-	showAlertMap(" \
-	Välkommen! Kartan uppdateras av användarna och felaktigheter kan förekomma.<br /> \
-	Lokala regler och lagar ska följas.	Respektera skyltning av leder och andra förbud.<br /> \
-	Webbsidan använder kakor (cookies). Klicka här för att godkänna. \
-	");
+
+	if ( readCookie("ack") != "ok" ) {
+		showAlertMap(" \
+		Välkommen! Kartan uppdateras av användarna och felaktigheter kan förekomma.<br /> \
+		Lokala regler och lagar ska följas.	Respektera skyltning av leder och andra förbud.<br /> \
+		Webbsidan använder kakor (cookies). Klicka här för att godkänna. \
+		");
+	}
 	
 	// Fix map size after return to map page
 	$( document ).delegate("#mapPage", "pageshow", function() {
@@ -1775,6 +1778,7 @@ $(document).ready(function() {
 
 	$("#alertMap").click(function() {
 		$('#alertMap').hide(1);
+		createCookie("ack", "ok", 14)
 	});
 	
 	$(".alertOk").click(function() {
