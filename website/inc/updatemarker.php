@@ -26,6 +26,22 @@ if(isset($_REQUEST['type']))		$newType = 		convert_UTF8($_REQUEST["type"]);
 if(isset($_REQUEST['name']))		$name = 		convert_UTF8($_REQUEST["name"]);
 
 
+if ($auth->hasRole(\Delight\Auth\Role::MODERATOR)) {
+	/* Prepare statement */
+	$sql='SELECT email FROM marker WHERE id = ?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('i',$id);
+	$stmt->execute();
+	$stmt->bind_result($userEmail);
+	$stmt->fetch();
+	$stmt->close();
+}
+
 if (!$description || !$title AND $action == "update") {
 	echo "error - Vänligen fyll i alla fält!";
 	exit;

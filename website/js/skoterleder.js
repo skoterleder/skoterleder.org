@@ -751,6 +751,9 @@ $(document).ready(function() {
 		$("<h3>").html(data.title).appendTo(div);
 		$("<p>").html(data.description.replace(/\r?\n/g, '<br>')).appendTo(div);
 
+		if ( data.isUsers == 2 ) {
+			changeMarkerLink = "<a href='#' class='changeMarkerLink textlink'>Administrera</a>"
+		}
 		if ( data.isUsers == 1 ) {
 			changeMarkerLink = "<a href='#' class='changeMarkerLink textlink'>Ändra denna markör</a>"
 		}

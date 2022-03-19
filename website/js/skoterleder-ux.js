@@ -192,7 +192,7 @@ function loadMyPage(openMarker){
 		$(".markerList").append("Laddar... <img src='images/ajax-loader.gif' width='16' height='16'>");
 		var openMarkerNumber = -1;
 	
-		$.getJSON('inc/listmymarkers.php', function(data) {
+		$.getJSON('inc/listmymarkers.php?id='+openMarker, function(data) {
 		
 			$(".markerList").empty();
 			if ( data == -1 ) {

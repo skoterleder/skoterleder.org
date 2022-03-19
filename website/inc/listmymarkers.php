@@ -7,7 +7,24 @@ $pdp_db = new \PDO('mysql:dbname='.DATABASE.';host=localhost;charset=utf8mb4', U
 $auth = new \Delight\Auth\Auth($pdp_db);
 
 $email = $auth->getEmail();
+$id = $_GET["id"];
 $jsonData ="";
+
+if ($auth->hasRole(\Delight\Auth\Role::MODERATOR) AND $id > 0 ) {
+	/* Prepare statement */
+	$sql='SELECT email FROM marker WHERE id = ?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('i',$id);
+	$stmt->execute();
+	$stmt->bind_result($email);
+	$stmt->fetch();
+	$stmt->close();
+}
 
 if ($email) {
 	$sql='SELECT id,title,description,name,lat,lng,type,status,createtime,commenttime,updatetime,count,comments,expires FROM marker WHERE status < 2 AND email=? ORDER BY expires DESC, status DESC, id DESC';
