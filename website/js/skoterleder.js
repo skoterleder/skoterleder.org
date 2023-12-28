@@ -1228,8 +1228,16 @@ $(document).ready(function() {
 	
 	function dispalyMarkers() {
 		if ( marker.length === 0 ) return;  // Markers not loaded
+		if ( $('#removeAllMarkers').is(":checked") ) return;
+
 		var zoom = map.getZoom();
 		var size = 0;
+
+		if ( zoom < 8 ) {
+			if ( markers ) 	map.removeLayer(markers);
+			iconSize = "";
+			return;
+		}
 		if ( zoom > 9 && iconSize != "large" ) { size = 100; iconSize = "large"; }
 		if ( zoom === 9 && iconSize != "medium" ) { size = 80; iconSize = "medium"; }
 		if ( zoom < 9 && iconSize != "smal" ) { size = 70; iconSize = "smal"; }
