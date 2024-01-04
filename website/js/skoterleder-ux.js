@@ -840,7 +840,7 @@ function verifyResetPassword(selector,token) {
 function getUser() {
 	$.ajax({
 		dataType: "json",
-		url: "inc/getuser.php",
+		url: "/inc/getuser.php",
 		success: function(data)
 		{
 			userEmail = data.userEmail;

@@ -7,7 +7,8 @@ $pdp_db = new \PDO('mysql:dbname='.DATABASE.';host=localhost;charset=utf8mb4', U
 $auth = new \Delight\Auth\Auth($pdp_db);
 
 $email = $auth->getEmail();
-$id = $_GET["id"];
+$id = "";
+if(isset($_REQUEST['id'])) $id = convert_UTF8($_REQUEST["id"]);
 $jsonData ="";
 
 if ($auth->hasRole(\Delight\Auth\Role::MODERATOR) AND $id > 0 ) {
@@ -53,9 +54,9 @@ if ($email) {
 			'icon' => $type,
 			'properties' => array(
 				'id' => $id,
-				'title' => $title,
-				'description' => $description,
-				'name' => $name,
+				'title' => htmlspecialchars($title, ENT_QUOTES, 'UTF-8'),
+				'description' => htmlspecialchars($description, ENT_QUOTES, 'UTF-8'),  // nl2br removed!
+				'name' => htmlspecialchars($name, ENT_QUOTES, 'UTF-8'),
 				'type' => $type,
 				'createtime' => $createtime,
 				'updatetime' => $updatetime,

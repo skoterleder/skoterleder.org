@@ -28,9 +28,12 @@ function decode_UTF8_htmlentities($str) {
 
 function newcommentmail($id,$text){
 	global $db;
-	
+	$pdp_db = new \PDO('mysql:dbname='.DATABASE.';host=localhost;charset=utf8mb4', USER, PASSWORD);
+	$auth = new \Delight\Auth\Auth($pdp_db);
+	$userEmail = $auth->getEmail();
+
 	/* Prepare statement */
-	$sql='SELECT email, name, title, hash FROM marker WHERE id = ?';
+	$sql='SELECT email, name, title, hash, lat,lng, type FROM marker WHERE id = ?';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -41,10 +44,10 @@ function newcommentmail($id,$text){
 
 	$stmt->execute();
 
-	$stmt->bind_result($email,$name,$title,$hash);
+	$stmt->bind_result($email,$name,$title,$hash,$lat,$lng,$type);
 	$stmt->fetch();
 	$stmt->close();
-	$db->close();	
+	
 
 	mb_internal_encoding('UTF-8');
 	
@@ -62,7 +65,6 @@ function newcommentmail($id,$text){
 		<p>En ny kommentar har skrivits om din markör som du skapat på skoterleder.org</p>
 		<br>
 		<p>Kommentar:</p>
-		<br>
 		<p><cite>
 		'.$text.'
 		</cite></p>
@@ -70,12 +72,11 @@ function newcommentmail($id,$text){
 		<br>
 		<p>Läs alla kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
 		<br>
-		<br>
+		<p><a href="'.$open_url.'"><img src="http://skoterleder.org/image/?zoom=13&lat='.$lat.'&lng='.$lng.'&height=250&width=640&icon='.$type.'" height=250 width=640></a></p>
 		<p>Ändra/inaktivera länk: <a href="'.$change_url.'">'.$change_url.'</a></p>
 		<br>
 		<br>
 		<p><b>Observera att alla som har dessa "långa" länkar kan radera eller ändra på markören!</b> Var lite rädd om länkarna!</p>
-		<p>Om du tappar bort detta mail kan du få nytt mail ut skickat via kartan/markören</p>
 		<br>
 		<br>
 		<p>Med vänliga hälsningar</p>
@@ -84,7 +85,145 @@ function newcommentmail($id,$text){
 	</html>
 	';
 
-	sendMail($to, $subject, $message);
+	if ( $email != $userEmail ) sendMail($to, $subject, $message);  //Only send if not users makrer.
+
+
+
+	/* Send email to everyone who commented */
+
+	/* Prepare statement */
+	// comments > 0 AND
+	$sql='SELECT DISTINCT email, name FROM comment WHERE identifier=? AND status=1';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('i',$id);
+
+	$stmt->execute();
+	$status = $stmt->bind_result( $CommentEmail, $name );
+	
+	$i=0;
+	$tmpCommentEmail = [];
+	$tmpName = [];
+	
+	if ( $status > 0 ) {
+		while ($stmt->fetch()) {
+			
+			if ( $CommentEmail != $email && $userEmail != $CommentEmail ) {
+				$tmpCommentEmail[$i] = $CommentEmail;
+				$tmpname[$i] = $name;
+				$i++;
+			}
+		}
+		
+		$i=0;
+		foreach ( $tmpCommentEmail as &$x) {
+			$to      = $tmpCommentEmail[$i];
+			$name = $tmpname[$i];
+			$subject = "Ny kommentar till markör: $title";
+
+			$message = '
+			<html>
+			<body>
+				<p><b>Hej '.$name.'!</b></p>
+				<p> </p>
+				<p>En ny kommentar har postats på en markör som du kommenterat tidigare på skoterleder.org</p>
+				<br>
+				<p>Kommentar:</p>
+				<p><cite>
+				'.$text.'
+				</cite></p>
+				<br>
+				<p><a href="'.$open_url.'"><img src="http://skoterleder.org/image/?zoom=13&lat='.$lat.'&lng='.$lng.'&height=250&width=640&icon='.$type.'" height=250 width=640></a></p>
+				<p>Läs alla kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
+				<br>
+				<br>
+				<br>
+				<p>Med vänliga hälsningar</p>
+				<p>Skoterleder.org</p>
+			</body>
+			</html>
+			';
+
+			sendMail($to, $subject, $message);
+			$i++;
+		}
+	}
+	$stmt->close();
+}
+
+function newCommentInfoMail($id,$text){
+	global $db;
+	$pdp_db = new \PDO('mysql:dbname='.DATABASE.';host=localhost;charset=utf8mb4', USER, PASSWORD);
+	$auth = new \Delight\Auth\Auth($pdp_db);
+	$userEmail = $auth->getEmail();
+	
+	mb_internal_encoding('UTF-8');
+
+	/* Send email to everyone who commented */
+	/* Prepare statement */
+	$sql='SELECT email, id, name, title, url FROM comment WHERE identifier=? AND status=1 GROUP BY email';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('s',$id);
+
+	$stmt->execute();
+	$status = $stmt->bind_result( $CommentEmail, $comId, $name, $title, $url );
+	
+	$i=0;
+	$tmpCommentEmail = [];
+	$tmpName = [];
+	
+	if ( $status > 0 ) {
+		while ($stmt->fetch()) {
+			
+			if ( $userEmail != $CommentEmail ) {
+				$tmpCommentEmail[$i] = $CommentEmail;
+				$tmpName[$i] = $name;
+				$i++;
+			}
+		}
+
+		$open_url  	= $url;
+		$i=0;
+		
+		foreach ( $tmpCommentEmail as &$x) {
+			
+			$to		 = $tmpCommentEmail[$i];
+			$name	 = $tmpName[$i];
+			$subject = "Ny kommentar till sidan: $title";
+
+			$message = '
+			<html>
+			<body>
+				<p><b>Hej '.$name.'!</b></p>
+				<p>En ny kommentar har postats på sidan '.$title.'.</p>
+				<br>
+				<p>Kommentar:</p>
+				<p><cite>'.$text.'</cite></p>
+				<br>
+				<p>Läs alla kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
+				<br>
+				<br>
+				<br>
+				<p>Med vänliga hälsningar</p>
+				<p>Skoterleder.org</p>
+			</body>
+			</html>
+			';
+
+			sendMail($to, $subject, $message);
+			$i++;
+		}
+	}
+	$stmt->close();
 }
 
 function newChangeMarkerMail($id,$nemail){
@@ -145,6 +284,7 @@ function newChangeMarkerMail($id,$nemail){
 		sendMail($to, $subject, $message);
 	}
 }
+
 function flagMarkerMail($id,$hash,$description){
 	global $db;
 	
@@ -202,6 +342,63 @@ function flagMarkerMail($id,$hash,$description){
 			<br>
 			<p><b>Observera att alla som har dessa "långa" länkar kan radera eller ändra på markören!</b> Var lite rädd om länkarna!</p>
 			<p>Om du tappar bort detta mail kan du få nytt mail ut skickat via kartan/markören</p>
+			<br>
+			<br>
+			<p>Med vänliga hälsningar</p>
+			<p>Skoterleder.org</p>
+		</body>
+		</html>
+		';
+
+		sendMail($to, $subject, $message);
+	}
+}
+
+function flagCommentMail($id,$hash,$description){
+	global $db;
+	
+	/* Prepare statement */
+	$sql='SELECT email, name, comment, url, title FROM comment WHERE id = ? AND LEFT(hash,8)=?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('is',$id,$hash);
+
+	$stmt->execute();
+
+	$stmt->bind_result($email,$name,$comment,$url,$title);
+	$stmt->fetch();
+	$stmt->close();
+
+	if ($email) {
+		mb_internal_encoding('UTF-8');
+
+		$name = htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
+		$title = htmlspecialchars(substr($comment,0,20), ENT_QUOTES, 'UTF-8');
+		$comment = htmlspecialchars($comment, ENT_QUOTES, 'UTF-8');
+		$description = htmlspecialchars($description, ENT_QUOTES, 'UTF-8');
+		
+		$to      = $email;
+		$subject = "Flaggad kommentar: $title";
+
+		$message = '
+		<html>
+		<body>
+			<p><b>Hej '.$name.'!</b></p>
+			<p>En användare har anmält din kommentar som kränkande eller på annat sätt olämplig.</p>
+			<p>Följande motivering angavs på sidan:</p>
+			<p>"<cite>'.$description.'</cite>"</p>
+			<br>
+			<p>Din kommentar:</p>
+			<p>"<cite>'.$comment.'</cite>"</p>
+			<br>
+			<p>För tillfället kam du inte ändra dina kommentare. Administratören kommer att vidta lämpliga åtgärder, t.ex. såsom att ta bort kommentaren.</p>
+			<br>
+			<p>Länkar till kommentaren: <a href="'.$url.'">'.$url.'</a></b></p>
+			<br>
 			<br>
 			<br>
 			<p>Med vänliga hälsningar</p>

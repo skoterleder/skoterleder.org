@@ -662,7 +662,7 @@ $(document).ready(function() {
 		var div = $("<div>").addClass("markerContent").appendTo("#showMarkerBox");
 		
 		div.on('click', '.closeMarkerBox', function() {
-			closeMarkerBox()
+			closeMarkerBox();
 		});
 		
 		function closeMarkerBox() {
@@ -776,13 +776,13 @@ $(document).ready(function() {
 		</td></tr></table> \
 		<p class='narrow'>" + changeMarkerLink + " \
 		<a href='#' class='adminFlag textlink'>Flagga som olämpligt</a></p> \
+		<p class='narrow' style='padding-top: 7px;'><a href='#!marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		<p class='nodinfo narrow'></p> \
 		<div id='displayInfo'></div> \
 		<div id='fbshare'> \
 		<div class='fb-like' data-href='" + shareUrl + "' \
 		data-width='280' data-layout='standard' data-action='like' \
 		data-show-faces='true' data-share='true'></div></div> \
-		<p class='narrow'><a href='#!marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		"
 		); 
 		if ( data.name == "Import" ) $(".created").html("Importerad från OSM");
@@ -798,9 +798,9 @@ $(document).ready(function() {
 			changeMarker(id);
 			return false;
 		});
-		
-		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
+
 		$("<div>").attr("id","disqus_thread").appendTo(div);
+
 		$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
 		
 		$( "#showMarkerBox" ).data( "markerid", id);
@@ -1978,54 +1978,6 @@ function hidebox(div) {
 	}
 }
 
-function loadDisqus(identifier, title, type) {
-	title = "Skoterleder.org - " + title;
-	if (type === "marker") url = serverUrl + "#!marker/" + identifier + "/";
-	if (type === "info") url = serverUrl + "#!info/" + identifier;
-	// console.log("id: "+identifier+" title: "+title+" url"+url);
-	
-	if (window.DISQUS) {
-		//if Disqus exists, call it's reset method with new parameters
-		DISQUS.reset({
-			reload: true,
-			config: function () {
-				this.page.identifier = identifier;
-				this.page.url = url;
-				this.page.title = title;
-			}
-		});
-	} else {
-		disqus_identifier = identifier; 	//set the identifier argument
-		disqus_url = url; 					//set the permalink argument
-		disqus_title = title;	   
-
-		//append the Disqus embed script to HTML
-		var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-		dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
-		jQuery('head').append(dsq);
-
-	}
-};
-
-function disqus_config() {
-	this.callbacks.onNewComment = [function(comment) {
-		// console.log(comment);
-		updateCommentsCount(comment.text.replace(/\n/g,"<br>") );
-	}];
-}
-
-function updateCommentsCount(text) {
-	var id = $( "#showMarkerBox" ).data( "markerid");
-	var hash = $( "#showMarkerBox" ).data( "hash");
-	
-	// console.log("Send id: " + id + " hash: "+ hash );
-	
-	$.ajax({
-		url: "inc/addcomment.php?id=" + id + "&hash=" + hash + "&text=" + text,
-		cache: false
-	});
-}
-
 function showAlert(text) {
 	$(".alertText").html(text);
 	moveAlertbox();
@@ -2038,6 +1990,8 @@ function showAlertMap(text) {
 }
 
 function showInfo(div,extra) {
+	
+	hidebox('#showMarkerBox');
 	var hash = "#!info";
 	var title = "Skoterleder.org - Mer Information"
 	var extrahash = "";
@@ -2056,6 +2010,7 @@ function showInfo(div,extra) {
 	moveInfo();
 	$('#grayout').show();
 	$('.info').show();
+	$('.showComments').show();
 	$('.content-box').slideDown(500);
 	$("#grayout").attr("close","content-box");
 
