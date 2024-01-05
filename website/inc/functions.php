@@ -93,7 +93,7 @@ function newcommentmail($id,$text){
 
 	/* Prepare statement */
 	// comments > 0 AND
-	$sql='SELECT DISTINCT email, name FROM comment WHERE identifier=? AND status=1';
+	$sql='SELECT email, name FROM comment WHERE identifier=? AND status=1 GROUP BY email';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -121,7 +121,7 @@ function newcommentmail($id,$text){
 		
 		$i=0;
 		foreach ( $tmpCommentEmail as &$x) {
-			$to      = $tmpCommentEmail[$i];
+			$to   = $tmpCommentEmail[$i];
 			$name = $tmpname[$i];
 			$subject = "Ny kommentar till markör: $title";
 
@@ -153,6 +153,8 @@ function newcommentmail($id,$text){
 		}
 	}
 	$stmt->close();
+
+	if ( $email == $userEmail && $i == 0 ) sendMail("", $subject, $message);  //Send mail to admin
 }
 
 function newCommentInfoMail($id,$text){
@@ -207,7 +209,7 @@ function newCommentInfoMail($id,$text){
 				<p>En ny kommentar har postats på sidan '.$title.'.</p>
 				<br>
 				<p>Kommentar:</p>
-				<p><cite>'.$text.'</cite></p>
+				<p>"<cite>'.$text.'</cite>"</p>
 				<br>
 				<p>Läs alla kommentarer här: <a href="'.$open_url.'">'.$open_url.'</a></p>
 				<br>
@@ -224,6 +226,13 @@ function newCommentInfoMail($id,$text){
 		}
 	}
 	$stmt->close();
+
+	if ( $i == 0 ) {
+		$message = '<html><body><p>En ny kommentar har postats på sidan '.$title.'.</p><p>"<cite>'.$text.'</cite>"
+					</p><br><p><a href="'.$open_url.'">'.$open_url.'</a></p><p>Skoterleder.org</p></body></html>';
+		$subject = "Ny kommentar till sidan: $title";
+		sendMail("", $subject, $message);  //Send mail to admin
+	}
 }
 
 function newChangeMarkerMail($id,$nemail){

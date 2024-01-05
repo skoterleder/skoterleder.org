@@ -67,7 +67,7 @@ function showCommets(comments) {
 			tabel += "<span class='ansverComment-"+i+"'></span>";
 			tabel += "<div class='underComment underCommentId"+comments.comment[i].id+"' style='display: none;'></div>";
 			tabel += "<p class='floatRight'><a href='#' class='adminFlag textlink floatRight' data-id='"+comments.comment[i].id+"' data-hash='"+comments.comment[i].hash+"'>";
-			tabel += "<img src='images/icons/flag.png' title='Flagga som olämplit' class='iconImg' width='10' height='12'>"
+			tabel += "<img src='/images/icons/flag.png' title='Flagga som olämplit' class='iconImg' width='10' height='12'>"
 			// tabel += "Anmäl";
 			if ( flag ) tabel += " *";
 			tabel += "</a></p>";
@@ -203,8 +203,8 @@ function commentForm(div,sort,child,commentsCount) {
 	<input type='hidden' name='hash' value='"+hash+"'>\
 	<input type='hidden' name='type' value='"+disqus_type+"'>\
 	<input type='hidden' name='commentsCount' value='"+commentsCount+"'>\
-	<input type='submit' value='Spara' class='inputbutton'> \
-	<input type='button' value='Stäng' class='closeComment inputbutton'> \
+	<input type='submit' value='Spara' class='inputbutton commentInputB'> \
+	<input type='button' value='Stäng' class='closeComment inputbutton commentInputB'> \
 	</form><p class='error'></p></div> \
 	");
 
@@ -215,6 +215,7 @@ function commentForm(div,sort,child,commentsCount) {
 	$("#submitcomment").submit(function(form) {
 		$(".error").css('color', '');
 		$(".error").html("Sparar... <img src='/images/ajax-loader.gif' width='16' height='16'>");
+		$('.commentInputB').prop('disabled', true);
 		
 		$.ajax({
 			type: "GET",

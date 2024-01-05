@@ -2020,7 +2020,7 @@ function showInfo(div,extra) {
 	});
 
 	if ($('#disqus_thread').length) $('#disqus_thread').remove();  // Remove old div
-	$("<div id='disqus_thread'>").appendTo('#main-info');
+	$("<div id='disqus_thread'>").appendTo('.infoDisqus');
 	loadDisqus('info','Information','info');
 	$('.infoComments').hide();
 
