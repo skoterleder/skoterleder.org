@@ -779,10 +779,6 @@ $(document).ready(function() {
 		<p class='narrow' style='padding-top: 7px;'><a href='#!marker/"+id+"/show' class='textlink showShareLink'>Visa dela-länk</a></p> \
 		<p class='nodinfo narrow'></p> \
 		<div id='displayInfo'></div> \
-		<div id='fbshare'> \
-		<div class='fb-like' data-href='" + shareUrl + "' \
-		data-width='280' data-layout='standard' data-action='like' \
-		data-show-faces='true' data-share='true'></div></div> \
 		"
 		); 
 		if ( data.name == "Import" ) $(".created").html("Importerad från OSM");
@@ -806,9 +802,6 @@ $(document).ready(function() {
 		$( "#showMarkerBox" ).data( "markerid", id);
 		$( "#showMarkerBox" ).data( "hash", data.hash);
 	
-		if(typeof FB == 'object') {  // Fix problem then lading marker page direct
-			FB.XFBML.parse(document.getElementById('fbshare'));
-		}
 		loadDisqus(id,data.title,'marker');
 		setTimeout(check_showMarkerBox_Width, 3000);
 	}
@@ -1360,10 +1353,6 @@ $(document).ready(function() {
 			<p>Länk:</p> \
 			<p><label for='link_marker'><input id='link_marker' type='checkbox'>Lägg till markör</label></p> \
 			<p><input type='text' value='" + shareUrl +"' class='shareLinkText'></p> \
-			<div id='fbMapShare'> \
-				<div class='fb-share-button' data-href='" + shareUrl + "' \
-				data-type='button'></div> \
-			</div> \
 			<div class='divider-share'></div> \
 			<h2>Bild:</h2> \
 			<p><label for='image_filter'><input id='image_filter' type='checkbox'> \
@@ -1379,8 +1368,6 @@ $(document).ready(function() {
 			"
 			);
 			
-			FB.XFBML.parse(document.getElementById('fbMapShare'));
-
 			div.on('click','#image_filter', function(e){
 				createSelectArea();
 
@@ -1529,17 +1516,6 @@ $(document).ready(function() {
 	function updateShareLinks() {
 		var shareUrl = shareMapUrl();
 		$('.shareLinkText').val(shareUrl);
-
-		$('#fbMapShare').after("<div id='fbshareTmp' class='hidden'></div>");
-		$('#fbshareTmp').append("<div class='fb-share-button' data-href='" + shareUrl + "' \
-			data-type='button'></div> \
-			");
-		
-		FB.XFBML.parse(document.getElementById('fbshareTmp'),function(){
-			$('#fbMapShare').remove();
-			$('#fbshareTmp').attr('id','fbMapShare');
-			$('#fbMapShare').show();
-		});
 	}
 
 	function shareMapUrl(){
@@ -2138,14 +2114,6 @@ function readCookie(name) {
 function eraseCookie(name) {
 	createCookie(name, "", -1);
 }
-
-(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/sv_SE/all.js#xfbml=1&appId="+facebook_appId;
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));
 
 function savelocation(latlng){
 	// Rounds to .5 for lat and no decimals for lng position. Used for statistics of visiters.
