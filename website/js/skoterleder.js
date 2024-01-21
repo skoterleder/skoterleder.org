@@ -1053,7 +1053,6 @@ $(document).ready(function() {
 				{
 					userEmail = data.userEmail;
 					userName  = data.userName;
-					console.log("userEmail:" + userEmail + " userName:" + userName);
 					
 					if (userEmail) {
 						container.html("\
@@ -1743,7 +1742,7 @@ $(document).ready(function() {
 		}
 		if (hashValues[0] === "!mypage" || hashValues[0] === "!login") {
 			setTimeout(function() {	
-				showUserPage(hashValues[1]);
+				showUserPage(hashValues[1]+"/"+hashValues[2]);
 			}, 300);
 		}
 		if (hashValues[0] === "confirmemail") {

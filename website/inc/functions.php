@@ -156,6 +156,29 @@ function newcommentmail($id,$text){
 
 	if ( $email == $userEmail && $i == 0 ) sendMail("", $subject, $message);  //Send mail to admin
 }
+function getGPXupploadUserInfo($id) {
+	global $db;
+	
+	$id = str_replace("-track", "", $id);
+	
+	/* Prepare statement */
+	$sql='SELECT email, name, perfemail, perfname FROM gpxtrack WHERE id = ?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('i',$id);
+
+	$stmt->execute();
+
+	$stmt->bind_result($user["email"],$user["name"],$user["perfemail"],$user["perfname"]);
+	$stmt->fetch();
+	$stmt->close();
+	
+	return $user;
+}
 
 function newCommentInfoMail($id,$text){
 	global $db;
@@ -164,6 +187,8 @@ function newCommentInfoMail($id,$text){
 	$userEmail = $auth->getEmail();
 	
 	mb_internal_encoding('UTF-8');
+
+	$user = getGPXupploadUserInfo($id);
 
 	/* Send email to everyone who commented */
 	/* Prepare statement */
@@ -179,9 +204,15 @@ function newCommentInfoMail($id,$text){
 	$stmt->execute();
 	$status = $stmt->bind_result( $CommentEmail, $comId, $name, $title, $url );
 	
-	$i=0;
-	$tmpCommentEmail = [];
-	$tmpName = [];
+	$tmpCommentEmail[0] = $user["email"];
+	$tmpName[0] = $user["name"];
+	$i=1;
+
+	if ( filter_var($user["perfemail"], FILTER_VALIDATE_EMAIL) && $user["perfemail"] != $userEmail ) {
+		$tmpCommentEmail[1] = $user["perfemail"];
+		$tmpName[1] = $user["perfname"];
+		$i=2;
+	}
 	
 	if ( $status > 0 ) {
 		while ($stmt->fetch()) {
@@ -604,4 +635,75 @@ function saveMail($to,$subject,$message,$result){
 	$stmt->execute();
 	$stmt->close();
 }
+
+
+function tileImage(	$zoom, $lat, $lng, $height, $width, $icon="" ) {
+	// Icons from http://mapicons.nicolasmollet.com/
+
+	$icons[1] = '../images/icons/snowmobile-green.png';
+	$icons[2] = '../images/icons/information.png';
+	$icons[3] = '../images/icons/treedown.png';
+	$icons[4] = '../images/icons/caution.png';
+	$icons[5] = '../images/icons/fixmap.png';
+	$icons[6] = '../images/icons/parking.png';
+	$icons[7] = '../images/icons/coffee.png';
+	$icons[500] = '../images/icons/fuel.png';
+	$icons[501] = '../images/icons/shelter.png';
+	$icons[502] = '../images/icons/wildernesshut.png';
+	$icons['l'] = '../images/icons/map22-1.png';
+		
+	$x = (($lng + 180) / 360) * pow(2, $zoom);
+	$y = (1 - log(tan(deg2rad($lat)) + 1 / cos(deg2rad($lat))) / pi()) /2 * pow(2, $zoom);
+
+	$xStart = $x - ($width/2/256);
+	$yStart = $y - ($height/2/256);
+	$xEnd = $x + ($width/2/256);
+	$yEnd = $y + ($height/2/256);
+
+	$yoffset = floor(($yStart-floor($yStart)) * 256);
+	$xoffset = floor(($xStart-floor($xStart)) * 256);
+
+	$mapImage = imagecreatetruecolor($width, $height);
+	$row=0;
+	$firstrow=0;
+	$firstrowInv=1;
+
+	for ($yy = floor($yStart); $yy < $yEnd; $yy++) {
+		$col=0;
+		$firstcol=0;
+		$firstcolInv=1;
+		for ($xx = floor($xStart); $xx < $xEnd; $xx++) {
+			$tile = "";
+			if (file_exists(TILESPATH.$zoom.'/'.$xx.'/'.$yy.'.png')) $tile = imagecreatefrompng(TILESPATH.$zoom.'/'.$xx.'/'.$yy.'.png');
+			if ($tile) imagecopy($mapImage, $tile, ($col*256-$xoffset)*$firstcol, ($row*256-$yoffset)*$firstrow, $xoffset*$firstcolInv, $yoffset*$firstrowInv, 256, 256);
+			$col++;
+			$firstcolInv=0;
+			$firstcol=1;
+		}
+		$firstrow=1;
+		$firstrowInv=0;
+		$row++;
+	}
+
+	if ($icon) {
+		list($iconWidth, $iconHeight) = getimagesize($icons[$icon]);
+		$iconPNG = imagecreatefrompng($icons[$icon]);
+		imagecopy($mapImage, $iconPNG, ($width/2) - ($iconWidth/2), ($height/2) - $iconHeight, 0, 0, $iconWidth, $iconHeight);
+	}
+
+	$textcolor = imagecolorallocate($mapImage, 140, 140, 150);
+
+	$textSize= 5;
+	if ($width < 650) $textSize= 4;
+	if ($width < 500) $textSize= 3;
+	// Write the string at the bottom left
+	imagestring($mapImage, $textSize, 20, $height-20, 'Skoterleder.org (c) OpenStreetMaps bidragsgivare', $textcolor);
+	
+	$filename = $zoom."-".$lat."-".$lng."-".$height."-".$width."-".$icon.".png";
+	imagepng($mapImage, IMGPATH.$filename);
+	imagedestroy($mapImage);
+
+	return "/img/".$filename;
+}
+
 ?>

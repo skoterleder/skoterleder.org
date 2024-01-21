@@ -11,7 +11,7 @@ if(isset($_GET['identifier']))	  $identifier =	   convert_UTF8($_GET["identifier
 
 if ($identifier) {
 	/* Prepare statement */
-	$sql='SELECT id,sort,createtime,status,name,comment,url,title,hash,flag FROM comment WHERE identifier = ? AND status=1 ORDER BY sort, id';
+	$sql='SELECT id,sort,createtime,status,name,comment,url,title,hash,flag,filename FROM comment WHERE identifier = ? AND status=1 ORDER BY sort, id';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -21,7 +21,7 @@ if ($identifier) {
 	$stmt->bind_param('s',$identifier);
 
 	$stmt->execute();
-	$stmt->bind_result($id,$sort,$createtime,$status,$name,$comment,$url,$title,$hash,$flag);
+	$stmt->bind_result($id,$sort,$createtime,$status,$name,$comment,$url,$title,$hash,$flag,$filename);
 
 	$jsonData  = array("comment" => array());
 
@@ -39,6 +39,7 @@ if ($identifier) {
 			'title' => $title,
 			'hash' => substr($hash,0,8),
 			'flag' => $flag,
+			'filename' => $filename,
 		);
 		array_push($jsonData["comment"], $array);
 	}

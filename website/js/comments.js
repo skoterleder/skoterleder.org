@@ -51,8 +51,10 @@ function showCommets(comments) {
 		
 		for(var i=0;i<comments.comment.length;i++){
 			indent = 4;
+			id = comments.comment[i].id;
 			sort = comments.comment[i].sort;
 			flag = comments.comment[i].flag;
+			filename = comments.comment[i].filename;
 			comment = zParse.BBCodeToHtml(comments.comment[i].comment.replace(/\r?\n/g, '<br>')); 
 
 			var created = jQuery.timeago(comments.comment[i].createtime);	
@@ -64,16 +66,14 @@ function showCommets(comments) {
 
 			tabel += "<div style='padding-left:"+indent+"px; clear: both;'><h4 style='margin-top: 2px'>Av " + comments.comment[i].name + "</h4><p class='textlink'>"+	created+"</p>";
 			tabel += "<p class='commettxt'>"+comment+"</p>";
+			if ( filename ) tabel += "<p><a href='/userimg/"+id+"-5000-"+filename+"'><img class='commentImg' src='/userimg/"+id+"-600-"+filename+"' width='100%'></a></p>";
 			tabel += "<span class='ansverComment-"+i+"'></span>";
-			tabel += "<div class='underComment underCommentId"+comments.comment[i].id+"' style='display: none;'></div>";
-			tabel += "<p class='floatRight'><a href='#' class='adminFlag textlink floatRight' data-id='"+comments.comment[i].id+"' data-hash='"+comments.comment[i].hash+"'>";
+			tabel += "<div class='underComment underCommentId"+id+"' style='display: none;'></div>";
+			tabel += "<p class='floatRight'><a href='#' class='adminFlag textlink floatRight' data-id='"+id+"' data-hash='"+comments.comment[i].hash+"'>";
 			tabel += "<img src='/images/icons/flag.png' title='Flagga som olämplit' class='iconImg' width='10' height='12'>"
-			// tabel += "Anmäl";
 			if ( flag ) tabel += " *";
 			tabel += "</a></p>";
-			
 			if ( i == comments.comment.length-1 && userEmail ) tabel += "<p class='floatRight'><a href='#' class='ansverCommentLink textlink' data-id='"+(i)+"' data-sort='"+(sort)+"'>Kommentera</a></p>";
-
 			tabel += "</div>";
 			lastSort = sort;
 		}
@@ -97,7 +97,7 @@ function showCommets(comments) {
 
 		div.on('click','.loginLink', function(e){
 			if (typeof gpxPage !== 'undefined' ) {
-				window.location.href = "/#!login";
+				window.location.href = "/#!login/" + window.location.hash;
 				return;
 			}
 
@@ -193,7 +193,8 @@ function commentForm(div,sort,child,commentsCount) {
 	}
 
 	$(div).append("\
-	<div "+childComment+" style='clear: both; padding-top:"+paddingtop+"px; padding-left:"+marginleft+"px '><form action='#' id ='submitcomment'> \
+	<div "+childComment+" style='clear: both; padding-top:"+paddingtop+"px; padding-left:"+marginleft+"px '>\
+	<form enctype='multipart/form-data' action='#' id ='submitcomment'> \
 	<label for='comment' style='margin-top:"+paddingtop+"px'>" + userName + ", lämna en ny kommentar nu:</label> \
 	<textarea name='comment' id='comment' rows='6' style='width:95%'></textarea> \
 	<input type='hidden' name='identifier' value='"+disqus_identifier+"'>\
@@ -203,6 +204,7 @@ function commentForm(div,sort,child,commentsCount) {
 	<input type='hidden' name='hash' value='"+hash+"'>\
 	<input type='hidden' name='type' value='"+disqus_type+"'>\
 	<input type='hidden' name='commentsCount' value='"+commentsCount+"'>\
+	<input name='file' type='file' >\
 	<input type='submit' value='Spara' class='inputbutton commentInputB'> \
 	<input type='button' value='Stäng' class='closeComment inputbutton commentInputB'> \
 	</form><p class='error'></p></div> \
@@ -218,9 +220,11 @@ function commentForm(div,sort,child,commentsCount) {
 		$('.commentInputB').prop('disabled', true);
 		
 		$.ajax({
-			type: "GET",
+			type: "POST",
 			url: "/inc/postcomment.php",
-			data: $("#submitcomment").serialize(), // serializes the form's elements.
+			processData: false,
+			contentType: false,
+			data: new FormData(this),
 			success: function(data)
 			{
 				message = $("#comment").val();
@@ -230,10 +234,10 @@ function commentForm(div,sort,child,commentsCount) {
 					$(".error").css('color', 'red');
 					console.log("Save Error");
 					console.log(data);
+					$('.commentInputB').prop('disabled', false);
 					
 				} else {
 					$(".error").html("Sparat!");
-					// if ( disqus_type == "marker" ) updateCommentsCount(commentsCount, message);
 					setTimeout(loadComments, 3000);
 				}
 			},
@@ -244,20 +248,6 @@ function commentForm(div,sort,child,commentsCount) {
 		return false; // avoid to execute the actual submit of the form.
 	});
 
-
 	if ( child == "last" )$(".closeComment:last").remove();
-	
-	
 }
 
-// ANvänds ej:::
-function updateCommentsCount(commentsCount,text) {
-	var id = $( "#showMarkerBox" ).data( "markerid");
-	var hash = $( "#showMarkerBox" ).data( "hash");
-	text = text.replace(/\n/g,"<br>")
-
-	$.ajax({
-		url: "inc/addcomment.php?id=" + id + "&hash=" + hash + "&commentsCount=" + commentsCount + "&text=" + text,
-		cache: false
-	});
-}

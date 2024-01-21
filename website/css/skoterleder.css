@@ -42,6 +42,11 @@ h4 {
 img {
 	margin: 5px;
 }
+.commentImg {
+    margin: 4px;
+	border-radius: 8px;
+	width: 95%
+}
 p {
 	font-size: 1em;
 	text-decoration: none;
@@ -606,6 +611,12 @@ img.floatRight {
 	transition: width 500ms ease-in-out;
 }
 
+.commettxt {
+    background-color: #e6e6e6;
+    padding: 10px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+}
 
 /* Tabel i create.html */			
 th {

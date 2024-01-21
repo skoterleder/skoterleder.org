@@ -7,6 +7,8 @@ function closeContenBox() {
 }
 
 function showUserPage(openMarker) {
+	hidebox('#showMarkerBox');
+	$('.info').hide();
 	$(".dynamic-text").empty();
 	$(".dynamic-text").append("<br/><br/><img src='images/ajax-loader.gif' width='16' height='16' class='center'><br/><br/>");
 	moveInfo();
@@ -489,6 +491,7 @@ function loadLoginPage(openMarker) {
 			<p><label for='loginEmail'>Din e-postadress</label> \
 			<input id='loginEmail' type='text' name='email' class='inputText'></p>\
 			<p><label for='password'>Lösenord:</label>\
+			<input id='open' type='hidden' name='open' value='"+openMarker+"'>\
 			<input id='password' type='password' name='password' class='inputText'></p>\
 			<p>Kom ihåg mig: <input type='checkbox' name='remember' value='1'></p>\
 			<p><input type='submit' value='Logga in' class='floatRight inputSubmit'></p>\
@@ -599,6 +602,11 @@ function loadLoginPage(openMarker) {
 			{
 				$(".result").empty();
 				if ( data.result === "ok" ) {
+					
+					var open = $("#open").val();
+					if ( open.substr(0,7) == "#!track" ) window.location.href = "/gpx/"+open;
+					if ( open == "#!gpx/gpx" ) window.location.href = "/gpx/#!uppload";
+					
 					getUser();
 					closeContenBox();
 					setTimeout(function() { showUserPage(openMarker); }, 500);
