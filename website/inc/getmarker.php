@@ -33,7 +33,7 @@ $stmt->bind_result($status, $title, $description,$name,$createtime,$commenttime,
 while ($stmt->fetch()) {
   // echo "title:$title Desc: $description <br>";
 	$isUsers = 0;
-	if ( strcasecmp($userEmail,$email) == 0 ) $isUsers = 1;
+	if ( $userEmail ) if ( strcasecmp($userEmail,$email) == 0 ) $isUsers = 1;
 	if ( !$userEmail ) $isUsers = -1; // User is not logged in
 	if ( $isModerator ) $isUsers = 2;
 	

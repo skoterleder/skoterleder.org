@@ -10,8 +10,8 @@ $userEmail = $auth->getEmail();
 $userName = $auth->getUsername();
 
 $jsonData = array(
-	'userEmail' => htmlspecialchars($userEmail),
-	'userName' => htmlspecialchars($userName),
+	'userEmail' => htmlspecialchars($userEmail ?? ''),
+	'userName' => htmlspecialchars($userName ?? ''),
 );
 $json = json_encode($jsonData);
 print_r($json);
