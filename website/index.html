@@ -29,7 +29,8 @@
 		<script type="module" src="plugins/Leaflet.GoogleMutant/Leaflet.GoogleMutant.js"></script>
 		<script src="plugins/jquery.timeago.js"></script>
 		<script src="plugins/leaflet-bing-layer.js"></script>
-		
+		<link rel="stylesheet" href="plugins/geoman/leaflet-geoman.css" />
+		<script src="plugins/geoman/leaflet-geoman.min.js"></script>
 		<link rel="stylesheet" href="plugins/markercluser/MarkerCluster.css" />
 		<link rel="stylesheet" href="plugins/markercluser/MarkerCluster.Default.css" />
 		<script src="plugins/markercluser/leaflet.markercluster.js"></script>
@@ -278,13 +279,21 @@
 				</a>
 			</div>
 
-			<h2 class="collapsible" data-collaps="about-download">Ladda ner GPX spår</h2>
+			<h2 class="collapsible getgpxarea" data-collaps="about-download">Ladda ner GPX spår</h2>
 			<div class="hidden collapsdata about-download">
-				<p>Nu finns en sida för att ladda ner skoterleder som GPX spår. På sidan väljer man område för att ladda ner spår över, för närvarande ca 130 olika områden.</p>
+				<!-- <p>Nu finns en sida för att ladda ner skoterleder som GPX spår. På sidan väljer man område för att ladda ner spår över, för närvarande ca 130 olika områden.</p> -->
+
+				<p>Ladda ner skoterleder som GPX spår från kartan.</p>
+				<a href="#" class="biglink saveGPX">Välj område på kartan</a>
+				<p>När du markerat ett område på kartan och valt spara ner kommer området in i konverteringskön. Beroende på storlek
+				på områden och antalet leder i området kan det ta några minuter att skapa filen.</p>
+				<p>Uppdatering 240222, GPX filens format är något justerat så det fungerar i Garmin BaseCamp nu.</p>
+				<h3>Konverteringskö</h3>
+				<span class="gpxarea"></span>
 				<p>GPX filen kan importeras i t.ex. GPS eller telefon för offline visning.</p>
 				<p>Olika GPS:er stöder dessa filer olika bra. Områdena kan vara för stora för GPS:en.</p>
 				<p>Meddela gärna mig på <a href="mailto:henrik@skoterleder.org">henrik@skoterleder.org</a> om du har problem med filerna. Meddela då gärna filnamnet.</p>
-				<p>Besök sidan <a href="download.html">Ladda ner GPX spår</a></p>
+				<p>Gamla sidan för att ladda ner områden finns här: <a href="download.html">Ladda ner GPX spår</a></p>
 				<a href="#" class="showComments" data-id="about-download-gpx" data-title="Ladda ner GPX spår">Visa kommentarer</a>
 			</div>
 

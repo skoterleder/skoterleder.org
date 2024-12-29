@@ -859,3 +859,243 @@ function getUser() {
 		}
 	});
 }
+
+function startSaveGPX() {
+	
+	$('.content-box').slideUp(10);
+	$('#grayout').hide(10);	
+	$('.info').hide();
+	if ($('#disqus_thread').length) $('#disqus_thread').remove();
+	
+	map.pm.enableDraw("Polygon", {
+		snappable: true,
+		snapDistance: 20,
+	});
+
+	map.on("pm:drawend", (e) => {
+	  map.pm.enableGlobalEditMode();
+	});
+
+	function getPolygon(layer) {
+		var tmpJson = layer.toGeoJSON();
+		jsonPolygon = tmpJson["geometry"]["coordinates"][0];
+
+		p = "POLYGON((";
+		var vertices = [];
+		
+		for (i=0; i < jsonPolygon.length; i++) {
+			if ( !i == 0 ) p += ",";
+			p += jsonPolygon[i][1]+" ";
+			p += jsonPolygon[i][0];
+		}
+		p += "))";
+
+		selectedPolygon = p;
+		area = calcPolygonArea(jsonPolygon);
+		
+		if ( area > maxArea ) {
+			$(".save").html('För stor yta');
+		} else {
+			$(".save").html('Spara');
+		}
+	}
+	
+	function calcPolygonArea(vertices) {
+		var total = 0;
+
+		for (var i = 0, l = vertices.length; i < l; i++) {
+		  var addX = vertices[i][1];
+		  var addY = vertices[i == vertices.length - 1 ? 0 : i + 1][0];
+		  var subX = vertices[i == vertices.length - 1 ? 0 : i + 1][1];
+		  var subY = vertices[i][0];
+
+		  total += (addX * addY * 0.5);
+		  total -= (subX * subY * 0.5);
+		}
+
+		return Math.abs(total);
+	}
+
+
+	map.on('pm:create', function(e) {
+		var layer = e.layer;
+		getPolygon(layer);
+
+		layer.on('pm:edit', function(e) {
+			getPolygon(e.layer);
+			});
+	});
+
+	initGPXBox();
+
+	return false;
+}
+
+function initGPXBox(type){
+
+	if ($("#shareBox").has( "div" ).length) return // menu already there.
+	
+	var div = $("<div>").addClass("").appendTo("#shareBox");
+		
+	$(div).append(" \
+	<h2>Ladda ner GPX</h2> \
+	<p>Välj område på kartan.</p> \
+	<p class='linkButtonLong save'><a href='#' class='save closeMarkerBox' data-action='share'>Spara</a></p> \
+	<p class='linkButtonLong abort'><a href='#' class='abort closeMarkerBox'>Avbryt</a></p> \
+	"
+	);
+	
+	$("#shareBox").slideDown();
+	
+	div.on('click', '.save', function() {
+		if ( area > maxArea ) return false;
+		
+		map.pm.disableGlobalEditMode();
+		saveGPXarea();
+		return false;
+	});
+	
+	div.on('click', '.abort', function() {
+		clearGPXBox();
+		return false;
+	});	
+}
+
+function clearGPXBox() {
+	$("#shareBox").empty();
+	$("#shareBox").hide();
+
+	showInfo("about-download","");
+	
+	map.pm.disableGlobalEditMode();
+	
+	map.eachLayer(function(layer){
+		if (layer._path != null) {
+			layer.remove();
+		}
+	});
+
+}
+
+function saveGPXarea(){
+	$.getJSON('https://gpx.skoterleder.org/newgpxarea.php?p='+selectedPolygon+'&jp='+jsonPolygon, function(data) {
+		clearGPXBox();
+		return;
+	});
+}
+
+$('.getgpxarea').click(function() {
+	updateGPXareaTbl();
+});
+
+function updateGPXareaTbl() {
+	$.getJSON('https://gpx.skoterleder.org/getgpxarea.php', function(data) {
+
+		if (typeof polygonLayer != 'undefined') {
+			if ( map.hasLayer(polygonLayer) ) polygonLayer.remove();
+		}
+		
+		srv="https://gpx.skoterleder.org/download/";
+		
+		html  = "<table style='width:100%;font-family: helvetica;' >";
+		html += "<tr><th>Yta</th><th>Fil / Info</th><th>Storlek</th><th>km</th><th>Skapad</th><tr>";  
+
+		working = false;
+
+		for(var i=0;i<data.length;i++){
+			
+			status = data[i]["status"];
+			created = data[i].createtime;
+
+			filename = "";
+			filelink = "";
+			kmValue = "";
+			polygonArray = data[i]["polygon"]
+			polygonString = JSON.stringify(polygonArray);
+			km = data[i]["km"];
+			gpxSize =""
+			gpxkb = ""
+			if ( data[i]["gpxkb"] ) {
+				gpxkb =  data[i]["gpxkb"] ;
+				gpxSize = gpxkb + " kB";
+			}
+			if ( gpxkb > 1000 ) gpxSize = ( Math.round(gpxkb / 100) /10 ) + " MB";
+
+			if ( status == 1 ) {
+				filelink = "I kö";
+			}
+			if ( status == 2 ) {
+				filelink = "Samlar data";
+				working = true;
+			}
+			if ( status == 3 ) {
+				filelink = "Bearbetar";
+				working = true;
+			}
+			if ( status == 4 ) {
+				filename = srv + data[i]["id"] + ".gpx";
+				filelink = "<a href='" + filename + "'>" + data[i]["id"] + ".gpx</a>";
+				if ( km > 0 ) {
+					kmValue = km + " km";
+				} else {
+					kmValue = "Ej beräknad";
+				}
+			}
+			if ( status == 5 ) {
+				filelink = "För mycket leder";
+			}
+			img = srv + data[i]["id"] + ".png";
+			
+			cl = "";
+			if ( status == 1 ) {
+				cl = "class='que'";
+			}
+			
+			html += "<td><a href='#' class='showPolygon' data-polygon='" + polygonString + "' title='Visa yta'><img src='" + img + "' / ></a></td>";
+			html += "<td "+cl+">" + filelink + "</td>";
+			html += "<td>" + gpxSize + "</td>";
+			html += "<td>" + kmValue + "</td>";
+			html += "<td>" + created + "</td>";
+			html += "</tr>";
+		}
+		html += "</tr></table>";
+		
+		$('.gpxarea').empty();
+		$(".gpxarea").append( html );		
+
+		if ( !working ) $(".que").last().html("Bearbetar");
+		
+		setTimeout(function() {	
+			if ( $(".about-download").is(":visible") ) {
+				updateGPXareaTbl();
+			}
+		}, 1000 * 20);  // 20 seconds
+		
+		$(".showPolygon").click( function() {
+			var polygonString = $(this).data("polygon");
+
+			latlngs =  polygonString
+			polygonLayer = L.polygon(latlngs, {color: 'red'}).addTo(map);
+			map.fitBounds(polygonLayer.getBounds());
+
+			polygonLayer.on('click', function (a) {
+				polygonLayer.remove(); 
+				showInfo("about-download","");
+			});	
+
+			$('.content-box').slideUp(10);
+			$('#grayout').hide(10);	
+			$('.info').hide();
+			if ($('#disqus_thread').length) $('#disqus_thread').remove();
+
+			return false;
+		});	
+
+		return;
+	})
+	.error(function(jqXHR, textStatus, errorThrown){ /* assign handler */
+		//alert(jqXHR.responseText);
+		//alert(textStatus);
+		// popup.setContent("Laddar &nbsp;&nbsp;<img src='images/ajax-loader.gif'  width='16' height='16'><br>" + jqXHR.responseText + " " + textStatus + " " + errorThrown)
+	});	
+}

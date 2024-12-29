@@ -29,6 +29,9 @@ var lastHash;
 var olat;
 var olng;
 var touchDev, userEmail, $userName;
+var selectedPolygon, jsonPolygon, polygonLayer, area;
+var maxArea = 300;
+
 
 // Unique user id, only used for statistics
 var uid = 'xxxxxxxxxxxxxxxx'.replace(/[x]/g, function(c) {
@@ -72,6 +75,8 @@ $(document).ready(function() {
 
 	moveAlertbox();
 	getUser();
+	
+	map.pm.setLang("sv");
 	
 	var moreInfoButton = L.Control.extend({
 		options: {
@@ -1782,6 +1787,11 @@ $(document).ready(function() {
 		return false;
 	});
 
+	$('.saveGPX').click(function(){
+		startSaveGPX();
+		return false;
+	});
+	
 	$("#grayout").click(function() {
 		var toclose = $("#grayout").attr("close");
 		$('.'+toclose).hide();
@@ -1978,6 +1988,8 @@ function showInfo(div,extra) {
 		newHash("#!info/" + div + extrahash);
 		// To do, update title!
 	}
+
+	updateGPXareaTbl();
 
 	document.title = title
 	$(".dynamic-text").empty();
