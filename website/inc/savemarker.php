@@ -29,16 +29,17 @@ if (!$email || !$name || !$description || !$type || !$lat || !$lng || !$title) {
 
 $hash = md5("SECRET_KEY".time());
 $ehash = md5("SECRET_KEY".$email);
+$point = "POINT($lng $lat)";
 
 /* Prepare statement */
-$sql='INSERT INTO marker (status,title,description, lat, lng, type, name, email,hash,ehash,expirationtime) VALUES (1,?,?,?,?,?,?,?,?,?,TIMESTAMPADD(DAY,30,NOW()))';
+$sql='INSERT INTO marker (status,title,description, lat, lng, type, name, email,hash,ehash,expirationtime,point) VALUES (1,?,?,?,?,?,?,?,?,?,TIMESTAMPADD(DAY,30,NOW()),ST_GeomFromText(?))';
 $stmt = $db->prepare($sql);
 if($stmt === false) {
   trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
 }
  
 /* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
-$stmt->bind_param('ssddissss',$title,$description,$lat,$lng,$type,$name,$email,$hash,$ehash);
+$stmt->bind_param('ssddisssss',$title,$description,$lat,$lng,$type,$name,$email,$hash,$ehash,$point);
  
 /* Execute statement */
 $stmt->execute();
@@ -85,7 +86,45 @@ $message = '
 ';
 
 sendMail($to, $subject, $message);
+saveMarkerAddress();
 
 $stmt->close();
+ 
+
+function saveMarkerAddress() {
+	global $db,$id,$lat,$lng;
+	
+	$url = "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$lng&format=json&addressdetails=1&zoom=10";
+	$options = array(
+	  'http'=>array(
+		'method'=>"GET",
+		'header'=>"Accept-language: SE\r\n" .
+				  "User-Agent: Skoterleder.org" 
+	  )
+	);
+
+	$context = stream_context_create($options);
+	$json = file_get_contents($url, false, $context);
+
+	$adress = json_decode($json, true);
+
+	$municipality = $adress["address"]["municipality"]; //Kommun
+	$county = $adress["address"]["county"];				//Län
+
+
+	$sql='UPDATE marker SET municipality=?, county=? WHERE id=?';
+	$stmt = $db->prepare($sql);
+	if($stmt === false) {
+	  echo "error";
+	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
+	}
+		
+	/* Bind parameters. TYpes: s = string, i = integer, d = double,  b = blob */
+	$stmt->bind_param('sss', $municipality, $county, $id);
+	$stmt->execute();
+	$affected_rows = $stmt->affected_rows;
+	$stmt->close();
+
+}
 
 ?>
