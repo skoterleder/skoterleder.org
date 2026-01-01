@@ -243,7 +243,7 @@ $(document).ready(function() {
 		maxNativeZoom: 14,
 		attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> bidragsgivare, Imagery &copy; <a href="http://skoterleder.org">Skoterleder.org</a>, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 	});
-	var topografisk = new L.tileLayer('https://api.lantmateriet.se/open/topowebb-ccby/v1/wmts/token/382a0381-7b89-352b-9e8c-26964c1cdf8e/?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=topowebb&STYLE=default&TILEMATRIXSET=3857&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}&FORMAT=image/png', {
+	var topografisk = new L.tileLayer('https://skoterleder.org/inc/lm-proxy.php?z={z}&y={y}&x={x}', {
 		maxZoom: 16,
 		maxNativeZoom: 15,
 		attribution: 'Karta från Lantmäteriet '

@@ -14,6 +14,8 @@ define('UPLOADPATH', "");
 define('CLIENTID', "");
 define('CLIENTSECRET', "");
 define('REFRESHTOKEN', "");
+define('LM_CLIENT_ID', "");
+define('CLIENT_SECRET', "");
 
 global $db;
 
