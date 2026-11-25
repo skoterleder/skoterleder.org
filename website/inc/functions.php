@@ -115,7 +115,7 @@ function newcommentmail($id,$text){
 
 	/* Prepare statement */
 	// comments > 0 AND
-	$sql='SELECT email, name FROM comment WHERE identifier=? AND status=1 GROUP BY email';
+	$sql='SELECT email, MIN(name) AS name FROM comment WHERE identifier=? AND status=1 GROUP BY email';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -214,7 +214,7 @@ function newCommentInfoMail($id,$text){
 
 	/* Send email to everyone who commented */
 	/* Prepare statement */
-	$sql='SELECT email, id, name, title, url FROM comment WHERE identifier=? AND status=1 GROUP BY email';
+	$sql='SELECT email, MIN(id) AS id, MIN(name) AS name, MIN(title) AS title, MIN(url) AS url FROM comment WHERE identifier=? AND status=1 GROUP BY email';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
