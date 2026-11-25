@@ -1,4 +1,6 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+
 include_once 'database_config.php';
 include_once 'functions.php';
 
@@ -37,6 +39,7 @@ if (!$ehash) {
 			'properties' => array(
 				'id' => $id,
 				'title' => $title,
+				'pmIgnore' => true,
 			)
 		);
 		array_push($jsonData["marker"], $array);
@@ -47,7 +50,8 @@ if (!$ehash) {
 }
 if ($ehash) {
 	/* Prepare statement */
-	$sql='SELECT id,title,hash,lat,lng,type,status,createtime,commenttime,updatetime,count,comments FROM marker WHERE status < 2 AND ehash=? ORDER BY id DESC';
+	// OBS: hash (redigeringsnyckel) får INTE skickas ut här - listan är bara för visning.
+	$sql='SELECT id,title,lat,lng,type,status,createtime,commenttime,updatetime,count,comments FROM marker WHERE status < 2 AND ehash=? ORDER BY id DESC';
 	$stmt = $db->prepare($sql);
 	if($stmt === false) {
 	  trigger_error('Wrong SQL: ' . $sql . ' Error: ' . $db->error, E_USER_ERROR);
@@ -57,7 +61,7 @@ if ($ehash) {
 	$stmt->bind_param('s',$ehash);
 
 	$stmt->execute();
-	$stmt->bind_result($id,$title,$hash,$lat, $lng, $type, $status,$createtime,$commenttime,$updatetime,$count,$comments);
+	$stmt->bind_result($id,$title,$lat, $lng, $type, $status,$createtime,$commenttime,$updatetime,$count,$comments);
 
 	$jsonData  = array("marker" => array());
 
@@ -74,7 +78,6 @@ if ($ehash) {
 				'status' => $status,
 				'comments' => $comments,
 				'count' => $count,
-				'hash' => $hash,
 			)
 		);
 		array_push($jsonData["marker"], $array);

@@ -52,7 +52,7 @@ if ($action == "") {
 		}
 	}
 
-	$commentHash = md5("SECRET_KEY".time());
+	$commentHash = newRandomHash();
 
 	/* Prepare statement */
 	$sql='INSERT INTO comment (identifier, sort, comment, url, title, email, name, hash) VALUES (?,?,?,?,?,?,?,?)';
@@ -70,10 +70,10 @@ if ($action == "") {
 
 	// Upload file and update database.
 	if (isset($_FILES["file"]) && $_FILES["file"]["error"] == 0) {
-		$hash = md5("SECRET_KEY".time());
+		$tmpName = newRandomHash();	// Eget namn så att $hash (markörens nyckel) inte skrivs över
 		$targetDir = UPLOADPATH;
 		$fileName = basename($_FILES["file"]["name"]);
-		$targetTmpFilePath = $targetDir . $hash;
+		$targetTmpFilePath = $targetDir . $tmpName;
 		$targetFilePath = $targetDir.$fileName;
 
 		// Move the uploaded file to the specified directory

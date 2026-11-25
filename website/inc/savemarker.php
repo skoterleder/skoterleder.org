@@ -27,8 +27,8 @@ if (!$email || !$name || !$description || !$type || !$lat || !$lng || !$title) {
 	exit;
 }
 
-$hash = md5("SECRET_KEY".time());
-$ehash = md5("SECRET_KEY".$email);
+$hash = newRandomHash();
+$ehash = getEhashForEmail($email);
 $point = "POINT($lng $lat)";
 
 /* Prepare statement */

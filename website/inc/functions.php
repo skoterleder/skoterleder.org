@@ -4,6 +4,28 @@ use PHPMailer\PHPMailer\OAuth;
 use League\OAuth2\Client\Provider\Google;
 require __DIR__ . '../../vendor/autoload.php';
 
+// Slumpad nyckel (32 hex-tecken) som inte går att gissa. Används för hash och ehash.
+function newRandomHash() {
+	return bin2hex(random_bytes(16));
+}
+
+// Hämtar befintlig ehash för en e-postadress, eller skapar en ny slumpad.
+// Alla markörer för samma e-post ska dela ehash (används av verifiera/ och #mymarkers/).
+function getEhashForEmail($email) {
+	global $db;
+	$ehash = null;
+	$stmt = $db->prepare('SELECT ehash FROM marker WHERE email=? AND ehash IS NOT NULL ORDER BY id DESC LIMIT 1');
+	if ($stmt) {
+		$stmt->bind_param('s', $email);
+		$stmt->execute();
+		$stmt->bind_result($ehash);
+		$stmt->fetch();
+		$stmt->close();
+	}
+	if (!$ehash) $ehash = newRandomHash();
+	return $ehash;
+}
+
 function convert_UTF8($str) {  	// Används när data sparas till databasen
 	$str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
 	return $str;

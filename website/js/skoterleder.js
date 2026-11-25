@@ -275,7 +275,7 @@ $(document).ready(function() {
 	var layersControl = new L.Control.Layers( {
 				'Skoterleder.org':skoterleder, 
 				'Topografisk':topografisk, 
-				'Bing Maps':bingLayer,
+				//'Bing Maps':bingLayer,
 				'Open Street Map':osm, 
 				'Google Road':ggl, 'Google Satelit':ggh, 'Google Terräng':ggt},
 				{'Visa skoterleder':overl, 'Visa information':info }
@@ -1149,7 +1149,7 @@ $(document).ready(function() {
 				return false;
 			});
 			div.on('click', '.editClick', function() {
-				changeMarker($(this).data('id'),$(this).data('hash'));
+				changeMarker($(this).data('id'));	// Ändring kräver inloggning som ägare
 				return false;
 			});
 			div.on('click', '.showClick', function() {
@@ -1173,8 +1173,7 @@ $(document).ready(function() {
 					" data-lng='" + point.coordinates[1] + "' " +
 					">Zoom</a>" +
 					" <a href='#' class='editClick textlink' title='Ändra på markören' " +
-					" data-id='" + point.properties.id + "' " + 
-					" data-hash='" + point.properties.hash + "' " + 
+					" data-id='" + point.properties.id + "' " +
 					">Ändra</a>" +
 					" <a href='#' class='showClick textlink' title='Visa markören' " +
 					" data-id='" + point.properties.id + "' " + 
@@ -1188,7 +1187,7 @@ $(document).ready(function() {
 			
 			
 			$("<p>").addClass("narrow").html("<a href='#mymarkers/" + ehash + "'>Länk</a> till denna lista. " + 
-			"OBS var rädd om länken eftersom dom som har den kan ändra på alla dina markörer!").appendTo(div);
+			"Den som har länken kan se listan, men för att ändra måste du vara inloggad.").appendTo(div);
 	
 			$("<p>").addClass("linkButtonLong closeMarkerBox").html("<a href='#' class='closeMarkerBox'>Stäng</a>").appendTo(div);
 			
