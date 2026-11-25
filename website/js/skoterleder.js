@@ -248,9 +248,9 @@ $(document).ready(function() {
 		maxNativeZoom: 15,
 		attribution: 'Karta från Lantmäteriet '
 	});	
-    var bingLayer = new L.tileLayer.bing({
-		bingMapsKey:"Ahv_frErjDVU-aphfIzfHIZI2AVteKBJ_w_z20cABFjxkqOpdGusSpCCwTrFRn-Q",
-		maxZoom: 18
+    var bingLayer = new L.tileLayer.azureMaps({
+		authOptions: {authType: 'subscriptionKey', clientId: b_clientId, subscriptionKey: b_subscriptionKey},
+		tilesetId: 'microsoft.imagery'
 	});
 	var osm = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 		maxZoom: 16,
